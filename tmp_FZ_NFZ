@@ -45,6 +45,15 @@ Integritet podataka
 1. Omogućiti ograničenja kao npr. jedan OIB se može pojaviti samo na jednom mjestu..
 
 
+-------------------------------
+zahtjevi za backend
+Funkcijski:
+  Omogućiti aplikaciji prikazivanje kao i mijenjanje podataka iz baze
+  Obrađivanje podataka u svrhu ostvarivanja funkcionalnosti aplikacije
+Nefunkcijski:
+  Backend funkcionalnosti ostvariti što jednostavnije i modularnije kako bi maksimizirali fleksibilnost razvoja
+  frontenda
+  
 
 -------------------------------
 Funkcijski zahtjevi za frontend
