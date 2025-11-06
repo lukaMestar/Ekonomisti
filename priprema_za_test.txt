@@ -1,0 +1,1 @@
+Za databazu se mora u application.yaml upisati podatke za datasource username i password.

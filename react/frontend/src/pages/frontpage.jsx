@@ -32,7 +32,7 @@ function FrontPage() {
     }
   };
 
-  if (!user) return <p>Učitavanje...</p>;
+  if (!user) return <a href="http://localhost:5173">Niste prijavljeni. Vrati se na početnu stranicu...</a>;
 
   return (
     <div className="page-background">
@@ -57,16 +57,7 @@ function FrontPage() {
             <p><strong>Ime:</strong> {user.name}</p>
             <p><strong>Email:</strong> {user.email}</p>
           </div>
-          {user.picture && (
-            <div className="info-card">
-              <img
-                src={user.picture}
-                alt="Profil"
-                width="100"
-                style={{ borderRadius: "50%" }}
-              />
-            </div>
-          )}
+          
         </div>
       </div>
     </div>

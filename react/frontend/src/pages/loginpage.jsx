@@ -47,14 +47,14 @@ function LoginPage() {
   return (
     <div className="page-container">
       <div className="form-container">
-        <h1 className="form-title">Registracija</h1>
+        <h1 className="form-title">Login</h1>
         
         <div className="auth-button-container">
           <button
             onClick={() => window.location.href = "http://localhost:9090/oauth2/authorization/google"}
             className="auth-button"
           >
-            Registriraj se s Auth2.0
+            Prijavi se s Auth2.0
           </button>
         </div>
 
