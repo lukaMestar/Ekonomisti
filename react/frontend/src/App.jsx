@@ -1,25 +1,33 @@
-import { Auth0Provider } from '@auth0/auth0-react';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LoginPage from './pages/loginpage.jsx';
 import FrontPage from './pages/frontpage.jsx';
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Admin from './USERI/ADMIN/admin.jsx';
+import Klijent from './USERI/KLIJENT/klijent.jsx';
+import Racunovoda from './USERI/RACUNOVODA/racunovoda.jsx';
+import Radnik from './USERI/RADNIK/radnik.jsx';
+import Odabir from './USERI/RADNIK/odabir.jsx';
+import NoviNalog from './USERI/RADNIK/novinalog.jsx';
+import Nalog from './USERI/RADNIK/nalog.jsx';
+import { UserProvider } from "./UserContext.jsx";
 
 function App() {
   return (
-    <Auth0Provider
-      domain="#" 
-      clientId=""
-      authorizationParams={{
-        redirect_uri: window.location.origin + "/pocetna"
-      }}
-      cacheLocation="localstorage"
-    >
+    <UserProvider>
       <Router>
         <Routes>
           <Route path="/" element={<LoginPage />} />
+          
           <Route path="/pocetna" element={<FrontPage />} />
+          <Route path="/test" element={<Admin />} />
+          <Route path="/klijent" element={<Klijent />} />
+          <Route path="/racunovoda" element={<Racunovoda />} />
+          <Route path="/radnik" element={<Radnik />} />
+          <Route path="/odabir" element={<Odabir />} />
+          <Route path="/nalog" element={<Nalog />} />
+          <Route path="/novinalog" element={<NoviNalog />} />
         </Routes>
       </Router>
-    </Auth0Provider>
+    </UserProvider>
   );
 }
 
