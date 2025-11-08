@@ -7,10 +7,11 @@ function KlijentInfo() {
 const navigate = useNavigate();
 const { klijenti } = useUser();
 const { klijentId } = useParams();
+const klijent = klijenti.find(k => k.id === idKlijenta);
 
 return (
     <div>
-        <h1>Klijent </h1>
+        <h1>Klijent klijent.ime</h1>
 
         <h3>Lista slobodnih klijenata</h3>
             <ul>

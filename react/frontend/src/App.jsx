@@ -13,6 +13,8 @@ import Odabir from './USERI/RADNIK/odabir.jsx';
 import NoviNalog from './USERI/RADNIK/novinalog.jsx';
 import Nalog from './USERI/RADNIK/nalog.jsx';
 import { UserProvider } from "./UserContext.jsx";
+import Racuni from './USERI/KLIJENT/racuni.jsx';
+import Podaci from "./USERI/KLIJENT/podaci.jsx";
 
 function App() {
   return (
@@ -33,6 +35,8 @@ function App() {
           <Route path="/odabir" element={<Odabir />} />
           <Route path="/nalog" element={<Nalog />} />
           <Route path="/novinalog" element={<NoviNalog />} />
+          <Route path="/racuni" element={<Racuni />} />
+          <Route path="/podaci" element={<Podaci />} />
         </Routes>
       </Router>
     </UserProvider>
