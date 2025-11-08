@@ -1,11 +1,15 @@
-import { useEffect } from "react";
-import { Link } from "react-router-dom";
 import { useUser } from "../../UserContext.jsx";
+import { useRadnik } from "../../USERI/RADNIK/RadnikContext.jsx";
 import Odabir from "./odabir.jsx";
+import { Link } from "react-router-dom";
 
 function Radnik() {
-  const { user, tvrtke, trenutnaTvrtka, setTrenutnaTvrtka } = useUser();
+  const { user } = useUser();
+  const radnikContext = useRadnik();
 
+  if (!radnikContext) return <p>Učitavanje tvrtki...</p>;
+
+  const { tvrtke, trenutnaTvrtka, setTrenutnaTvrtka } = radnikContext;
 
   const handleLogout = async () => {
     try {
@@ -22,7 +26,6 @@ function Radnik() {
 
   if (!user) return <p>Učitavanje korisnika...</p>;
   if (!tvrtke || tvrtke.length === 0) return <p>Učitavanje tvrtki...</p>;
-
 
   if (!trenutnaTvrtka) {
     return <Odabir opcije={tvrtke} onOdaberi={setTrenutnaTvrtka} />;

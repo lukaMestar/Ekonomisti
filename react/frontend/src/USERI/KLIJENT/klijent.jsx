@@ -1,9 +1,9 @@
-
 import { Link } from "react-router-dom";
 import { useUser } from "../../UserContext.jsx";
 
+
 function Klijent() {
-  const { user, tvrtke, trenutnaTvrtka, setTrenutnaTvrtka } = useUser();
+  const { user } = useUser();
 
 
   const handleLogout = async () => {
@@ -26,8 +26,14 @@ function Klijent() {
       <div className="content-container">
         <div className="header">
           <h1 className="page-title">Dobrodošli, {user.name}!</h1>
+          <Link to="/podaci" style={{ textDecoration: "none", color: "blue" }}>
+            Moji podaci
+          </Link>
           <Link to="/nalog" style={{ textDecoration: "none", color: "blue" }}>
             Putni nalog
+          </Link>
+          <Link to="/racuni" style={{ textDecoration: "none", color: "blue" }}>
+            Moji računi
           </Link>
           <button onClick={handleLogout} className="logout-button">
             Odjava
