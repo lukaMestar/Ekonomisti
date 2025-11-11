@@ -1,10 +1,15 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import "./Tablice.css";
 
 export default function ListaKorisnika() {
   return (
     <div className="tablica-box">
       <h2>Pregled korisnika</h2>
+      
+      <div className="back">
+        <Link to="/admin">Natrag</Link>
+      </div>
 
       <div className="tablica-toolbar">
         <button className="tablica-btn">Sortiraj po idKorisnik</button>

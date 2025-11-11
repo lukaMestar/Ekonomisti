@@ -97,3 +97,9 @@ CREATE TABLE RacunovodjaKlijent (
     mjesecniTrosakUsluge DECIMAL(10,2) CHECK (mjesecniTrosakUsluge >= 0),
     PRIMARY KEY (idRacunovodja, idKlijent)
 );
+
+INSERT INTO Uloge (imeUloge) VALUES
+('Admin'),
+('Računovođa'),
+('Klijent'),
+('Radnik');
