@@ -18,10 +18,10 @@ Cilj projekta je digitalizirati i pojednostaviti procese računovodstva, omoguć
 | Ime i prezime | GitHub profil | Glavni doprinos
 |----------------|----------------|-----------------|
 | Vedran Ivanković |[@VedranIvankovic](https://github.com/VedranIvankovic)  | Back-end development|
-| Šimun Čović | [covicsimun](https://github.com/covicsimun) | Front-end development|
+| Šimun Čović | [@covicsimun](https://github.com/covicsimun) | Front-end development|
 | Luka Salopek | [@LukaSalopek](https://github.com/LukaSalopek) | Front-end development |
-| Natali Mišić | [natalimsc](https://github.com/natalimsc) | Baza podataka |
-| Ivan Lovrinović| [Ivan-Lovrinovic](https://github.com/Ivan-Lovrinovic) | Back-end development |
+| Natali Mišić | [@natalimsc](https://github.com/natalimsc) | Baza podataka |
+| Ivan Lovrinović| [@Ivan-Lovrinovic](https://github.com/Ivan-Lovrinovic) | Back-end development |
 | Luka Meštrović |[@lukaMestar](https://github.com/lukaMestar)| Front-end development |
 
    
