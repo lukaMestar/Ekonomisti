@@ -1,8 +1,9 @@
-package com.eco.user_manager;
+package com.eco.oauth2_login;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,13 +12,15 @@ import org.springframework.web.bind.annotation.RestController;
 import com.eco.oauth2_login.databaza.Korisnik;
 
 @RestController
-@RequestMapping("/api/addaccountant")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+
+@RequestMapping("/api")
 public class AddAccountantController {
     
      @Autowired
     private AccountantService accountantService;
 
-    @PostMapping
+    @PostMapping("/addaccountant")
     public ResponseEntity<String> addKorisnik(@RequestBody Korisnik korisnik) {
         System.out.println("request recieved");
         try {
