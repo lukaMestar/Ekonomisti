@@ -8,6 +8,34 @@ export default function DodajKorisnika() {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("RACUNOVODA");
 
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    const korisnikData = {
+      email: email.trim(),
+      role,
+    };
+
+    try {
+      const response = await fetch("http://localhost:9090/api/addaccountant", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(korisnikData),
+      });
+
+      if (response.ok) {
+        alert("Korisnik added successfully");
+      } else {
+        alert("Error adding korisnik");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Error adding korisnik");
+    }
+  };
+
   return (
     <div className="dodaj-box">
       <h2>Dodaj korisnika</h2>
@@ -33,13 +61,13 @@ export default function DodajKorisnika() {
           </select>
         </label>
 
-        <button className="btn" type="button">
+        <button className="btn" type="button" onClick={handleSubmit}>
           Spremi
         </button>
       </div>
 
       <div className="back">
-        <Link to="/test">Natrag</Link>
+        <Link to="/admin">Natrag</Link>
       </div>
     </div>
   );

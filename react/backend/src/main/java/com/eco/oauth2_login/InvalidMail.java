@@ -68,6 +68,11 @@ public class InvalidMail extends OidcUserService {
             user1.setPrezimeKorisnik(prezime);
             userRepository.save(user1);
         }
+        
+        /*dodavanje uloge u oidcUser kako bi se mogao odrediti ispravan redirect nakon oautha
+        Integer uloga = user1.getIdUloge();
+        oidcUser.getAttributes().put("role", uloga);*/
+
         return oidcUser;
     }
 }

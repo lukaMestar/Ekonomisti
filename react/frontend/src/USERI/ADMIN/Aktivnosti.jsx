@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom"
 import "./Tablice.css";
 
 export default function Aktivnosti() {
@@ -7,6 +8,10 @@ export default function Aktivnosti() {
   return (
     <div className="tablica-box">
       <h2>Pregled aktivnosti</h2>
+
+      <div className="back">
+        <Link to="/admin">Natrag</Link>
+      </div>
 
       <div className="tablica-toolbar">
         <button className="tablica-btn">Sortiraj po datumu</button>
