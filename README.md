@@ -28,4 +28,10 @@ Cilj projekta je digitalizirati i pojednostaviti procese računovodstva, omoguć
 Voditelj našega tima je Luka Meštrović
 
 
+## 🧾 Licenca
+
+Ovaj projekt je objavljen pod [MIT licencom](./LICENSE).
+
+
+
 
