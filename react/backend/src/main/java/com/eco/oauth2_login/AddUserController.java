@@ -15,16 +15,16 @@ import com.eco.oauth2_login.databaza.Korisnik;
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 
 @RequestMapping("/api")
-public class AddAccountantController {
+public class AddUserController {
     
      @Autowired
-    private AccountantService accountantService;
+    private AddUserService addUserService;
 
-    @PostMapping("/addaccountant")
+    @PostMapping("/adduser")
     public ResponseEntity<String> addKorisnik(@RequestBody Korisnik korisnik) {
-        System.out.println("request recieved");
+
         try {
-            accountantService.addKorisnik(korisnik);
+            addUserService.addKorisnik(korisnik);
             return ResponseEntity.ok("Korisnik added successfully");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error adding korisnik");

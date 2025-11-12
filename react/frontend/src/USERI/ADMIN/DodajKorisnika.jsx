@@ -2,22 +2,37 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import "./dodajKorisnika.css";
 
-const ROLES = ["ADMIN", "RACUNOVODA", "KLIJENT", "RADNIK"];
+//const ROLES = ["ADMIN", "RACUNOVODA", "KLIJENT", "RADNIK"];
+
+const ROLE_MAP = {
+  ADMIN: 1,
+  RACUNOVODA: 2,
+  KLIJENT: 3,
+  RADNIK: 4
+};
 
 export default function DodajKorisnika() {
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState("RACUNOVODA");
+  const [idUloge, setRole] = useState(2); //default je "RACUNOVODA"
+
+
+  const handleRoleChange = (event) => {
+    const selectedRole = event.target.value;
+    // pretvori ulogu u idUloge
+    setRole(ROLE_MAP[selectedRole]);
+  };
+
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
     const korisnikData = {
       email: email.trim(),
-      role,
+      idUloge,
     };
 
     try {
-      const response = await fetch("http://localhost:9090/api/addaccountant", {
+      const response = await fetch("http://localhost:9090/api/adduser", {
         method: "POST",
         credentials: "include",
         headers: {
@@ -53,10 +68,10 @@ export default function DodajKorisnika() {
 
         <label className="uloge">
           <span>Uloga</span>
-          <select value={role} onChange={(e) => setRole(e.target.value)}>
-            {ROLES.map((r) => (
-              <option key={r} value={r}>
-                {r}
+          <select value={Object.keys(ROLE_MAP).find(key => ROLE_MAP[key] === idUloge)} onChange={handleRoleChange}>
+            {Object.keys(ROLE_MAP).map((roleName) => (
+              <option key={roleName} value={roleName}>
+                {roleName}
               </option>
             ))}
           </select>
