@@ -19,7 +19,7 @@ CREATE TABLE Korisnici (
     prezimeKorisnik VARCHAR(50) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     provider VARCHAR(255),
-    providerUserId VARCHAR(255) UNIQUE NOT NULL,
+    providerUserId VARCHAR(255) NOT NULL,
     datumRegistracije DATE NOT NULL DEFAULT CURRENT_DATE,
     idUloge INT REFERENCES Uloge(idUloge) ON DELETE SET NULL
 );

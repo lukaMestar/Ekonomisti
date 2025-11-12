@@ -24,7 +24,7 @@ public class Korisnik {
     @Column(name = "provider", length = 255)
     private String provider;
 
-    @Column(name = "provideruserid", nullable = false, unique = true, length = 255)
+    @Column(name = "provideruserid", nullable = false, length = 255)
     private String providerUserId;
 
     @Column(name = "datumregistracije", nullable = false)

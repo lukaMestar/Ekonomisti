@@ -1,0 +1,1 @@
+ALTER TABLE Korisnici MODIFY provideruserid VARCHAR(255) NOT NULL;
