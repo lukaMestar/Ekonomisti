@@ -9,11 +9,10 @@ services:
   # Backend Spring Boot Service
   - type: web
     name: ekonomisti-backend
-    env: java
+    dockerfilePath: react/backend/Dockerfile
+    dockerContext: react/backend
     region: frankfurt
     plan: free
-    buildCommand: cd react/backend && chmod +x ./mvnw && ./mvnw clean package -DskipTests
-    startCommand: cd react/backend && java -jar target/*.jar
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: production
