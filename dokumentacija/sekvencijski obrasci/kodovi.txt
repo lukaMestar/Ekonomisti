@@ -1,0 +1,73 @@
+@startuml
+actor Korisnik
+participant "Web klijent (React)" as Klijent
+participant "OAuth servis" as OAuth
+participant "API Gateway" as Gateway
+participant "Autentifikacijska mikrousluga" as Auth
+database "PostgreSQL" as DB
+
+Korisnik -> Klijent : Otvara login stranicu
+Klijent -> OAuth : Redirect na OAuth login
+OAuth -> Korisnik : Unos podataka za prijavu
+OAuth -> Klijent : Vraća auth token
+Klijent -> Gateway : Šalje token za autentifikaciju
+Gateway -> Auth : Provjerava token
+Auth -> OAuth : Validira token
+OAuth -> Auth : Token potvrđen
+Auth -> DB : Dohvaća / kreira korisnika prema OAuth ID-u
+DB --> Auth : Podaci o korisniku
+Auth -> Gateway : Generira JWT i vraća korisniku
+Gateway -> Klijent : Vraća JWT
+Klijent -> Korisnik : Prikazuje početnu stranicu sustava
+
+@enduml
+
+@startuml
+actor "Radnik" as R
+participant "Web klijent (React)" as UI
+participant "API Gateway" as GW
+participant "Faktura mikrousluga" as Fakture
+participant "Računovođa mikrousluga" as Racunovoda
+database "PostgreSQL (Fakture)" as DB_F
+database "PostgreSQL (Računovođe)" as DB_R
+
+R -> UI : Odabire unos nove fakture
+UI -> GW : HTTP POST /fakture (JWT)
+GW -> Fakture : Prosljeđuje zahtjev
+Fakture -> DB_F : Sprema fakturu u bazu
+Fakture -> Racunovoda : Obavještava računovođu (message)
+Racunovoda -> DB_R : Označava novu fakturu za obradu
+DB_R --> Racunovoda : Potvrda
+Racunovoda -> Fakture : Status = "Primljeno"
+Fakture -> UI : Potvrda o uspješnom unosu
+UI -> R : Prikazuje poruku "Faktura poslana računovođi"
+
+@enduml
+
+
+
+@startuml
+actor "Računovođa" as R
+participant "Web klijent" as UI
+participant "API Gateway" as GW
+participant "Izvještaji mikrousluga" as Report
+participant "Notifikacijska mikrousluga" as Notify
+database "PostgreSQL (Izvještaji)" as DB_Rep
+participant "SMTP Server" as Mail
+
+R -> UI : Odabire generiranje izvještaja
+UI -> GW : HTTP POST /izvjestaj/generiraj (JWT)
+GW -> Report : Prosljeđuje zahtjev
+Report -> DB_Rep : Dohvaća fakture i troškove
+DB_Rep --> Report : Podaci o fakturama
+Report -> Report : Izračun (prihodi, rashodi, PDV, dobit)
+Report -> DB_Rep : Sprema generirani izvještaj
+DB_Rep --> Report : Potvrda o pohrani
+Report -> Notify : Zahtjev za slanje izvještaja e-mailom
+Notify -> Mail : Šalje izvještaj klijentu
+Mail --> Notify : Potvrda slanja
+Notify -> Report : Status = "Poslano"
+Report -> UI : Potvrda o uspješnom generiranju
+UI -> R : Prikazuje poruku "Izvještaj poslan klijentu"
+
+@enduml
