@@ -9,6 +9,7 @@ services:
   # Backend Spring Boot Service
   - type: web
     name: ekonomisti-backend
+    env: docker
     dockerfilePath: react/backend/Dockerfile
     dockerContext: react/backend
     region: frankfurt
