@@ -8,9 +8,9 @@ import com.eco.oauth2_login.databaza.UserRepository;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -18,7 +18,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
+
 
 import org.springframework.security.core.Authentication;
 import jakarta.servlet.ServletException;
@@ -33,6 +33,9 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class SecurityConfigurate {
     private final InvalidMail im;
     private final UserRepository userRepository;
+
+    @Value("${FRONTEND_URL:http://localhost:5173}")
+    private String frontendUrl;
 
     @Autowired
     public SecurityConfigurate(InvalidMail im, UserRepository userRepository) {
@@ -58,7 +61,7 @@ public class SecurityConfigurate {
                 .failureHandler((request, response, exception) -> {
                     System.out.println("GREŠKA PRI LOGINU: " + exception.getMessage());
 
-                    response.sendRedirect("http://localhost:5173/?error=unauthorized");
+                    response.sendRedirect(frontendUrl + "/?error=unauthorized");
                 })
                 .successHandler(new CustomOAuth2AuthenticationSuccessHandler(userRepository))
             )
@@ -82,7 +85,7 @@ public class SecurityConfigurate {
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOrigin("http://localhost:5173");
+        config.addAllowedOrigin(frontendUrl);
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         config.setExposedHeaders(List.of("Set-Cookie"));
@@ -96,10 +99,15 @@ public class SecurityConfigurate {
 class CustomOAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final UserRepository userRepository;
+    private String frontendUrl;
 
     @Autowired
     public CustomOAuth2AuthenticationSuccessHandler(UserRepository userRepository) {
         this.userRepository = userRepository;
+        this.frontendUrl = System.getenv("FRONTEND_URL");
+        if (this.frontendUrl == null || this.frontendUrl.isEmpty()) {
+            this.frontendUrl = "http://localhost:5173";
+        }
     }
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -109,7 +117,7 @@ class CustomOAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSu
 
         Optional<Korisnik> userOptional = userRepository.findByEmail(email);
         if (userOptional.isEmpty()) {
-            response.sendRedirect("http://localhost:5173/?error=userNotFound");
+            response.sendRedirect(frontendUrl + "/?error=userNotFound");
             return;
         }
         Korisnik user = userOptional.get();
@@ -118,20 +126,20 @@ class CustomOAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSu
         System.out.println("Determiniram ulogu:");
         String redirectUrl;
         if (userRole == 1) {
-            redirectUrl = "http://localhost:5173/admin";
+            redirectUrl = frontendUrl + "/admin";
             System.out.println("admin");
         } else if (userRole == 2) {
             System.out.println("racunovoda");
-            redirectUrl = "http://localhost:5173/racunovoda";
+            redirectUrl = frontendUrl + "/racunovoda";
         } else if (userRole == 3) {
             System.out.println("klijent");
-            redirectUrl = "http://localhost:5173/klijent";
+            redirectUrl = frontendUrl + "/klijent";
         } else if (userRole == 4) {
             System.out.println("radnik");
-            redirectUrl = "http://localhost:5173/radnik";
+            redirectUrl = frontendUrl + "/radnik";
         } else {
             System.out.println("fail");
-            redirectUrl = "http://localhost:5173/pocetna";
+            redirectUrl = frontendUrl + "/pocetna";
         }
 
         response.sendRedirect(redirectUrl);

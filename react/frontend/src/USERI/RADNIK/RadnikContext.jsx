@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import {useUser } from "../../UserContext.jsx";
+import { API_URL } from "../../config.js";
 
 const RadnikContext = createContext();
 
@@ -17,7 +18,7 @@ export function RadnikProvider({ children }) {
 
 
     useEffect(() => {
-    fetch("http://localhost:9090/api/tvrtke", {
+    fetch(`${API_URL}/api/tvrtke`, {
       credentials: "include",
     })
       .then((res) => res.json())
@@ -34,7 +35,7 @@ export function RadnikProvider({ children }) {
 
 
     useEffect(() => {
-    fetch("http://localhost:9090/api/putniNalozi", {
+    fetch(`${API_URL}/api/putniNalozi`, {
       credentials: "include",
     })
       .then((res) => res.json())

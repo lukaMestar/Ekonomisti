@@ -1,0 +1,65 @@
+services:
+  # PostgreSQL Database
+  - type: pspg
+    name: ekonomisti-db
+    databaseName: ekonomisti
+    user: ekonomisti_user
+    plan: free
+
+  # Backend Spring Boot Service
+  - type: web
+    name: ekonomisti-backend
+    env: java
+    region: frankfurt
+    plan: free
+    buildCommand: cd react/backend && chmod +x ./mvnw && ./mvnw clean package -DskipTests
+    startCommand: cd react/backend && java -jar target/*.jar
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: production
+      - key: SPRING_DATASOURCE_URL
+        fromDatabase:
+          name: ekonomisti-db
+          property: connectionString
+      - key: SPRING_DATASOURCE_USERNAME
+        fromDatabase:
+          name: ekonomisti-db
+          property: user
+      - key: SPRING_DATASOURCE_PASSWORD
+        fromDatabase:
+          name: ekonomisti-db
+          property: password
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: SERVER_PORT
+        value: 9090
+      - key: FRONTEND_URL
+        fromService:
+          name: ekonomisti-frontend
+          type: web
+          property: host
+
+  # Frontend React Service
+  - type: web
+    name: ekonomisti-frontend
+    env: node
+    region: frankfurt
+    plan: free
+    buildCommand: cd react/frontend && npm install && npm run build
+    startCommand: cd react/frontend && npm run start
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: VITE_API_URL
+        fromService:
+          name: ekonomisti-backend
+          type: web
+          property: host
+      - key: VITE_FRONTEND_URL
+        fromService:
+          name: ekonomisti-frontend
+          type: web
+          property: host
+

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./Tablice.css";
+import { API_URL } from "../../config.js";
 
 export default function ListaKorisnika() {
   const [korisnici, setKorisnici] = useState([]); // State to store users
@@ -10,7 +11,7 @@ export default function ListaKorisnika() {
   // Fetch users from the backend on component mount
   useEffect(() => {
     // Perform the fetch request
-    fetch("http://localhost:9090/api/fetchusers", {credentials: "include"}) // Replace with your actual backend URL
+    fetch(`${API_URL}/api/fetchusers`, { credentials: "include" })
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
@@ -39,7 +40,7 @@ export default function ListaKorisnika() {
   return (
     <div className="tablica-box">
       <h2>Pregled korisnika</h2>
-      
+
       <div className="back">
         <Link to="/admin">Natrag</Link>
       </div>

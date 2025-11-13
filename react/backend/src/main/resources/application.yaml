@@ -4,8 +4,8 @@ spring:
       client:
         registration:
           google:
-            client-id: 188867089736-sa463uj75r7t2ijdd478obnid77nd4ds.apps.googleusercontent.com
-            client-secret: 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
+            client-id: ${GOOGLE_CLIENT_ID:188867089736-sa463uj75r7t2ijdd478obnid77nd4ds.apps.googleusercontent.com}
+            client-secret: ${GOOGLE_CLIENT_SECRET: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}
             client-name: Google
             scope:
               - openid
@@ -18,20 +18,20 @@ spring:
             token-uri: https://www.googleapis.com/oauth2/v4/token
             user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
   datasource:
-    url: jdbc:postgresql://localhost:5432/ekonomisti
-    username: postgres
-    password: bazepodataka
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/ekonomisti}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:bazepodataka}
     driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: ${SHOW_SQL:true}
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 server:
-  port: 9090
+  port: ${SERVER_PORT:9090}
 #logging:
 #  level:
 #    org:

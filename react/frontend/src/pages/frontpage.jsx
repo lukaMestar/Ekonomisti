@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
+import { API_URL, FRONTEND_URL } from "../config.js";
 
 function FrontPage() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:9090/api/user", {
+    fetch(`${API_URL}/api/user`, {
       method: "GET",
       credentials: "include", 
     })
@@ -18,7 +19,7 @@ function FrontPage() {
 
   const handleLogout = async () => {
     try {
-      await fetch("http://localhost:9090/logout", {
+      await fetch(`${API_URL}/logout`, {
         method: "POST",
         credentials: "include", 
         headers: {
@@ -26,13 +27,13 @@ function FrontPage() {
         },
       });
 
-      window.location.href = "http://localhost:5173";
+      window.location.href = FRONTEND_URL;
     } catch (error) {
       console.error("Logout failed:", error);
     }
   };
 
-  if (!user) return <a href="http://localhost:5173">Niste prijavljeni. Vrati se na početnu stranicu...</a>;
+  if (!user) return <a href={FRONTEND_URL}>Niste prijavljeni. Vrati se na početnu stranicu...</a>;
 
   return (
     <div className="page-background">

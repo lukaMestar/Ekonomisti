@@ -12,7 +12,7 @@ import com.eco.oauth2_login.databaza.Korisnik;
 import com.eco.oauth2_login.databaza.UserRepository;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+@CrossOrigin(origins = "${FRONTEND_URL:http://localhost:5173}", allowCredentials = "true")
 
 @RequestMapping("/api")
 public class FetchUsersController {

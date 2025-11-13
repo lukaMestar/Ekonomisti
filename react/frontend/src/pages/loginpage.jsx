@@ -1,6 +1,7 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../config.js";
 
 function LoginPage() {
   {/*const { loginWithRedirect, isAuthenticated, isLoading } = useAuth0();
@@ -51,7 +52,7 @@ function LoginPage() {
         
         <div className="auth-button-container">
           <button
-            onClick={() => window.location.href = "http://localhost:9090/oauth2/authorization/google"}
+            onClick={() => window.location.href = `${API_URL}/oauth2/authorization/google`}
             className="auth-button"
           >
             Prijavi se s Auth2.0

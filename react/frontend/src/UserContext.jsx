@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect } from "react";
 import { KlijentProvider } from "./USERI/KLIJENT/KlijentContext.jsx";
 import { RadnikProvider } from "./USERI/RADNIK/RadnikContext.jsx";
 import { RacunovodaProvider } from "./USERI/RACUNOVODA/RacunovodaContext.jsx";
+import { API_URL } from "./config.js";
 
 const UserContext = createContext();
 
@@ -10,7 +11,10 @@ export function UserProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:9090/api/user", { method: "GET", credentials: "include" })
+    fetch(`${API_URL}/api/user`, {
+      method: "GET",
+      credentials: "include",
+    })
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch user");
         return res.json();
@@ -53,7 +57,11 @@ export function UserProvider({ children }) {
     );
   }
 
-  return <UserContext.Provider value={{ user, setUser }}>{children}</UserContext.Provider>;
+  return (
+    <UserContext.Provider value={{ user, setUser }}>
+      {children}
+    </UserContext.Provider>
+  );
 }
 
 export function useUser() {
