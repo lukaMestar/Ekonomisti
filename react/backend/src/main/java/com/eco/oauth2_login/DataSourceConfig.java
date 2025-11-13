@@ -54,7 +54,8 @@ public class DataSourceConfig {
                 }
                 
                 // Build JDBC URL: jdbc:postgresql://host:port/database
-                jdbcUrl = String.format("jdbc:postgresql://%s:%d/%s", host, port, path);
+                // Add SSL parameters for Render PostgreSQL (prefer allows fallback to non-SSL for internal connections)
+                jdbcUrl = String.format("jdbc:postgresql://%s:%d/%s?sslmode=prefer", host, port, path);
                 System.out.println("=== DataSourceConfig: Built JDBC URL = " + jdbcUrl);
             } catch (Exception e) {
                 System.err.println("=== DataSourceConfig: Error parsing URI: " + e.getMessage());

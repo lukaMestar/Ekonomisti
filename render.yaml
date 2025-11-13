@@ -21,7 +21,7 @@ services:
       - key: SPRING_DATASOURCE_URL
         fromDatabase:
           name: ekonomisti-db
-          property: connectionString
+          property: internalConnectionString
       - key: SPRING_DATASOURCE_USERNAME
         fromDatabase:
           name: ekonomisti-db
