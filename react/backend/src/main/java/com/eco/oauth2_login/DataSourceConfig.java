@@ -30,8 +30,16 @@ public class DataSourceConfig {
         String dbUsername = username;
         String dbPassword = password;
         
-        System.out.println("=== DataSourceConfig: Original URL = " + jdbcUrl);
-        System.out.println("=== DataSourceConfig: Original username = " + dbUsername);
+        System.out.println("=== DataSourceConfig: Starting configuration ===");
+        System.out.println("=== DataSourceConfig: Original URL = " + (jdbcUrl != null ? jdbcUrl : "NULL"));
+        System.out.println("=== DataSourceConfig: Original username = " + (dbUsername != null ? dbUsername : "NULL"));
+        System.out.println("=== DataSourceConfig: Password provided = " + (dbPassword != null && !dbPassword.isEmpty()));
+        
+        // If URL is null or empty, use default
+        if (jdbcUrl == null || jdbcUrl.isEmpty()) {
+            System.err.println("=== DataSourceConfig: ERROR - URL is null or empty!");
+            jdbcUrl = "jdbc:postgresql://localhost:5432/ekonomisti";
+        }
         
         // If URL is in postgresql:// format (from Render), parse it
         if (jdbcUrl.startsWith("postgresql://")) {
