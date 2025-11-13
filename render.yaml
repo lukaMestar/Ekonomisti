@@ -1,19 +1,19 @@
-services:
+databases:
   # PostgreSQL Database
-  - type: pg
-    name: ekonomisti-db
+  - name: ekonomisti-db
     databaseName: ekonomisti
     user: ekonomisti_user
     plan: free
 
+services:
   # Backend Spring Boot Service
   - type: web
     name: ekonomisti-backend
-    env: java
+    env: docker
+    dockerfilePath: ./react/backend/Dockerfile
+    dockerContext: ./react/backend
     region: frankfurt
     plan: free
-    buildCommand: cd react/backend && chmod +x ./mvnw && ./mvnw clean package -DskipTests
-    startCommand: cd react/backend && java -jar target/*.jar
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: production
@@ -62,4 +62,3 @@ services:
           name: ekonomisti-frontend
           type: web
           property: host
-
