@@ -1,9 +1,7 @@
 services:
   # PostgreSQL Database
-  - type: pg
+  - type: postgresql
     name: ekonomisti-db
-    databaseName: ekonomisti
-    user: ekonomisti_user
     plan: free
 
   # Backend Spring Boot Service
