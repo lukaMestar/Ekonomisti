@@ -10,8 +10,8 @@ services:
   - type: web
     name: ekonomisti-backend
     env: docker
-    dockerfilePath: ./react/backend/Dockerfile
-    dockerContext: ./react/backend
+    dockerfilePath: react/backend/Dockerfile
+    dockerContext: react/backend
     region: frankfurt
     plan: free
     envVars:
