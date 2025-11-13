@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Primary;
 
 import javax.sql.DataSource;
 import java.net.URI;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 @Configuration
 public class DataSourceConfig {
@@ -41,9 +43,10 @@ public class DataSourceConfig {
                 
                 if (userInfo != null && userInfo.contains(":")) {
                     String[] credentials = userInfo.split(":", 2);
-                    dbUsername = credentials[0];
-                    dbPassword = credentials[1];
+                    dbUsername = URLDecoder.decode(credentials[0], StandardCharsets.UTF_8);
+                    dbPassword = URLDecoder.decode(credentials[1], StandardCharsets.UTF_8);
                     System.out.println("=== DataSourceConfig: Extracted username = " + dbUsername);
+                    System.out.println("=== DataSourceConfig: Password length = " + dbPassword.length());
                 }
                 
                 String host = uri.getHost();
@@ -54,7 +57,8 @@ public class DataSourceConfig {
                 }
                 
                 // Build JDBC URL: jdbc:postgresql://host:port/database
-                // Add SSL parameters for Render PostgreSQL (prefer allows fallback to non-SSL for internal connections)
+                // Use sslmode=prefer to try SSL first, but fallback to non-SSL if needed
+                // This works for both internal and external connections
                 jdbcUrl = String.format("jdbc:postgresql://%s:%d/%s?sslmode=prefer", host, port, path);
                 System.out.println("=== DataSourceConfig: Built JDBC URL = " + jdbcUrl);
             } catch (Exception e) {
