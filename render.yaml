@@ -1,6 +1,6 @@
 services:
   # PostgreSQL Database
-  - type: pspg
+  - type: pg
     name: ekonomisti-db
     databaseName: ekonomisti
     user: ekonomisti_user
