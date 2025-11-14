@@ -25,8 +25,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
 @Configuration
 @EnableWebSecurity
 
@@ -70,10 +68,27 @@ public class SecurityConfigurate {
         http
             .csrf(csrf -> csrf.disable())
             .httpBasic(httpBasic -> httpBasic.disable())
-            .cors(withDefaults())
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/oauth2/**", "/login/oauth2/**", "/logout").permitAll()
+                .requestMatchers("OPTIONS", "/**").permitAll() // Allow OPTIONS requests for CORS preflight
                 .anyRequest().authenticated()
+            )
+            .exceptionHandling(exceptions -> exceptions
+                .authenticationEntryPoint((request, response, authException) -> {
+                    // Add CORS headers even for unauthorized requests
+                    String origin = request.getHeader("Origin");
+                    String allowedOrigin = getFrontendUrl();
+                    
+                    if (origin != null && (origin.equals(allowedOrigin) || origin.equals("https://ekonomisti-frontend.onrender.com"))) {
+                        response.setHeader("Access-Control-Allow-Origin", origin);
+                        response.setHeader("Access-Control-Allow-Credentials", "true");
+                        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+                        response.setHeader("Access-Control-Allow-Headers", "*");
+                    }
+                    
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                })
             )
             .oauth2Login(oauth2 -> oauth2
                 .userInfoEndpoint(userInfo -> {
@@ -106,11 +121,14 @@ public class SecurityConfigurate {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         String allowedOrigin = getFrontendUrl();
+        // Add both the processed URL and explicit Render URL
         config.addAllowedOrigin(allowedOrigin);
-        System.out.println("++++++++++++++++++++CORS allowed origin = " + allowedOrigin);
+        config.addAllowedOrigin("https://ekonomisti-frontend.onrender.com");
+        config.addAllowedOrigin("http://localhost:5173");
+        System.out.println("++++++++++++++++++++CORS allowed origins = " + allowedOrigin + ", https://ekonomisti-frontend.onrender.com");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
-        config.setExposedHeaders(List.of("Set-Cookie"));
+        config.setExposedHeaders(List.of("Set-Cookie", "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
