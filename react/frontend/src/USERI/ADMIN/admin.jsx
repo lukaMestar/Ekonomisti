@@ -1,10 +1,47 @@
 import { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "../../UserContext.jsx";
 import { API_URL, FRONTEND_URL } from "../../config.js";
 
 function Admin() {
   const { user, tvrtke, trenutnaTvrtka, setTrenutnaTvrtka } = useUser();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // If user is not loaded, try to fetch it
+    if (!user) {
+      fetch(`${API_URL}/api/user`, {
+        method: "GET",
+        credentials: "include",
+      })
+        .then((res) => {
+          if (!res.ok) {
+            // Not authenticated, redirect to login
+            navigate("/", { replace: true });
+            return;
+          }
+          return res.json();
+        })
+        .then((data) => {
+          if (data && data.role !== "ADMIN") {
+            // Wrong role, redirect to appropriate page
+            if (data.role === "RACUNOVODA") {
+              navigate("/racunovoda", { replace: true });
+            } else if (data.role === "KLIJENT") {
+              navigate("/klijent", { replace: true });
+            } else if (data.role === "RADNIK") {
+              navigate("/radnik", { replace: true });
+            } else {
+              navigate("/pocetna", { replace: true });
+            }
+          }
+        })
+        .catch(() => {
+          // Not authenticated, redirect to login
+          navigate("/", { replace: true });
+        });
+    }
+  }, [user, navigate]);
 
   const handleLogout = async () => {
     try {

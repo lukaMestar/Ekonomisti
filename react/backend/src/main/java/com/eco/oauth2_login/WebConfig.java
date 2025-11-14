@@ -10,27 +10,13 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Value("${FRONTEND_URL:http://localhost:5173}")
     private String frontendUrl;
-    
-    private String getFrontendUrl() {
-        if (frontendUrl == null || frontendUrl.isEmpty()) {
-            return "http://localhost:5173";
-        }
-        String url = frontendUrl;
-        // Ensure it has protocol
-        if (!url.startsWith("http://") && !url.startsWith("https://")) {
-            url = "https://" + url;
-        }
-        return url;
-    }
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        String allowedOrigin = getFrontendUrl();
         registry.addMapping("/api/**")
-        .allowedOrigins(allowedOrigin, "https://ekonomisti-frontend.onrender.com")
-        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+        .allowedOrigins(frontendUrl)
+        .allowedMethods("GET", "POST", "PUT", "DELETE")
         .allowedHeaders("*")
-        .allowCredentials(true)
-        .maxAge(3600);
+        .allowCredentials(true);
     }
 }
