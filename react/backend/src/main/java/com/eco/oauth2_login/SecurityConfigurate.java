@@ -51,10 +51,14 @@ public class SecurityConfigurate {
             .httpBasic(httpBasic -> httpBasic.disable())
             .cors(withDefaults())
             .authorizeHttpRequests(auth -> auth
-               
                 .requestMatchers("/oauth2/**", "/login/oauth2/**", "/logout").permitAll()
-   
                 .anyRequest().authenticated()
+            )
+            .exceptionHandling(exceptions -> exceptions
+                .authenticationEntryPoint((request, response, authException) -> {
+                    // Redirect unauthenticated requests to frontend instead of causing redirect loop
+                    response.sendRedirect(frontendUrl + "/");
+                })
             )
             .oauth2Login(oauth2 -> oauth2
                 .userInfoEndpoint(userInfo -> {
