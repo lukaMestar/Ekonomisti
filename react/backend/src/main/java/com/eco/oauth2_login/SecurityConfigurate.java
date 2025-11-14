@@ -54,13 +54,13 @@ public class SecurityConfigurate {
                 .anyRequest().authenticated()
             )
             .oauth2Login(oauth2 -> oauth2
-                
-                /* .userInfoEndpoint(userInfo -> {
-                System.out.println("KONFIGURIRAM userInfoEndpoint");
-                userInfo.userService(new TestOAuth2UserService());})*/
+                .userInfoEndpoint(userInfo -> {
+                    System.out.println("KONFIGURIRAM userInfoEndpoint");
+                    userInfo.oidcUserService(im);
+                })
                 .failureHandler((request, response, exception) -> {
                     System.out.println("GREŠKA PRI LOGINU: " + exception.getMessage());
-
+                    exception.printStackTrace();
                     response.sendRedirect(frontendUrl + "/?error=unauthorized");
                 })
                 .successHandler(new CustomOAuth2AuthenticationSuccessHandler(userRepository))
