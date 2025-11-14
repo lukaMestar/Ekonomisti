@@ -14,7 +14,7 @@ import com.eco.oauth2_login.databaza.Korisnik;
 import com.eco.oauth2_login.databaza.UserRepository;
 
 @RestController
-@CrossOrigin(origins = "${FRONTEND_URL:http://localhost:5173}", allowCredentials = "true")
+@CrossOrigin(origins = {"${FRONTEND_URL:http://localhost:5173}", "https://ekonomisti-frontend.onrender.com", "http://localhost:5173"}, allowCredentials = "true")
 public class UserController {
 
     private final UserRepository userRepository;
