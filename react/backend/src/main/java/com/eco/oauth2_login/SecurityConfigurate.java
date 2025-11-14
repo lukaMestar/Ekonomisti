@@ -36,6 +36,14 @@ public class SecurityConfigurate {
 
     @Value("${FRONTEND_URL:http://localhost:5173}")
     private String frontendUrl;
+    
+    private String getFrontendUrl() {
+        // Ensure FRONTEND_URL has protocol
+        if (frontendUrl != null && !frontendUrl.startsWith("http://") && !frontendUrl.startsWith("https://")) {
+            return "https://" + frontendUrl;
+        }
+        return frontendUrl != null ? frontendUrl : "http://localhost:5173";
+    }
 
     @Autowired
     public SecurityConfigurate(InvalidMail im, UserRepository userRepository) {
@@ -56,8 +64,14 @@ public class SecurityConfigurate {
             )
             .exceptionHandling(exceptions -> exceptions
                 .authenticationEntryPoint((request, response, authException) -> {
-                    // Redirect unauthenticated requests to frontend instead of causing redirect loop
-                    response.sendRedirect(frontendUrl + "/");
+                    String requestPath = request.getRequestURI();
+                    // Don't redirect OAuth callback URLs - let them be handled by OAuth2Login
+                    if (requestPath.startsWith("/login/oauth2/code/") || requestPath.startsWith("/oauth2/")) {
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        return;
+                    }
+                    // Redirect other unauthenticated requests to frontend
+                    response.sendRedirect(getFrontendUrl() + "/");
                 })
             )
             .oauth2Login(oauth2 -> oauth2
@@ -68,7 +82,7 @@ public class SecurityConfigurate {
                 .failureHandler((request, response, exception) -> {
                     System.out.println("GREŠKA PRI LOGINU: " + exception.getMessage());
                     exception.printStackTrace();
-                    response.sendRedirect(frontendUrl + "/?error=unauthorized");
+                    response.sendRedirect(getFrontendUrl() + "/?error=unauthorized");
                 })
                 .successHandler(new CustomOAuth2AuthenticationSuccessHandler(userRepository))
             )
@@ -92,7 +106,7 @@ public class SecurityConfigurate {
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOrigin(frontendUrl);
+        config.addAllowedOrigin(getFrontendUrl());
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         config.setExposedHeaders(List.of("Set-Cookie"));
@@ -114,6 +128,10 @@ class CustomOAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSu
         this.frontendUrl = System.getenv("FRONTEND_URL");
         if (this.frontendUrl == null || this.frontendUrl.isEmpty()) {
             this.frontendUrl = "http://localhost:5173";
+        }
+        // Ensure FRONTEND_URL has protocol
+        if (!this.frontendUrl.startsWith("http://") && !this.frontendUrl.startsWith("https://")) {
+            this.frontendUrl = "https://" + this.frontendUrl;
         }
     }
     @Override
