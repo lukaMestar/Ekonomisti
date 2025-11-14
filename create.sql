@@ -103,3 +103,8 @@ INSERT INTO Uloge (imeUloge) VALUES
 ('Računovođa'),
 ('Klijent'),
 ('Radnik');
+
+-- Insert admin user
+
+INSERT INTO Korisnici (imeKorisnik, prezimeKorisnik, email, provider, providerUserId, idUloge) VALUES
+('Admin', 'User', 'luka.mestarm@gmail.com', 'manual', 'luka.mestarm@gmail.com', 1);
