@@ -51,6 +51,9 @@ public class SecurityConfigurate {
             .httpBasic(httpBasic -> httpBasic.disable())
             .cors(withDefaults())
             .authorizeHttpRequests(auth -> auth
+               
+                .requestMatchers("/oauth2/**", "/login/oauth2/**", "/logout").permitAll()
+   
                 .anyRequest().authenticated()
             )
             .oauth2Login(oauth2 -> oauth2

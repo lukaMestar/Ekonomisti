@@ -41,20 +41,19 @@ public class DataSourceConfig {
             jdbcUrl = "jdbc:postgresql://localhost:5432/ekonomisti";
         }
         
-        // If URL is in postgresql:// format (from Render), parse it
+    
         if (jdbcUrl.startsWith("postgresql://")) {
             try {
-                // Parse postgresql://user:pass@host:port/dbname
-                // Use the raw string to preserve the full hostname including domain
+              
                 String urlWithoutScheme = jdbcUrl.substring("postgresql://".length());
                 
-                // Extract user:pass@host:port/dbname
+             
                 int atIndex = urlWithoutScheme.indexOf('@');
                 if (atIndex > 0) {
                     String credentialsPart = urlWithoutScheme.substring(0, atIndex);
                     String hostPortDbPart = urlWithoutScheme.substring(atIndex + 1);
                     
-                    // Extract credentials
+                   
                     if (credentialsPart.contains(":")) {
                         String[] creds = credentialsPart.split(":", 2);
                         dbUsername = URLDecoder.decode(creds[0], StandardCharsets.UTF_8);
@@ -63,12 +62,12 @@ public class DataSourceConfig {
                         System.out.println("=== DataSourceConfig: Password length = " + dbPassword.length());
                     }
                     
-                    // Extract host:port/database
+                   
                     int slashIndex = hostPortDbPart.indexOf('/');
                     String hostPort = slashIndex > 0 ? hostPortDbPart.substring(0, slashIndex) : hostPortDbPart;
                     String database = slashIndex > 0 ? hostPortDbPart.substring(slashIndex + 1) : "";
                     
-                    // Split host and port
+                   
                     String host;
                     int port = 5432;
                     if (hostPort.contains(":")) {
@@ -87,8 +86,7 @@ public class DataSourceConfig {
                     System.out.println("=== DataSourceConfig: Extracted port = " + port);
                     System.out.println("=== DataSourceConfig: Extracted database = " + database);
                     
-                    // Build JDBC URL: jdbc:postgresql://host:port/database
-                    // Use sslmode=prefer to try SSL first, but fallback to non-SSL if needed
+                   
                     jdbcUrl = String.format("jdbc:postgresql://%s:%d/%s?sslmode=prefer", host, port, database);
                     System.out.println("=== DataSourceConfig: Built JDBC URL = " + jdbcUrl);
                 } else {
@@ -106,11 +104,11 @@ public class DataSourceConfig {
             } catch (Exception e) {
                 System.err.println("=== DataSourceConfig: Error parsing postgresql:// URL: " + e.getMessage());
                 e.printStackTrace();
-                // Fallback: just add jdbc: prefix
+                
                 jdbcUrl = "jdbc:" + jdbcUrl;
             }
         } else if (!jdbcUrl.startsWith("jdbc:")) {
-            // If it doesn't start with jdbc:, add it
+
             jdbcUrl = "jdbc:" + jdbcUrl;
         }
         
