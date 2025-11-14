@@ -27,16 +27,16 @@ public class UserController {
     @GetMapping("/api/user")
     public Map<String, Object> user(@AuthenticationPrincipal OAuth2User principal) {
         String email = principal.getAttribute("email");
-        String role = "USER"; // default role
+        String role = "USER"; 
         
-        // Get role from database
+    
         if (email != null) {
             Optional<Korisnik> userOptional = userRepository.findByEmail(email);
             if (userOptional.isPresent()) {
                 Korisnik user = userOptional.get();
                 Integer idUloge = user.getIdUloge();
                 if (idUloge != null) {
-                    // Map role ID to role name
+           
                     switch (idUloge) {
                         case 1 -> role = "ADMIN";
                         case 2 -> role = "RACUNOVODA";
