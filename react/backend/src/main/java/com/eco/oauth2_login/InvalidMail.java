@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class InvalidMail extends OidcUserService {
@@ -32,18 +32,23 @@ public class InvalidMail extends OidcUserService {
             String email = oidcUser.getEmail();
 
             if (email == null) {
-                System.err.println("InvalidMail: Email is null!");
                 throw new OAuth2AuthenticationException(
                         new OAuth2Error("invalid_email", "Email nije dostupan", null),
                         "Email atribut nije pronađen u Google user info objektu"
                 );
             }
 
-            // provjera u bazi
-            Optional<Korisnik> user = userRepository.findByEmail(email);
+            Optional<Korisnik> user;
+            try {
+                user = userRepository.findByEmail(email);
+            } catch (Exception dbException) {
+                throw new OAuth2AuthenticationException(
+                        new OAuth2Error("server_error", "Greška pristupa bazi podataka", null),
+                        "Database error: " + dbException.getMessage()
+                );
+            }
 
             if (user.isEmpty()) {
-                System.err.println("InvalidMail: User not found in database for email: " + email);
                 throw new OAuth2AuthenticationException(
                         new OAuth2Error("invalid_token", "Email nije dozvoljen", null),
                         "Pristup odbijen: korisnik nije u bazi podataka"
@@ -60,7 +65,6 @@ public class InvalidMail extends OidcUserService {
             if (prezime == null) {
                 prezime = "-";  
             }
-            
 
             String currentIme = user1.getImeKorisnik();
             String currentPrezime = user1.getPrezimeKorisnik();
@@ -72,22 +76,14 @@ public class InvalidMail extends OidcUserService {
                 try {
                     userRepository.save(user1);
                 } catch (Exception e) {
-                    System.err.println("GREŠKA PRI SPREMANJU KORISNIKA: " + e.getMessage());
                     e.printStackTrace();
-                    
                 }
             }
-            
-            /*dodavanje uloge u oidcUser kako bi se mogao odrediti ispravan redirect nakon oautha
-            Integer uloga = user1.getIdUloge();
-            oidcUser.getAttributes().put("role", uloga);*/
 
             return oidcUser;
         } catch (OAuth2AuthenticationException e) {
-            System.err.println("InvalidMail: OAuth2AuthenticationException: " + e.getMessage());
             throw e;
         } catch (Exception e) {
-            System.err.println("InvalidMail: Unexpected exception: " + e.getMessage());
             e.printStackTrace();
             throw new OAuth2AuthenticationException(
                     new OAuth2Error("server_error", "Greška na serveru", null),

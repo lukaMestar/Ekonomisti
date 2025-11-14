@@ -1,10 +1,12 @@
 package com.eco.oauth2_login;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
 import javax.sql.DataSource;
 import java.net.URI;
@@ -30,14 +32,7 @@ public class DataSourceConfig {
         String dbUsername = username;
         String dbPassword = password;
         
-        System.out.println("=== DataSourceConfig: Starting configuration ===");
-        System.out.println("=== DataSourceConfig: Original URL = " + (jdbcUrl != null ? jdbcUrl : "NULL"));
-        System.out.println("=== DataSourceConfig: Original username = " + (dbUsername != null ? dbUsername : "NULL"));
-        System.out.println("=== DataSourceConfig: Password provided = " + (dbPassword != null && !dbPassword.isEmpty()));
-        
-        // If URL is null or empty, use default
         if (jdbcUrl == null || jdbcUrl.isEmpty()) {
-            System.err.println("=== DataSourceConfig: ERROR - URL is null or empty!");
             jdbcUrl = "jdbc:postgresql://localhost:5432/ekonomisti";
         }
         
@@ -58,8 +53,6 @@ public class DataSourceConfig {
                         String[] creds = credentialsPart.split(":", 2);
                         dbUsername = URLDecoder.decode(creds[0], StandardCharsets.UTF_8);
                         dbPassword = URLDecoder.decode(creds[1], StandardCharsets.UTF_8);
-                        System.out.println("=== DataSourceConfig: Extracted username = " + dbUsername);
-                        System.out.println("=== DataSourceConfig: Password length = " + dbPassword.length());
                     }
                     
                    
@@ -82,15 +75,8 @@ public class DataSourceConfig {
                         host = hostPort;
                     }
                     
-                    System.out.println("=== DataSourceConfig: Extracted host = " + host);
-                    System.out.println("=== DataSourceConfig: Extracted port = " + port);
-                    System.out.println("=== DataSourceConfig: Extracted database = " + database);
-                    
-                   
                     jdbcUrl = String.format("jdbc:postgresql://%s:%d/%s?sslmode=prefer", host, port, database);
-                    System.out.println("=== DataSourceConfig: Built JDBC URL = " + jdbcUrl);
                 } else {
-                    // No credentials in URL, use URI parsing
                     URI uri = new URI(jdbcUrl);
                     String host = uri.getHost();
                     int port = uri.getPort() == -1 ? 5432 : uri.getPort();
@@ -99,28 +85,26 @@ public class DataSourceConfig {
                         path = path.substring(1);
                     }
                     jdbcUrl = String.format("jdbc:postgresql://%s:%d/%s?sslmode=prefer", host, port, path);
-                    System.out.println("=== DataSourceConfig: Built JDBC URL (no credentials) = " + jdbcUrl);
                 }
             } catch (Exception e) {
-                System.err.println("=== DataSourceConfig: Error parsing postgresql:// URL: " + e.getMessage());
-                e.printStackTrace();
-                
                 jdbcUrl = "jdbc:" + jdbcUrl;
             }
         } else if (!jdbcUrl.startsWith("jdbc:")) {
-
             jdbcUrl = "jdbc:" + jdbcUrl;
         }
         
-        System.out.println("=== DataSourceConfig: Final JDBC URL = " + jdbcUrl);
-        System.out.println("=== DataSourceConfig: Final username = " + dbUsername);
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(jdbcUrl);
+        config.setUsername(dbUsername);
+        config.setPassword(dbPassword);
+        config.setDriverClassName("org.postgresql.Driver");
+        config.setAutoCommit(false); // Disable autoCommit for transaction management
+        config.setConnectionTimeout(60000);
+        config.setMaximumPoolSize(5);
+        config.setMinimumIdle(1);
+        config.setConnectionTestQuery("SELECT 1");
         
-        return DataSourceBuilder.create()
-                .url(jdbcUrl)
-                .username(dbUsername)
-                .password(dbPassword)
-                .driverClassName("org.postgresql.Driver")
-                .build();
+        return new HikariDataSource(config);
     }
 }
 

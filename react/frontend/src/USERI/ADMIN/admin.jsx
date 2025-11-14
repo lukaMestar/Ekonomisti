@@ -2,21 +2,19 @@ import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "../../UserContext.jsx";
 import { API_URL, FRONTEND_URL } from "../../config.js";
+import { apiCall } from "../../api.js";
 
 function Admin() {
   const { user, tvrtke, trenutnaTvrtka, setTrenutnaTvrtka } = useUser();
   const navigate = useNavigate();
 
   useEffect(() => {
-    // If user is not loaded, try to fetch it
     if (!user) {
-      fetch(`${API_URL}/api/user`, {
+      apiCall(`${API_URL}/api/user`, {
         method: "GET",
-        credentials: "include",
       })
         .then((res) => {
           if (!res.ok) {
-            // Not authenticated, redirect to login
             navigate("/", { replace: true });
             return;
           }
@@ -24,7 +22,6 @@ function Admin() {
         })
         .then((data) => {
           if (data && data.role !== "ADMIN") {
-            // Wrong role, redirect to appropriate page
             if (data.role === "RACUNOVODA") {
               navigate("/racunovoda", { replace: true });
             } else if (data.role === "KLIJENT") {
@@ -37,7 +34,6 @@ function Admin() {
           }
         })
         .catch(() => {
-          // Not authenticated, redirect to login
           navigate("/", { replace: true });
         });
     }

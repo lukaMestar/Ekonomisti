@@ -23,7 +23,6 @@ function FrontPage() {
       .catch((err) => {
         console.error(err);
         setLoading(false);
-        // Redirect to login if not authenticated
         navigate("/");
       });
   }, [navigate]);
@@ -45,7 +44,7 @@ function FrontPage() {
   };
 
   if (loading) return <p>Učitavanje...</p>;
-  if (!user) return null; // Will redirect via useEffect
+  if (!user) return null;
 
   return (
     <div className="page-background">

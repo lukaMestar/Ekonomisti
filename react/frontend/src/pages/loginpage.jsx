@@ -1,16 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { API_URL } from "../config.js";
+import { apiCall } from "../api.js";
 
 function LoginPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is already logged in
-    fetch(`${API_URL}/api/user`, {
+    apiCall(`${API_URL}/api/user`, {
       method: "GET",
-      credentials: "include",
     })
       .then((res) => {
         if (res.ok) {
@@ -19,7 +18,6 @@ function LoginPage() {
         throw new Error("Not authenticated");
       })
       .then((data) => {
-        // User is logged in, redirect based on role
         if (data.role === "ADMIN") {
           navigate("/admin", { replace: true });
         } else if (data.role === "RACUNOVODA") {
@@ -33,7 +31,6 @@ function LoginPage() {
         }
       })
       .catch(() => {
-        // User is not logged in, show login page
         setLoading(false);
       });
   }, [navigate]);

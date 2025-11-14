@@ -27,6 +27,7 @@ spring:
       maximum-pool-size: 5
       minimum-idle: 1
       connection-test-query: SELECT 1
+      auto-commit: false
 
   jpa:
     hibernate:
@@ -42,8 +43,22 @@ spring:
 server:
   port: ${PORT:${SERVER_PORT:9090}}
   address: 0.0.0.0
-#logging:
-#  level:
-#    org:
-#      springframework:
-#        security: DEBUG
+  servlet:
+    session:
+      cookie:
+        name: JSESSIONID
+        http-only: true
+        secure: true
+        same-site: none
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
+        web: DEBUG
+        oauth2: DEBUG
+    com:
+      eco:
+        oauth2_login: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
