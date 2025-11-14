@@ -105,6 +105,6 @@ INSERT INTO Uloge (imeUloge) VALUES
 ('Radnik');
 
 -- Insert admin user
-
 INSERT INTO Korisnici (imeKorisnik, prezimeKorisnik, email, provider, providerUserId, idUloge) VALUES
-('Admin', 'User', 'luka.mestarm@gmail.com', 'manual', 'luka.mestarm@gmail.com', 1);
+('Luka', 'Mestrovic', 'luka.mestarm@gmail.com', 'google', 'luka.mestarm@gmail.com', 1)
+ON CONFLICT (email) DO UPDATE SET idUloge = 1;

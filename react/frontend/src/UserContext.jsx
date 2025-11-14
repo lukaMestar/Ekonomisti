@@ -32,7 +32,16 @@ export function UserProvider({ children }) {
   }, []);
 
   if (loading) return <p>Loading user...</p>;
-  if (!user) return <p>No user logged in</p>;
+
+  // Always provide context, even if user is null
+  // This allows pages to render and handle authentication themselves
+  if (!user) {
+    return (
+      <UserContext.Provider value={{ user, setUser }}>
+        {children}
+      </UserContext.Provider>
+    );
+  }
 
   if (user.role === "KLIJENT") {
     return (

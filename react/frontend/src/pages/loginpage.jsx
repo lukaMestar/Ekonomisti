@@ -1,12 +1,32 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { API_URL } from "../config.js";
 
 function LoginPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Check if we have role parameter from OAuth redirect
+    const role = searchParams.get("role");
+    if (role) {
+      // Redirect based on role from OAuth
+      if (role === "ADMIN") {
+        navigate("/admin", { replace: true });
+        return;
+      } else if (role === "RACUNOVODA") {
+        navigate("/racunovoda", { replace: true });
+        return;
+      } else if (role === "KLIJENT") {
+        navigate("/klijent", { replace: true });
+        return;
+      } else if (role === "RADNIK") {
+        navigate("/radnik", { replace: true });
+        return;
+      }
+    }
+
     // Check if user is already logged in
     fetch(`${API_URL}/api/user`, {
       method: "GET",
@@ -21,22 +41,22 @@ function LoginPage() {
       .then((data) => {
         // User is logged in, redirect based on role
         if (data.role === "ADMIN") {
-          navigate("/admin");
+          navigate("/admin", { replace: true });
         } else if (data.role === "RACUNOVODA") {
-          navigate("/racunovoda");
+          navigate("/racunovoda", { replace: true });
         } else if (data.role === "KLIJENT") {
-          navigate("/klijent");
+          navigate("/klijent", { replace: true });
         } else if (data.role === "RADNIK") {
-          navigate("/radnik");
+          navigate("/radnik", { replace: true });
         } else {
-          navigate("/pocetna");
+          navigate("/pocetna", { replace: true });
         }
       })
       .catch(() => {
         // User is not logged in, show login page
         setLoading(false);
       });
-  }, [navigate]);
+  }, [navigate, searchParams]);
 
   if (loading) {
     return (

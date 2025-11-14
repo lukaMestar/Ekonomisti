@@ -122,23 +122,18 @@ class CustomOAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSu
         Korisnik user = userOptional.get();
         Integer userRole = user.getIdUloge();
 
-        System.out.println("Determiniram ulogu:");
-        String redirectUrl;
+        // Redirect to frontend with role parameter
+        String redirectUrl = frontendUrl + "/?role=";
         if (userRole == 1) {
-            redirectUrl = frontendUrl + "/admin";
-            System.out.println("admin");
+            redirectUrl += "ADMIN";
         } else if (userRole == 2) {
-            System.out.println("racunovoda");
-            redirectUrl = frontendUrl + "/racunovoda";
+            redirectUrl += "RACUNOVODA";
         } else if (userRole == 3) {
-            System.out.println("klijent");
-            redirectUrl = frontendUrl + "/klijent";
+            redirectUrl += "KLIJENT";
         } else if (userRole == 4) {
-            System.out.println("radnik");
-            redirectUrl = frontendUrl + "/radnik";
+            redirectUrl += "RADNIK";
         } else {
-            System.out.println("fail");
-            redirectUrl = frontendUrl + "/pocetna";
+            redirectUrl += "USER";
         }
 
         response.sendRedirect(redirectUrl);
