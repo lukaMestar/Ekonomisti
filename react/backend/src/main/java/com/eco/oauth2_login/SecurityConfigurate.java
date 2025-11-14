@@ -36,26 +36,6 @@ public class SecurityConfigurate {
 
     @Value("${FRONTEND_URL:http://localhost:5173}")
     private String frontendUrl;
-    
-    private String getFrontendUrl() {
-        if (frontendUrl == null || frontendUrl.isEmpty()) {
-            return "http://localhost:5173";
-        }
-        
-        String url = frontendUrl;
-        
-        // If it's just a hostname without domain (e.g., "ekonomisti-frontend"), add .onrender.com
-        if (!url.contains(".") && !url.contains("localhost") && !url.contains("://")) {
-            url = url + ".onrender.com";
-        }
-        
-        // Ensure FRONTEND_URL has protocol
-        if (!url.startsWith("http://") && !url.startsWith("https://")) {
-            url = "https://" + url;
-        }
-        
-        return url;
-    }
 
     @Autowired
     public SecurityConfigurate(InvalidMail im, UserRepository userRepository) {
@@ -74,31 +54,13 @@ public class SecurityConfigurate {
                 .requestMatchers("/oauth2/**", "/login/oauth2/**", "/logout").permitAll()
                 .anyRequest().authenticated()
             )
-            .exceptionHandling(exceptions -> exceptions
-                .authenticationEntryPoint((request, response, authException) -> {
-                    String requestPath = request.getRequestURI();
-                    // Don't redirect OAuth callback URLs - let them be handled by OAuth2Login
-                    if (requestPath.startsWith("/login/oauth2/code/") || requestPath.startsWith("/oauth2/")) {
-                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                        return;
-                    }
-                    // Redirect other unauthenticated requests to frontend
-                    response.sendRedirect(getFrontendUrl() + "/");
-                })
-            )
-            .sessionManagement(session -> session
-                .sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.IF_REQUIRED)
-                .maximumSessions(1)
-            )
             .oauth2Login(oauth2 -> oauth2
                 .userInfoEndpoint(userInfo -> {
-                    System.out.println("KONFIGURIRAM userInfoEndpoint");
                     userInfo.oidcUserService(im);
                 })
                 .failureHandler((request, response, exception) -> {
                     System.out.println("GREŠKA PRI LOGINU: " + exception.getMessage());
-                    exception.printStackTrace();
-                    response.sendRedirect(getFrontendUrl() + "/?error=unauthorized");
+                    response.sendRedirect(frontendUrl + "/?error=unauthorized");
                 })
                 .successHandler(new CustomOAuth2AuthenticationSuccessHandler(userRepository))
             )
@@ -122,11 +84,10 @@ public class SecurityConfigurate {
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOrigin(getFrontendUrl());
+        config.addAllowedOrigin(frontendUrl);
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
-        config.setExposedHeaders(List.of("Set-Cookie", "JSESSIONID"));
-        config.setMaxAge(3600L);
+        config.setExposedHeaders(List.of("Set-Cookie"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
@@ -145,14 +106,6 @@ class CustomOAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSu
         this.frontendUrl = System.getenv("FRONTEND_URL");
         if (this.frontendUrl == null || this.frontendUrl.isEmpty()) {
             this.frontendUrl = "http://localhost:5173";
-        }
-        // If it's just a hostname without domain, add .onrender.com
-        if (!this.frontendUrl.contains(".") && !this.frontendUrl.contains("localhost") && !this.frontendUrl.contains("://")) {
-            this.frontendUrl = this.frontendUrl + ".onrender.com";
-        }
-        // Ensure FRONTEND_URL has protocol
-        if (!this.frontendUrl.startsWith("http://") && !this.frontendUrl.startsWith("https://")) {
-            this.frontendUrl = "https://" + this.frontendUrl;
         }
     }
     @Override

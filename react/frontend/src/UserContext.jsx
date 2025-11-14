@@ -32,16 +32,7 @@ export function UserProvider({ children }) {
   }, []);
 
   if (loading) return <p>Loading user...</p>;
-
-  // Always provide the context, even if user is null
-  // This allows routes to handle authentication themselves
-  if (!user) {
-    return (
-      <UserContext.Provider value={{ user, setUser }}>
-        {children}
-      </UserContext.Provider>
-    );
-  }
+  if (!user) return <p>No user logged in</p>;
 
   if (user.role === "KLIJENT") {
     return (
@@ -67,7 +58,6 @@ export function UserProvider({ children }) {
     );
   }
 
-  // Default case - user exists but no specific role provider
   return (
     <UserContext.Provider value={{ user, setUser }}>
       {children}
