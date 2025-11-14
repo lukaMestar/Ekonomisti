@@ -7,6 +7,7 @@ import com.eco.oauth2_login.databaza.Korisnik;
 import com.eco.oauth2_login.databaza.UserRepository;
 
 import jakarta.transaction.Transactional;
+import java.time.LocalDate;
 
 
 @Service
@@ -21,12 +22,14 @@ public class AddUserService {
 
     @Transactional
     public void addKorisnik(Korisnik korisnik){
-        System.out.println("Adding korisnik: " + korisnik.getEmail() + " with role " + korisnik.getIdUloge() + "datuma " + korisnik.getDatumRegistracije());
-
         korisnik.setImeKorisnik("Placeholder");
         korisnik.setPrezimeKorisnik("Placeholder");
         korisnik.setProvider("Placeholder");
         korisnik.setProviderUserId("Placeholder");
+        
+        if (korisnik.getDatumRegistracije() == null) {
+            korisnik.setDatumRegistracije(LocalDate.now());
+        }
         
         userRepository.save(korisnik);
 

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import "./dodajKorisnika.css";
 import { API_URL } from "../../config.js";
+import { apiCall } from "../../api.js";
 
 //const ROLES = ["ADMIN", "RACUNOVODA", "KLIJENT", "RADNIK"];
 
@@ -31,9 +32,8 @@ export default function DodajKorisnika() {
     };
 
     try {
-      const response = await fetch(`${API_URL}/api/adduser`, {
+      const response = await apiCall(`${API_URL}/api/adduser`, {
         method: "POST",
-        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -42,12 +42,13 @@ export default function DodajKorisnika() {
 
       if (response.ok) {
         alert("Korisnik added successfully");
+        setEmail("");
       } else {
-        alert("Error adding korisnik");
+        const errorText = await response.text();
+        alert("Error adding korisnik: " + errorText);
       }
     } catch (error) {
-      console.error("Error:", error);
-      alert("Error adding korisnik");
+      alert("Error adding korisnik: " + error.message);
     }
   };
 
