@@ -1,10 +1,50 @@
-import { useAuth0 } from "@auth0/auth0-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { API_URL } from "../config.js";
+import { apiCall } from "../api.js";
 
 function LoginPage() {
-  {/*const { loginWithRedirect, isAuthenticated, isLoading } = useAuth0();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    apiCall(`${API_URL}/api/user`, {
+      method: "GET",
+    })
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        }
+        throw new Error("Not authenticated");
+      })
+      .then((data) => {
+        if (data.role === "ADMIN") {
+          navigate("/admin", { replace: true });
+        } else if (data.role === "RACUNOVODA") {
+          navigate("/racunovoda", { replace: true });
+        } else if (data.role === "KLIJENT") {
+          navigate("/klijent", { replace: true });
+        } else if (data.role === "RADNIK") {
+          navigate("/radnik", { replace: true });
+        } else {
+          navigate("/pocetna", { replace: true });
+        }
+      })
+      .catch(() => {
+        setLoading(false);
+      });
+  }, [navigate]);
+
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="loading-text">Učitavanje...</div>
+      </div>
+    );
+  }
+
+  {
+    /*const { loginWithRedirect, isAuthenticated, isLoading } = useAuth0();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -44,22 +84,23 @@ function LoginPage() {
       </div>
     );
   }
-  */}
+  */
+  }
   return (
     <div className="page-container">
       <div className="form-container">
         <h1 className="form-title">Login</h1>
-        
+
         <div className="auth-button-container">
           <button
-            onClick={() => window.location.href = `${API_URL}/oauth2/authorization/google`}
+            onClick={() =>
+              (window.location.href = `${API_URL}/oauth2/authorization/google`)
+            }
             className="auth-button"
           >
             Prijavi se s Auth2.0
           </button>
         </div>
-
-        
       </div>
     </div>
   );

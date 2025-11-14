@@ -1,4 +1,10 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useSearchParams,
+} from "react-router-dom";
+import { useEffect } from "react";
 import LoginPage from "./pages/loginpage.jsx";
 import FrontPage from "./pages/frontpage.jsx";
 import Admin from "./USERI/ADMIN/admin.jsx";
@@ -19,11 +25,35 @@ import Podaci from "./USERI/KLIJENT/podaci.jsx";
 import DodajKorisnika from "./USERI/ADMIN/DodajKorisnika.jsx";
 import Aktivnosti from "./USERI/ADMIN/Aktivnosti.jsx";
 import ListaKorisnika from "./USERI/ADMIN/ListaKorisnika.jsx";
+import { setSessionToken } from "./api.js";
+import { useUser } from "./UserContext.jsx";
+
+function TokenHandler() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { fetchUser } = useUser();
+
+  useEffect(() => {
+    const token = searchParams.get("token");
+    if (token) {
+      console.log("Token found in URL, storing in localStorage");
+      setSessionToken(token);
+      searchParams.delete("token");
+      setSearchParams(searchParams, { replace: true });
+
+      setTimeout(() => {
+        fetchUser().catch(() => {});
+      }, 100);
+    }
+  }, [searchParams, setSearchParams, fetchUser]);
+
+  return null;
+}
 
 function App() {
   return (
     <UserProvider>
       <Router>
+        <TokenHandler />
         <Routes>
           <Route path="/" element={<LoginPage />} />
 

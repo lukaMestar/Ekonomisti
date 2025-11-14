@@ -1,27 +1,37 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { API_URL, FRONTEND_URL } from "../config.js";
 
 function FrontPage() {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch(`${API_URL}/api/user`, {
       method: "GET",
-      credentials: "include", 
+      credentials: "include",
     })
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch user");
         return res.json();
       })
-      .then((data) => setUser(data))
-      .catch((err) => console.error(err));
-  }, []);
+      .then((data) => {
+        setUser(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
+        navigate("/");
+      });
+  }, [navigate]);
 
   const handleLogout = async () => {
     try {
       await fetch(`${API_URL}/logout`, {
         method: "POST",
-        credentials: "include", 
+        credentials: "include",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
@@ -33,7 +43,8 @@ function FrontPage() {
     }
   };
 
-  if (!user) return <a href={FRONTEND_URL}>Niste prijavljeni. Vrati se na početnu stranicu...</a>;
+  if (loading) return <p>Učitavanje...</p>;
+  if (!user) return null;
 
   return (
     <div className="page-background">
@@ -55,10 +66,13 @@ function FrontPage() {
         <div className="info-grid">
           <div className="info-card">
             <h3 className="info-title">Korisnički podaci:</h3>
-            <p><strong>Ime:</strong> {user.name}</p>
-            <p><strong>Email:</strong> {user.email}</p>
+            <p>
+              <strong>Ime:</strong> {user.name}
+            </p>
+            <p>
+              <strong>Email:</strong> {user.email}
+            </p>
           </div>
-          
         </div>
       </div>
     </div>
