@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,23 +27,22 @@ public class UserController {
     }
 
     @GetMapping("/api/user")
-    public Map<String, Object> user(@AuthenticationPrincipal OAuth2User principal) {
+    public Map<String, Object> user() {
         System.out.println("=== /api/user endpoint called ===");
         
-        if (principal == null) {
-            System.out.println("ERROR: Principal is null!");
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        
+        if (authentication == null || !authentication.isAuthenticated()) {
+            System.out.println("ERROR: Not authenticated!");
             throw new org.springframework.security.authentication.AuthenticationCredentialsNotFoundException("Not authenticated");
         }
         
-        String email = principal.getAttribute("email");
-        System.out.println("Email from principal: " + email);
+        String email = authentication.getName();
+        System.out.println("Email from authentication: " + email);
         
         Optional<Korisnik> userOptional = userRepository.findByEmail(email);
         
         Map<String, Object> userMap = new HashMap<>();
-        userMap.put("name", principal.getAttribute("name"));
-        userMap.put("email", email);
-        userMap.put("picture", principal.getAttribute("picture"));
         
         if (userOptional.isPresent()) {
             Korisnik user = userOptional.get();
@@ -69,11 +68,15 @@ public class UserController {
                         break;
                 }
             }
+            
+            userMap.put("name", user.getImeKorisnik() + " " + user.getPrezimeKorisnik());
+            userMap.put("email", email);
             userMap.put("role", role);
             userMap.put("idUloge", idUloge);
             System.out.println("Returning user with role: " + role);
         } else {
             System.out.println("User not found in database");
+            userMap.put("email", email);
             userMap.put("role", "USER");
         }
         

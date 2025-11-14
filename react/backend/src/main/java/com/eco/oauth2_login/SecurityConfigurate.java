@@ -33,6 +33,8 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class SecurityConfigurate {
     private final InvalidMail im;
     private final UserRepository userRepository;
+    private final JwtUtil jwtUtil;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Value("${FRONTEND_URL:http://localhost:5173}")
     private String frontendUrl;
@@ -58,9 +60,11 @@ public class SecurityConfigurate {
     }
 
     @Autowired
-    public SecurityConfigurate(InvalidMail im, UserRepository userRepository) {
+    public SecurityConfigurate(InvalidMail im, UserRepository userRepository, JwtUtil jwtUtil, JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.im = im;
         this.userRepository = userRepository;
+        this.jwtUtil = jwtUtil;
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         System.out.println("++++++++++++++++++++SecurityConfigurate bean kreiran!");
     }
     @Bean
@@ -104,11 +108,12 @@ public class SecurityConfigurate {
                     exception.printStackTrace();
                     response.sendRedirect(getFrontendUrl() + "/?error=unauthorized");
                 })
-                .successHandler(new CustomOAuth2AuthenticationSuccessHandler(userRepository))
+                .successHandler(new CustomOAuth2AuthenticationSuccessHandler(userRepository, jwtUtil))
             )
             .sessionManagement(session -> session
-                .sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.IF_REQUIRED)
+                .sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.STATELESS)
             )
+            .addFilterBefore(jwtAuthenticationFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
             .logout(logout -> logout
                 .logoutUrl("/logout")
                 .logoutSuccessHandler((request, response, authentication) -> {
@@ -147,11 +152,13 @@ public class SecurityConfigurate {
 class CustomOAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final UserRepository userRepository;
+    private final JwtUtil jwtUtil;
     private String frontendUrl;
 
     @Autowired
-    public CustomOAuth2AuthenticationSuccessHandler(UserRepository userRepository) {
+    public CustomOAuth2AuthenticationSuccessHandler(UserRepository userRepository, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
+        this.jwtUtil = jwtUtil;
         this.frontendUrl = System.getenv("FRONTEND_URL");
         if (this.frontendUrl == null || this.frontendUrl.isEmpty()) {
             this.frontendUrl = "http://localhost:5173";
@@ -204,11 +211,24 @@ class CustomOAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSu
             redirectUrl = frontendUrl + "/pocetna";
         }
 
-        // Ensure session is saved before redirect
-        request.getSession().setAttribute("SPRING_SECURITY_CONTEXT", 
-            org.springframework.security.core.context.SecurityContextHolder.getContext());
+        // Generate JWT token
+        String role = "USER";
+        if (userRole == 1) {
+            role = "ADMIN";
+        } else if (userRole == 2) {
+            role = "RACUNOVODA";
+        } else if (userRole == 3) {
+            role = "KLIJENT";
+        } else if (userRole == 4) {
+            role = "RADNIK";
+        }
         
-        System.out.println("Final redirect URL: " + redirectUrl);
-        response.sendRedirect(redirectUrl);
+        String jwtToken = jwtUtil.generateToken(email, role, userRole);
+        System.out.println("Generated JWT token for user: " + email);
+        
+        // Redirect with JWT token as URL parameter
+        String finalRedirectUrl = redirectUrl + "?token=" + jwtToken;
+        System.out.println("Final redirect URL: " + finalRedirectUrl);
+        response.sendRedirect(finalRedirectUrl);
     }
 }

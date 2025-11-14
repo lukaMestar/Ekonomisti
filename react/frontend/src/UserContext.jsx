@@ -11,15 +11,26 @@ export function UserProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const token = localStorage.getItem("jwt_token");
+    if (!token) {
+      console.log("UserContext: No JWT token found");
+      setUser(null);
+      setLoading(false);
+      return;
+    }
+
     console.log("UserContext: Fetching user from", `${API_URL}/api/user`);
     fetch(`${API_URL}/api/user`, {
       method: "GET",
-      credentials: "include",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     })
       .then((res) => {
         console.log("UserContext: Response status", res.status, res.statusText);
         if (!res.ok) {
-          // User is not authenticated
+          // Token invalid, remove it
+          localStorage.removeItem("jwt_token");
           console.log("UserContext: User not authenticated");
           setUser(null);
           setLoading(false);
@@ -37,6 +48,7 @@ export function UserProvider({ children }) {
       .catch((error) => {
         // User is not authenticated
         console.error("UserContext: Error fetching user", error);
+        localStorage.removeItem("jwt_token");
         setUser(null);
         setLoading(false);
       });
