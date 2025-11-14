@@ -24,12 +24,9 @@ public class AddUserService {
     public void addKorisnik(Korisnik korisnik){
         korisnik.setImeKorisnik("Placeholder");
         korisnik.setPrezimeKorisnik("Placeholder");
-        korisnik.setProvider("Placeholder");
-        korisnik.setProviderUserId("Placeholder");
-        
-        if (korisnik.getDatumRegistracije() == null) {
-            korisnik.setDatumRegistracije(LocalDate.now());
-        }
+        korisnik.setProvider("google");
+        korisnik.setProviderUserId(korisnik.getEmail() != null ? korisnik.getEmail() : "placeholder");
+        korisnik.setDatumRegistracije(LocalDate.now());
         
         userRepository.save(korisnik);
     }

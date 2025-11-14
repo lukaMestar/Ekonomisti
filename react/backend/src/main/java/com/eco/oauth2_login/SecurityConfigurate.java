@@ -221,10 +221,8 @@ class SessionTokenFilter implements Filter {
             SecurityContext securityContext = SessionTokenStore.getSecurityContext(token);
             if (securityContext != null) {
                 SecurityContextHolder.setContext(securityContext);
-                jakarta.servlet.http.HttpSession session = httpRequest.getSession(false);
-                if (session != null) {
-                    session.setAttribute("SPRING_SECURITY_CONTEXT", securityContext);
-                }
+                jakarta.servlet.http.HttpSession session = httpRequest.getSession(true);
+                session.setAttribute("SPRING_SECURITY_CONTEXT", securityContext);
             }
         }
         

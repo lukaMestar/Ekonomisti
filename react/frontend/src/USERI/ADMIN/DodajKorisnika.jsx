@@ -40,14 +40,16 @@ export default function DodajKorisnika() {
         body: JSON.stringify(korisnikData),
       });
 
+      const responseText = await response.text();
+
       if (response.ok) {
         alert("Korisnik added successfully");
         setEmail("");
       } else {
-        alert("Error adding korisnik");
+        alert("Error adding korisnik: " + responseText);
       }
     } catch (error) {
-      alert("Error adding korisnik");
+      alert("Error adding korisnik: " + error.message);
     }
   };
 
