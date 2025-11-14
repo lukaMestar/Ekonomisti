@@ -42,6 +42,12 @@ spring:
 server:
   port: ${PORT:${SERVER_PORT:9090}}
   address: 0.0.0.0
+  servlet:
+    session:
+      cookie:
+        same-site: none
+        secure: true
+        http-only: true
 #logging:
 #  level:
 #    org:

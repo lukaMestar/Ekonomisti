@@ -11,13 +11,16 @@ export function UserProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log("UserContext: Fetching user from", `${API_URL}/api/user`);
     fetch(`${API_URL}/api/user`, {
       method: "GET",
       credentials: "include",
     })
       .then((res) => {
+        console.log("UserContext: Response status", res.status, res.statusText);
         if (!res.ok) {
           // User is not authenticated
+          console.log("UserContext: User not authenticated");
           setUser(null);
           setLoading(false);
           return;
@@ -25,13 +28,15 @@ export function UserProvider({ children }) {
         return res.json();
       })
       .then((data) => {
+        console.log("UserContext: User data received", data);
         if (data) {
           setUser(data);
         }
         setLoading(false);
       })
-      .catch(() => {
+      .catch((error) => {
         // User is not authenticated
+        console.error("UserContext: Error fetching user", error);
         setUser(null);
         setLoading(false);
       });

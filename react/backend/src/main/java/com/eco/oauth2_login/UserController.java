@@ -28,7 +28,16 @@ public class UserController {
 
     @GetMapping("/api/user")
     public Map<String, Object> user(@AuthenticationPrincipal OAuth2User principal) {
+        System.out.println("=== /api/user endpoint called ===");
+        
+        if (principal == null) {
+            System.out.println("ERROR: Principal is null!");
+            throw new org.springframework.security.authentication.AuthenticationCredentialsNotFoundException("Not authenticated");
+        }
+        
         String email = principal.getAttribute("email");
+        System.out.println("Email from principal: " + email);
+        
         Optional<Korisnik> userOptional = userRepository.findByEmail(email);
         
         Map<String, Object> userMap = new HashMap<>();
@@ -39,6 +48,8 @@ public class UserController {
         if (userOptional.isPresent()) {
             Korisnik user = userOptional.get();
             Integer idUloge = user.getIdUloge();
+            
+            System.out.println("User found in database, role ID: " + idUloge);
             
             // Map role ID to role name
             String role = "USER";
@@ -60,7 +71,9 @@ public class UserController {
             }
             userMap.put("role", role);
             userMap.put("idUloge", idUloge);
+            System.out.println("Returning user with role: " + role);
         } else {
+            System.out.println("User not found in database");
             userMap.put("role", "USER");
         }
         

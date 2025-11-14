@@ -82,7 +82,15 @@ public class SecurityConfigurate {
                         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                         return;
                     }
-                    // Redirect other unauthenticated requests to frontend
+                    // For API requests, return 401 instead of redirecting
+                    if (requestPath.startsWith("/api/")) {
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        response.setContentType("application/json");
+                        response.setCharacterEncoding("UTF-8");
+                        response.getWriter().write("{\"error\":\"Unauthorized\"}");
+                        return;
+                    }
+                    // Redirect other unauthenticated requests to frontend (for browser navigation)
                     response.sendRedirect(getFrontendUrl() + "/");
                 })
             )
@@ -97,6 +105,9 @@ public class SecurityConfigurate {
                     response.sendRedirect(getFrontendUrl() + "/?error=unauthorized");
                 })
                 .successHandler(new CustomOAuth2AuthenticationSuccessHandler(userRepository))
+            )
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.IF_REQUIRED)
             )
             .logout(logout -> logout
                 .logoutUrl("/logout")
@@ -116,9 +127,13 @@ public class SecurityConfigurate {
 
     @Bean
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
+        String allowedOrigin = getFrontendUrl();
+        System.out.println("=== CORS Configuration ===");
+        System.out.println("Allowed Origin: " + allowedOrigin);
+        
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOrigin(getFrontendUrl());
+        config.addAllowedOrigin(allowedOrigin);
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         config.setExposedHeaders(List.of("Set-Cookie"));
@@ -155,20 +170,26 @@ class CustomOAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSu
                                         Authentication authentication) throws IOException, ServletException {
         OAuth2AuthenticationToken oauth2Token = (OAuth2AuthenticationToken) authentication;
         String email = oauth2Token.getPrincipal().getAttribute("email");
+        
+        System.out.println("=== OAuth2 Authentication Success ===");
+        System.out.println("Email: " + email);
+        System.out.println("Frontend URL: " + frontendUrl);
+        System.out.println("Session ID: " + request.getSession().getId());
 
         Optional<Korisnik> userOptional = userRepository.findByEmail(email);
         if (userOptional.isEmpty()) {
+            System.out.println("User not found in database");
             response.sendRedirect(frontendUrl + "/?error=userNotFound");
             return;
         }
         Korisnik user = userOptional.get();
         Integer userRole = user.getIdUloge();
 
-        System.out.println("Determiniram ulogu:");
+        System.out.println("Determiniram ulogu: " + userRole);
         String redirectUrl;
         if (userRole == 1) {
             redirectUrl = frontendUrl + "/admin";
-            System.out.println("admin");
+            System.out.println("Redirecting to: " + redirectUrl);
         } else if (userRole == 2) {
             System.out.println("racunovoda");
             redirectUrl = frontendUrl + "/racunovoda";
@@ -183,6 +204,11 @@ class CustomOAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSu
             redirectUrl = frontendUrl + "/pocetna";
         }
 
+        // Ensure session is saved before redirect
+        request.getSession().setAttribute("SPRING_SECURITY_CONTEXT", 
+            org.springframework.security.core.context.SecurityContextHolder.getContext());
+        
+        System.out.println("Final redirect URL: " + redirectUrl);
         response.sendRedirect(redirectUrl);
     }
 }
