@@ -10,25 +10,11 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Value("${FRONTEND_URL:http://localhost:5173}")
     private String frontendUrl;
-    
-    private String getFrontendUrl() {
-        if (frontendUrl == null || frontendUrl.isEmpty()) {
-            return "http://localhost:5173";
-        }
-        String url = frontendUrl;
-        if (!url.contains(".") && !url.contains("localhost") && !url.contains("://")) {
-            url = url + ".onrender.com";
-        }
-        if (!url.startsWith("http://") && !url.startsWith("https://")) {
-            url = "https://" + url;
-        }
-        return url;
-    }
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
-        .allowedOrigins(getFrontendUrl())
+        .allowedOrigins(frontendUrl)
         .allowedMethods("GET", "POST", "PUT", "DELETE")
         .allowedHeaders("*")
         .allowCredentials(true);

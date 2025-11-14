@@ -16,20 +16,15 @@ export function UserProvider({ children }) {
       credentials: "include",
     })
       .then((res) => {
-        if (!res.ok) {
-          console.error("Failed to fetch user, status:", res.status);
-          throw new Error("Failed to fetch user");
-        }
+        if (!res.ok) throw new Error("Failed to fetch user");
         return res.json();
       })
       .then((data) => {
-        console.log("User fetched successfully:", data);
         setUser(data);
         setLoading(false);
       })
-      .catch((error) => {
-        console.error("Error fetching user:", error);
-        // User is not authenticated
+      .catch(() => {
+        // User is not authenticated, redirect to login
         setLoading(false);
         setUser(null);
         // Don't redirect here - let the route handle it
@@ -37,10 +32,15 @@ export function UserProvider({ children }) {
   }, []);
 
   if (loading) return <p>Loading user...</p>;
+
+  // Always provide the context, even if user is null
+  // This allows routes to handle authentication themselves
   if (!user) {
-    // Don't redirect here - let individual routes handle authentication
-    // This prevents redirect loops
-    return <p>No user logged in</p>;
+    return (
+      <UserContext.Provider value={{ user, setUser }}>
+        {children}
+      </UserContext.Provider>
+    );
   }
 
   if (user.role === "KLIJENT") {
@@ -67,6 +67,7 @@ export function UserProvider({ children }) {
     );
   }
 
+  // Default case - user exists but no specific role provider
   return (
     <UserContext.Provider value={{ user, setUser }}>
       {children}

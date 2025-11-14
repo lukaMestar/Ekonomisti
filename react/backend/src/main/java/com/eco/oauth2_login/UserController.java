@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -19,26 +18,10 @@ import com.eco.oauth2_login.databaza.UserRepository;
 public class UserController {
 
     private final UserRepository userRepository;
-    private String frontendUrl;
 
     @Autowired
-    public UserController(UserRepository userRepository, @Value("${FRONTEND_URL:http://localhost:5173}") String frontendUrl) {
+    public UserController(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.frontendUrl = frontendUrl;
-    }
-    
-    private String getFrontendUrl() {
-        if (frontendUrl == null || frontendUrl.isEmpty()) {
-            return "http://localhost:5173";
-        }
-        String url = frontendUrl;
-        if (!url.contains(".") && !url.contains("localhost") && !url.contains("://")) {
-            url = url + ".onrender.com";
-        }
-        if (!url.startsWith("http://") && !url.startsWith("https://")) {
-            url = "https://" + url;
-        }
-        return url;
     }
 
     @GetMapping("/api/user")

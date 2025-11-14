@@ -1,10 +1,52 @@
-import { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "../../UserContext.jsx";
 import { API_URL, FRONTEND_URL } from "../../config.js";
 
 function Admin() {
-  const { user, tvrtke, trenutnaTvrtka, setTrenutnaTvrtka } = useUser();
+  const { user, setUser, tvrtke, trenutnaTvrtka, setTrenutnaTvrtka } =
+    useUser();
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // If user is not loaded, try to fetch it
+    if (!user) {
+      fetch(`${API_URL}/api/user`, {
+        method: "GET",
+        credentials: "include",
+      })
+        .then((res) => {
+          if (res.ok) {
+            return res.json();
+          }
+          throw new Error("Not authenticated");
+        })
+        .then((data) => {
+          setUser(data);
+          setLoading(false);
+          // If user is not admin, redirect to appropriate page
+          if (data.role !== "ADMIN") {
+            if (data.role === "RACUNOVODA") {
+              navigate("/racunovoda");
+            } else if (data.role === "KLIJENT") {
+              navigate("/klijent");
+            } else if (data.role === "RADNIK") {
+              navigate("/radnik");
+            } else {
+              navigate("/pocetna");
+            }
+          }
+        })
+        .catch(() => {
+          // User is not authenticated, redirect to login
+          setLoading(false);
+          navigate("/");
+        });
+    } else {
+      setLoading(false);
+    }
+  }, [user, setUser, navigate]);
 
   const handleLogout = async () => {
     try {
@@ -19,7 +61,7 @@ function Admin() {
     }
   };
 
-  if (!user) return <p>Učitavanje korisnika...</p>;
+  if (loading || !user) return <p>Učitavanje korisnika...</p>;
 
   return (
     <div className="page-background">

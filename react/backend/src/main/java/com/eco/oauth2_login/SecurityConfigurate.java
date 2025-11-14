@@ -86,6 +86,10 @@ public class SecurityConfigurate {
                     response.sendRedirect(getFrontendUrl() + "/");
                 })
             )
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.IF_REQUIRED)
+                .maximumSessions(1)
+            )
             .oauth2Login(oauth2 -> oauth2
                 .userInfoEndpoint(userInfo -> {
                     System.out.println("KONFIGURIRAM userInfoEndpoint");
@@ -97,9 +101,6 @@ public class SecurityConfigurate {
                     response.sendRedirect(getFrontendUrl() + "/?error=unauthorized");
                 })
                 .successHandler(new CustomOAuth2AuthenticationSuccessHandler(userRepository))
-            )
-            .sessionManagement(session -> session
-                .sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.IF_REQUIRED)
             )
             .logout(logout -> logout
                 .logoutUrl("/logout")
@@ -124,7 +125,8 @@ public class SecurityConfigurate {
         config.addAllowedOrigin(getFrontendUrl());
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
-        config.setExposedHeaders(List.of("Set-Cookie"));
+        config.setExposedHeaders(List.of("Set-Cookie", "JSESSIONID"));
+        config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
@@ -152,9 +154,6 @@ class CustomOAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSu
         if (!this.frontendUrl.startsWith("http://") && !this.frontendUrl.startsWith("https://")) {
             this.frontendUrl = "https://" + this.frontendUrl;
         }
-        
-        // Set redirect strategy to always redirect (don't use saved request)
-        setAlwaysUseDefaultTargetUrl(true);
     }
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
