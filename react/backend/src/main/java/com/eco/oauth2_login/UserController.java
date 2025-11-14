@@ -31,25 +31,12 @@ public class UserController {
 
     @GetMapping("/api/user")
     public ResponseEntity<Map<String, Object>> user(@AuthenticationPrincipal OAuth2User principal, HttpServletRequest request) {
-        System.out.println("[UserController] user() - START");
-        
-        if (request.getCookies() != null) {
-            System.out.println("[UserController] user() - Cookies count: " + request.getCookies().length);
-            for (jakarta.servlet.http.Cookie cookie : request.getCookies()) {
-                System.out.println("[UserController] user() - Cookie: " + cookie.getName() + " = " + cookie.getValue());
-            }
-        } else {
-            System.out.println("[UserController] user() - No cookies in request");
-        }
-        
         if (principal == null) {
-            System.out.println("[UserController] user() - ERROR: principal is null");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(Map.of("error", "User not authenticated"));
         }
         
         String email = principal.getAttribute("email");
-        System.out.println("[UserController] user() - Email: " + email);
         String role = "USER";
         
         if (email != null) {
@@ -57,7 +44,6 @@ public class UserController {
             if (userOptional.isPresent()) {
                 Korisnik user = userOptional.get();
                 Integer idUloge = user.getIdUloge();
-                System.out.println("[UserController] user() - User found, idUloge: " + idUloge);
                 if (idUloge != null) {
                     switch (idUloge) {
                         case 1 -> role = "ADMIN";
@@ -67,12 +53,8 @@ public class UserController {
                         default -> role = "USER";
                     }
                 }
-            } else {
-                System.out.println("[UserController] user() - User not found in database");
             }
         }
-        
-        System.out.println("[UserController] user() - Final role: " + role);
         
         Map<String, Object> result = new HashMap<>();
         result.put("name", principal.getAttribute("name") != null ? principal.getAttribute("name") : "");
@@ -80,7 +62,6 @@ public class UserController {
         result.put("picture", principal.getAttribute("picture") != null ? principal.getAttribute("picture") : "");
         result.put("role", role);
         
-        System.out.println("[UserController] user() - END, returning result");
         return ResponseEntity.ok(result);
     }
 }

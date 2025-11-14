@@ -19,9 +19,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             OAuth2AuthenticationException ex,
             HttpServletRequest request,
             HttpServletResponse response) throws IOException {
-        System.err.println("[GlobalExceptionHandler] OAuth2AuthenticationException: " + ex.getMessage());
-        ex.printStackTrace();
-        
         String requestURI = request.getRequestURI();
         if (requestURI != null && (requestURI.contains("/oauth2/") || requestURI.contains("/login/oauth2/"))) {
             String frontendUrl = System.getenv("FRONTEND_URL");
@@ -47,11 +44,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleGenericException(
             Exception ex,
             HttpServletRequest request) {
-        System.err.println("[GlobalExceptionHandler] Generic Exception: " + ex.getMessage());
-        ex.printStackTrace();
-        
         String requestURI = request.getRequestURI();
-        System.err.println("[GlobalExceptionHandler] Request URI: " + requestURI);
         
         if (requestURI != null && (requestURI.contains("/oauth2/") || requestURI.contains("/login/oauth2/"))) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

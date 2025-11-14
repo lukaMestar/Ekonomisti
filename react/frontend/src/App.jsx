@@ -35,7 +35,6 @@ function TokenHandler() {
   useEffect(() => {
     const token = searchParams.get("token");
     if (token) {
-      console.log("Token found in URL, storing in localStorage");
       setSessionToken(token);
       searchParams.delete("token");
       setSearchParams(searchParams, { replace: true });
