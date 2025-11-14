@@ -36,12 +36,26 @@ public class SecurityConfigurate {
 
     @Value("${FRONTEND_URL:http://localhost:5173}")
     private String frontendUrl;
+    
+    private String getFrontendUrl() {
+        if (frontendUrl == null || frontendUrl.isEmpty()) {
+            return "http://localhost:5173";
+        }
+        String url = frontendUrl;
+        // Ensure it has protocol
+        if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            url = "https://" + url;
+        }
+        return url;
+    }
 
     @Autowired
     public SecurityConfigurate(InvalidMail im, UserRepository userRepository) {
         this.im = im;
         this.userRepository = userRepository;
         System.out.println("++++++++++++++++++++SecurityConfigurate bean kreiran!");
+        System.out.println("++++++++++++++++++++FRONTEND_URL = " + frontendUrl);
+        System.out.println("++++++++++++++++++++Processed FRONTEND_URL = " + getFrontendUrl());
     }
     @Bean
     //@Order(1)
@@ -60,7 +74,7 @@ public class SecurityConfigurate {
                 })
                 .failureHandler((request, response, exception) -> {
                     System.out.println("GREŠKA PRI LOGINU: " + exception.getMessage());
-                    response.sendRedirect(frontendUrl + "/?error=unauthorized");
+                    response.sendRedirect(getFrontendUrl() + "/?error=unauthorized");
                 })
                 .successHandler(new CustomOAuth2AuthenticationSuccessHandler(userRepository))
             )
@@ -84,11 +98,17 @@ public class SecurityConfigurate {
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOrigin(frontendUrl);
+        String allowedOrigin = getFrontendUrl();
+        config.addAllowedOrigin(allowedOrigin);
+        // Also explicitly allow common Render frontend URL
+        config.addAllowedOrigin("https://ekonomisti-frontend.onrender.com");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
-        config.setExposedHeaders(List.of("Set-Cookie"));
+        config.setExposedHeaders(List.of("Set-Cookie", "JSESSIONID"));
+        config.setMaxAge(3600L);
 
+        System.out.println("++++++++++++++++++++CORS allowed origin = " + allowedOrigin);
+        
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
@@ -106,6 +126,10 @@ class CustomOAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSu
         this.frontendUrl = System.getenv("FRONTEND_URL");
         if (this.frontendUrl == null || this.frontendUrl.isEmpty()) {
             this.frontendUrl = "http://localhost:5173";
+        }
+        // Ensure it has protocol
+        if (!this.frontendUrl.startsWith("http://") && !this.frontendUrl.startsWith("https://")) {
+            this.frontendUrl = "https://" + this.frontendUrl;
         }
     }
     @Override
