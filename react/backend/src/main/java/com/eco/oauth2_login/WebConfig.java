@@ -15,19 +15,13 @@ public class WebConfig implements WebMvcConfigurer {
         if (frontendUrl == null || frontendUrl.isEmpty()) {
             return "http://localhost:5173";
         }
-        
         String url = frontendUrl;
-        
-        // If it's just a hostname without domain, add .onrender.com
         if (!url.contains(".") && !url.contains("localhost") && !url.contains("://")) {
             url = url + ".onrender.com";
         }
-        
-        // Ensure FRONTEND_URL has protocol
         if (!url.startsWith("http://") && !url.startsWith("https://")) {
             url = "https://" + url;
         }
-        
         return url;
     }
 

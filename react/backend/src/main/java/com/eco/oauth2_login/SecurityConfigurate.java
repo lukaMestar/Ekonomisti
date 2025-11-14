@@ -33,8 +33,6 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class SecurityConfigurate {
     private final InvalidMail im;
     private final UserRepository userRepository;
-    private final JwtUtil jwtUtil;
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Value("${FRONTEND_URL:http://localhost:5173}")
     private String frontendUrl;
@@ -60,11 +58,9 @@ public class SecurityConfigurate {
     }
 
     @Autowired
-    public SecurityConfigurate(InvalidMail im, UserRepository userRepository, JwtUtil jwtUtil, JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityConfigurate(InvalidMail im, UserRepository userRepository) {
         this.im = im;
         this.userRepository = userRepository;
-        this.jwtUtil = jwtUtil;
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         System.out.println("++++++++++++++++++++SecurityConfigurate bean kreiran!");
     }
     @Bean
@@ -86,15 +82,7 @@ public class SecurityConfigurate {
                         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                         return;
                     }
-                    // For API requests, return 401 instead of redirecting
-                    if (requestPath.startsWith("/api/")) {
-                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                        response.setContentType("application/json");
-                        response.setCharacterEncoding("UTF-8");
-                        response.getWriter().write("{\"error\":\"Unauthorized\"}");
-                        return;
-                    }
-                    // Redirect other unauthenticated requests to frontend (for browser navigation)
+                    // Redirect other unauthenticated requests to frontend
                     response.sendRedirect(getFrontendUrl() + "/");
                 })
             )
@@ -108,12 +96,11 @@ public class SecurityConfigurate {
                     exception.printStackTrace();
                     response.sendRedirect(getFrontendUrl() + "/?error=unauthorized");
                 })
-                .successHandler(new CustomOAuth2AuthenticationSuccessHandler(userRepository, jwtUtil))
+                .successHandler(new CustomOAuth2AuthenticationSuccessHandler(userRepository))
             )
             .sessionManagement(session -> session
-                .sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.STATELESS)
+                .sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.IF_REQUIRED)
             )
-            .addFilterBefore(jwtAuthenticationFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
             .logout(logout -> logout
                 .logoutUrl("/logout")
                 .logoutSuccessHandler((request, response, authentication) -> {
@@ -132,13 +119,9 @@ public class SecurityConfigurate {
 
     @Bean
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
-        String allowedOrigin = getFrontendUrl();
-        System.out.println("=== CORS Configuration ===");
-        System.out.println("Allowed Origin: " + allowedOrigin);
-        
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOrigin(allowedOrigin);
+        config.addAllowedOrigin(getFrontendUrl());
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         config.setExposedHeaders(List.of("Set-Cookie"));
@@ -152,13 +135,11 @@ public class SecurityConfigurate {
 class CustomOAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final UserRepository userRepository;
-    private final JwtUtil jwtUtil;
     private String frontendUrl;
 
     @Autowired
-    public CustomOAuth2AuthenticationSuccessHandler(UserRepository userRepository, JwtUtil jwtUtil) {
+    public CustomOAuth2AuthenticationSuccessHandler(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.jwtUtil = jwtUtil;
         this.frontendUrl = System.getenv("FRONTEND_URL");
         if (this.frontendUrl == null || this.frontendUrl.isEmpty()) {
             this.frontendUrl = "http://localhost:5173";
@@ -171,32 +152,29 @@ class CustomOAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSu
         if (!this.frontendUrl.startsWith("http://") && !this.frontendUrl.startsWith("https://")) {
             this.frontendUrl = "https://" + this.frontendUrl;
         }
+        
+        // Set redirect strategy to always redirect (don't use saved request)
+        setAlwaysUseDefaultTargetUrl(true);
     }
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
         OAuth2AuthenticationToken oauth2Token = (OAuth2AuthenticationToken) authentication;
         String email = oauth2Token.getPrincipal().getAttribute("email");
-        
-        System.out.println("=== OAuth2 Authentication Success ===");
-        System.out.println("Email: " + email);
-        System.out.println("Frontend URL: " + frontendUrl);
-        System.out.println("Session ID: " + request.getSession().getId());
 
         Optional<Korisnik> userOptional = userRepository.findByEmail(email);
         if (userOptional.isEmpty()) {
-            System.out.println("User not found in database");
             response.sendRedirect(frontendUrl + "/?error=userNotFound");
             return;
         }
         Korisnik user = userOptional.get();
         Integer userRole = user.getIdUloge();
 
-        System.out.println("Determiniram ulogu: " + userRole);
+        System.out.println("Determiniram ulogu:");
         String redirectUrl;
         if (userRole == 1) {
             redirectUrl = frontendUrl + "/admin";
-            System.out.println("Redirecting to: " + redirectUrl);
+            System.out.println("admin");
         } else if (userRole == 2) {
             System.out.println("racunovoda");
             redirectUrl = frontendUrl + "/racunovoda";
@@ -211,24 +189,6 @@ class CustomOAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSu
             redirectUrl = frontendUrl + "/pocetna";
         }
 
-        // Generate JWT token
-        String role = "USER";
-        if (userRole == 1) {
-            role = "ADMIN";
-        } else if (userRole == 2) {
-            role = "RACUNOVODA";
-        } else if (userRole == 3) {
-            role = "KLIJENT";
-        } else if (userRole == 4) {
-            role = "RADNIK";
-        }
-        
-        String jwtToken = jwtUtil.generateToken(email, role, userRole);
-        System.out.println("Generated JWT token for user: " + email);
-        
-        // Redirect with JWT token as URL parameter
-        String finalRedirectUrl = redirectUrl + "?token=" + jwtToken;
-        System.out.println("Final redirect URL: " + finalRedirectUrl);
-        response.sendRedirect(finalRedirectUrl);
+        response.sendRedirect(redirectUrl);
     }
 }

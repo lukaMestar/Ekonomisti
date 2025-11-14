@@ -1,13 +1,22 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useUser } from "../../UserContext.jsx";
-import { logout } from "../../api.js";
+import { API_URL, FRONTEND_URL } from "../../config.js";
 
 function Admin() {
   const { user, tvrtke, trenutnaTvrtka, setTrenutnaTvrtka } = useUser();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    try {
+      await fetch(`${API_URL}/logout`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      });
+      window.location.href = FRONTEND_URL;
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   if (!user) return <p>Učitavanje korisnika...</p>;

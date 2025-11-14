@@ -11,58 +11,36 @@ export function UserProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("jwt_token");
-    if (!token) {
-      console.log("UserContext: No JWT token found");
-      setUser(null);
-      setLoading(false);
-      return;
-    }
-
-    console.log("UserContext: Fetching user from", `${API_URL}/api/user`);
     fetch(`${API_URL}/api/user`, {
       method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      credentials: "include",
     })
       .then((res) => {
-        console.log("UserContext: Response status", res.status, res.statusText);
         if (!res.ok) {
-          // Token invalid, remove it
-          localStorage.removeItem("jwt_token");
-          console.log("UserContext: User not authenticated");
-          setUser(null);
-          setLoading(false);
-          return;
+          console.error("Failed to fetch user, status:", res.status);
+          throw new Error("Failed to fetch user");
         }
         return res.json();
       })
       .then((data) => {
-        console.log("UserContext: User data received", data);
-        if (data) {
-          setUser(data);
-        }
+        console.log("User fetched successfully:", data);
+        setUser(data);
         setLoading(false);
       })
       .catch((error) => {
+        console.error("Error fetching user:", error);
         // User is not authenticated
-        console.error("UserContext: Error fetching user", error);
-        localStorage.removeItem("jwt_token");
-        setUser(null);
         setLoading(false);
+        setUser(null);
+        // Don't redirect here - let the route handle it
       });
   }, []);
 
   if (loading) return <p>Loading user...</p>;
-
-  // If no user, still render children (for login page and public routes)
   if (!user) {
-    return (
-      <UserContext.Provider value={{ user, setUser }}>
-        {children}
-      </UserContext.Provider>
-    );
+    // Don't redirect here - let individual routes handle authentication
+    // This prevents redirect loops
+    return <p>No user logged in</p>;
   }
 
   if (user.role === "KLIJENT") {
