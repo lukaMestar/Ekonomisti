@@ -38,11 +38,23 @@ public class SecurityConfigurate {
     private String frontendUrl;
     
     private String getFrontendUrl() {
-        // Ensure FRONTEND_URL has protocol
-        if (frontendUrl != null && !frontendUrl.startsWith("http://") && !frontendUrl.startsWith("https://")) {
-            return "https://" + frontendUrl;
+        if (frontendUrl == null || frontendUrl.isEmpty()) {
+            return "http://localhost:5173";
         }
-        return frontendUrl != null ? frontendUrl : "http://localhost:5173";
+        
+        String url = frontendUrl;
+        
+        // If it's just a hostname without domain (e.g., "ekonomisti-frontend"), add .onrender.com
+        if (!url.contains(".") && !url.contains("localhost") && !url.contains("://")) {
+            url = url + ".onrender.com";
+        }
+        
+        // Ensure FRONTEND_URL has protocol
+        if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            url = "https://" + url;
+        }
+        
+        return url;
     }
 
     @Autowired
@@ -128,6 +140,10 @@ class CustomOAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSu
         this.frontendUrl = System.getenv("FRONTEND_URL");
         if (this.frontendUrl == null || this.frontendUrl.isEmpty()) {
             this.frontendUrl = "http://localhost:5173";
+        }
+        // If it's just a hostname without domain, add .onrender.com
+        if (!this.frontendUrl.contains(".") && !this.frontendUrl.contains("localhost") && !this.frontendUrl.contains("://")) {
+            this.frontendUrl = this.frontendUrl + ".onrender.com";
         }
         // Ensure FRONTEND_URL has protocol
         if (!this.frontendUrl.startsWith("http://") && !this.frontendUrl.startsWith("https://")) {
