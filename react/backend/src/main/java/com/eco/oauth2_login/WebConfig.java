@@ -34,7 +34,6 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         String allowedOrigin = getFrontendUrl();
-        System.out.println("++++++++++++++++++++WebConfig CORS allowed origins = " + allowedOrigin + ", https://ekonomisti-frontend.onrender.com");
         registry.addMapping("/api/**")
         .allowedOrigins(allowedOrigin, "https://ekonomisti-frontend.onrender.com", "http://localhost:5173")
         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")

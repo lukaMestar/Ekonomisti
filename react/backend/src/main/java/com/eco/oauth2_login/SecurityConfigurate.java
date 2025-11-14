@@ -59,8 +59,6 @@ public class SecurityConfigurate {
     public SecurityConfigurate(InvalidMail im, UserRepository userRepository) {
         this.im = im;
         this.userRepository = userRepository;
-        System.out.println("++++++++++++++++++++SecurityConfigurate bean kreiran!");
-        System.out.println("++++++++++++++++++++FRONTEND_URL = " + getFrontendUrl());
     }
     @Bean
     //@Order(1)
@@ -125,7 +123,6 @@ public class SecurityConfigurate {
         config.addAllowedOrigin(allowedOrigin);
         config.addAllowedOrigin("https://ekonomisti-frontend.onrender.com");
         config.addAllowedOrigin("http://localhost:5173");
-        System.out.println("++++++++++++++++++++CORS allowed origins = " + allowedOrigin + ", https://ekonomisti-frontend.onrender.com");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         config.setExposedHeaders(List.of("Set-Cookie", "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials"));
@@ -157,7 +154,6 @@ class CustomOAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSu
                 }
             }
         }
-        System.out.println("++++++++++++++++++++CustomOAuth2AuthenticationSuccessHandler FRONTEND_URL = " + this.frontendUrl);
     }
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,

@@ -21,58 +21,78 @@ public class InvalidMail extends OidcUserService {
 
     public InvalidMail(UserRepository userRepository) {
         this.userRepository = userRepository;
-        
     }
 
     @Override
     @Transactional
     public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {
-        
+        try {
+            OidcUser oidcUser = super.loadUser(userRequest);
 
-        // dohvaćamo korisničke podatke preko super.loadUser
-        OidcUser oidcUser = super.loadUser(userRequest);
+            String email = oidcUser.getEmail();
 
-        String email = oidcUser.getEmail();
-        
-        
+            if (email == null) {
+                System.err.println("InvalidMail: Email is null!");
+                throw new OAuth2AuthenticationException(
+                        new OAuth2Error("invalid_email", "Email nije dostupan", null),
+                        "Email atribut nije pronađen u Google user info objektu"
+                );
+            }
 
-        if (email == null) {
+            // provjera u bazi
+            Optional<Korisnik> user = userRepository.findByEmail(email);
+
+            if (user.isEmpty()) {
+                System.err.println("InvalidMail: User not found in database for email: " + email);
+                throw new OAuth2AuthenticationException(
+                        new OAuth2Error("invalid_token", "Email nije dozvoljen", null),
+                        "Pristup odbijen: korisnik nije u bazi podataka"
+                );
+            }
+            
+            Korisnik user1 = user.get();
+            String ime = oidcUser.getGivenName();
+            String prezime = oidcUser.getFamilyName();
+            if (ime == null) {
+                ime = "-";
+            }
+            
+            if (prezime == null) {
+                prezime = "-";  
+            }
+            
+
+            String currentIme = user1.getImeKorisnik();
+            String currentPrezime = user1.getPrezimeKorisnik();
+            
+            if (currentIme == null || currentPrezime == null || 
+                !currentIme.equals(ime) || !currentPrezime.equals(prezime)) {
+                user1.setImeKorisnik(ime);
+                user1.setPrezimeKorisnik(prezime);
+                try {
+                    userRepository.save(user1);
+                } catch (Exception e) {
+                    System.err.println("GREŠKA PRI SPREMANJU KORISNIKA: " + e.getMessage());
+                    e.printStackTrace();
+                    
+                }
+            }
+            
+            /*dodavanje uloge u oidcUser kako bi se mogao odrediti ispravan redirect nakon oautha
+            Integer uloga = user1.getIdUloge();
+            oidcUser.getAttributes().put("role", uloga);*/
+
+            return oidcUser;
+        } catch (OAuth2AuthenticationException e) {
+            System.err.println("InvalidMail: OAuth2AuthenticationException: " + e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            System.err.println("InvalidMail: Unexpected exception: " + e.getMessage());
+            e.printStackTrace();
             throw new OAuth2AuthenticationException(
-                    new OAuth2Error("invalid_email", "Email nije dostupan", null),
-                    "Email atribut nije pronađen u Google user info objektu"
+                    new OAuth2Error("server_error", "Greška na serveru", null),
+                    "Neočekivana greška pri učitavanju korisnika: " + e.getMessage()
             );
         }
-
-        // provjera u bazi
-        Optional<Korisnik> user = userRepository.findByEmail(email);
-
-        if (user.isEmpty()) {
-            throw new OAuth2AuthenticationException(
-                    new OAuth2Error("invalid_token", "Email nije dozvoljen", null),
-                    "Pristup odbijen: korisnik nije u bazi podataka"
-            );
-        }
-        Korisnik user1 = user.get();
-        String ime = oidcUser.getGivenName();
-        String prezime = oidcUser.getFamilyName();
-        if (ime == null) {
-            ime = "-";
-        }
-        
-        if (prezime == null) {
-
-            prezime = "-";  
-        }
-        if(!user1.getImeKorisnik().equals(ime) || !user1.getPrezimeKorisnik().equals(prezime)) {
-            user1.setImeKorisnik(ime);
-            user1.setPrezimeKorisnik(prezime);
-            userRepository.save(user1);
-        }
-        
-        /*dodavanje uloge u oidcUser kako bi se mogao odrediti ispravan redirect nakon oautha
-        Integer uloga = user1.getIdUloge();
-        oidcUser.getAttributes().put("role", uloga);*/
-
-        return oidcUser;
     }
 }
