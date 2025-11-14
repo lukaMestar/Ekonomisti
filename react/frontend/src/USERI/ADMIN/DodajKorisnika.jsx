@@ -44,11 +44,10 @@ export default function DodajKorisnika() {
         alert("Korisnik added successfully");
         setEmail("");
       } else {
-        const errorText = await response.text();
-        alert("Error adding korisnik: " + errorText);
+        alert("Error adding korisnik");
       }
     } catch (error) {
-      alert("Error adding korisnik: " + error.message);
+      alert("Error adding korisnik");
     }
   };
 

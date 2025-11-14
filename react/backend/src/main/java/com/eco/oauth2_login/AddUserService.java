@@ -32,6 +32,5 @@ public class AddUserService {
         }
         
         userRepository.save(korisnik);
-
     }
 }

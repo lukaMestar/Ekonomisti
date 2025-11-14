@@ -22,7 +22,6 @@ public class AddUserController {
 
     @PostMapping("/adduser")
     public ResponseEntity<String> addKorisnik(@RequestBody Korisnik korisnik) {
-
         try {
             addUserService.addKorisnik(korisnik);
             return ResponseEntity.ok("Korisnik added successfully");
