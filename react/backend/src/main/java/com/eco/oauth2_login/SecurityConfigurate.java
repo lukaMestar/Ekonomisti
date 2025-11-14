@@ -42,9 +42,8 @@ public class SecurityConfigurate {
         
         String url = frontendUrl;
         
-        // If it doesn't start with http:// or https://, add https://
+        
         if (!url.startsWith("http://") && !url.startsWith("https://")) {
-            // For localhost, use http://, otherwise use https://
             if (url.contains("localhost")) {
                 url = "http://" + url;
             } else {
@@ -119,7 +118,7 @@ public class SecurityConfigurate {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         String allowedOrigin = getFrontendUrl();
-        // Add both the processed URL and explicit Render URL
+       
         config.addAllowedOrigin(allowedOrigin);
         config.addAllowedOrigin("https://ekonomisti-frontend.onrender.com");
         config.addAllowedOrigin("http://localhost:5173");
