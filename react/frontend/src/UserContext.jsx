@@ -16,22 +16,37 @@ export function UserProvider({ children }) {
       credentials: "include",
     })
       .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch user");
+        if (!res.ok) {
+          // User is not authenticated
+          setUser(null);
+          setLoading(false);
+          return;
+        }
         return res.json();
       })
       .then((data) => {
-        setUser(data);
+        if (data) {
+          setUser(data);
+        }
         setLoading(false);
       })
       .catch(() => {
-        // fallback user
-        setUser({ name: "Luka", email: "luka@test.com", role: "RACUNOVODA" });
+        // User is not authenticated
+        setUser(null);
         setLoading(false);
       });
   }, []);
 
   if (loading) return <p>Loading user...</p>;
-  if (!user) return <p>No user logged in</p>;
+
+  // If no user, still render children (for login page and public routes)
+  if (!user) {
+    return (
+      <UserContext.Provider value={{ user, setUser }}>
+        {children}
+      </UserContext.Provider>
+    );
+  }
 
   if (user.role === "KLIJENT") {
     return (
