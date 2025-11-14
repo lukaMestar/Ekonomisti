@@ -41,7 +41,7 @@ spring:
           provider_disables_autocommit: true
 server:
   port: ${PORT:${SERVER_PORT:9090}}
-  address: 0.0.0.0 # Required by Render - must bind to 0.0.0.0, not just localhost
+  address: 0.0.0.0
 #logging:
 #  level:
 #    org:

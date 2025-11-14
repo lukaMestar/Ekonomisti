@@ -45,32 +45,66 @@ public class DataSourceConfig {
         if (jdbcUrl.startsWith("postgresql://")) {
             try {
                 // Parse postgresql://user:pass@host:port/dbname
-                URI uri = new URI(jdbcUrl);
-                String userInfo = uri.getUserInfo();
-                System.out.println("=== DataSourceConfig: Parsed userInfo = " + userInfo);
+                // Use the raw string to preserve the full hostname including domain
+                String urlWithoutScheme = jdbcUrl.substring("postgresql://".length());
                 
-                if (userInfo != null && userInfo.contains(":")) {
-                    String[] credentials = userInfo.split(":", 2);
-                    dbUsername = URLDecoder.decode(credentials[0], StandardCharsets.UTF_8);
-                    dbPassword = URLDecoder.decode(credentials[1], StandardCharsets.UTF_8);
-                    System.out.println("=== DataSourceConfig: Extracted username = " + dbUsername);
-                    System.out.println("=== DataSourceConfig: Password length = " + dbPassword.length());
+                // Extract user:pass@host:port/dbname
+                int atIndex = urlWithoutScheme.indexOf('@');
+                if (atIndex > 0) {
+                    String credentialsPart = urlWithoutScheme.substring(0, atIndex);
+                    String hostPortDbPart = urlWithoutScheme.substring(atIndex + 1);
+                    
+                    // Extract credentials
+                    if (credentialsPart.contains(":")) {
+                        String[] creds = credentialsPart.split(":", 2);
+                        dbUsername = URLDecoder.decode(creds[0], StandardCharsets.UTF_8);
+                        dbPassword = URLDecoder.decode(creds[1], StandardCharsets.UTF_8);
+                        System.out.println("=== DataSourceConfig: Extracted username = " + dbUsername);
+                        System.out.println("=== DataSourceConfig: Password length = " + dbPassword.length());
+                    }
+                    
+                    // Extract host:port/database
+                    int slashIndex = hostPortDbPart.indexOf('/');
+                    String hostPort = slashIndex > 0 ? hostPortDbPart.substring(0, slashIndex) : hostPortDbPart;
+                    String database = slashIndex > 0 ? hostPortDbPart.substring(slashIndex + 1) : "";
+                    
+                    // Split host and port
+                    String host;
+                    int port = 5432;
+                    if (hostPort.contains(":")) {
+                        String[] parts = hostPort.split(":", 2);
+                        host = parts[0];
+                        try {
+                            port = Integer.parseInt(parts[1]);
+                        } catch (NumberFormatException e) {
+                            port = 5432;
+                        }
+                    } else {
+                        host = hostPort;
+                    }
+                    
+                    System.out.println("=== DataSourceConfig: Extracted host = " + host);
+                    System.out.println("=== DataSourceConfig: Extracted port = " + port);
+                    System.out.println("=== DataSourceConfig: Extracted database = " + database);
+                    
+                    // Build JDBC URL: jdbc:postgresql://host:port/database
+                    // Use sslmode=prefer to try SSL first, but fallback to non-SSL if needed
+                    jdbcUrl = String.format("jdbc:postgresql://%s:%d/%s?sslmode=prefer", host, port, database);
+                    System.out.println("=== DataSourceConfig: Built JDBC URL = " + jdbcUrl);
+                } else {
+                    // No credentials in URL, use URI parsing
+                    URI uri = new URI(jdbcUrl);
+                    String host = uri.getHost();
+                    int port = uri.getPort() == -1 ? 5432 : uri.getPort();
+                    String path = uri.getPath();
+                    if (path.startsWith("/")) {
+                        path = path.substring(1);
+                    }
+                    jdbcUrl = String.format("jdbc:postgresql://%s:%d/%s?sslmode=prefer", host, port, path);
+                    System.out.println("=== DataSourceConfig: Built JDBC URL (no credentials) = " + jdbcUrl);
                 }
-                
-                String host = uri.getHost();
-                int port = uri.getPort() == -1 ? 5432 : uri.getPort();
-                String path = uri.getPath();
-                if (path.startsWith("/")) {
-                    path = path.substring(1);
-                }
-                
-                // Build JDBC URL: jdbc:postgresql://host:port/database
-                // Use sslmode=prefer to try SSL first, but fallback to non-SSL if needed
-                // This works for both internal and external connections
-                jdbcUrl = String.format("jdbc:postgresql://%s:%d/%s?sslmode=prefer", host, port, path);
-                System.out.println("=== DataSourceConfig: Built JDBC URL = " + jdbcUrl);
             } catch (Exception e) {
-                System.err.println("=== DataSourceConfig: Error parsing URI: " + e.getMessage());
+                System.err.println("=== DataSourceConfig: Error parsing postgresql:// URL: " + e.getMessage());
                 e.printStackTrace();
                 // Fallback: just add jdbc: prefix
                 jdbcUrl = "jdbc:" + jdbcUrl;
