@@ -18,7 +18,7 @@ spring:
             token-uri: https://www.googleapis.com/oauth2/v4/token
             user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/ekonomisti}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/ekonomisti}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
     password: ${SPRING_DATASOURCE_PASSWORD:bazepodataka}
     driver-class-name: org.postgresql.Driver
@@ -48,8 +48,8 @@ server:
       cookie:
         name: JSESSIONID
         http-only: true
-        secure: true
-        same-site: none
+        secure: ${COOKIE_SECURE:false}
+        same-site: ${COOKIE_SAME_SITE:lax}
 logging:
   level:
     org:

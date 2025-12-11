@@ -39,9 +39,7 @@ function TokenHandler() {
       searchParams.delete("token");
       setSearchParams(searchParams, { replace: true });
 
-      setTimeout(() => {
-        fetchUser().catch(() => {});
-      }, 100);
+      fetchUser().catch(() => {});
     }
   }, [searchParams, setSearchParams, fetchUser]);
 

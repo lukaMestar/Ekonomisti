@@ -16,7 +16,7 @@ import java.nio.charset.StandardCharsets;
 @Configuration
 public class DataSourceConfig {
 
-    @Value("${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/ekonomisti}")
+    @Value("${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/ekonomisti}")
     private String dataSourceUrl;
 
     @Value("${SPRING_DATASOURCE_USERNAME:postgres}")
@@ -33,7 +33,7 @@ public class DataSourceConfig {
         String dbPassword = password;
         
         if (jdbcUrl == null || jdbcUrl.isEmpty()) {
-            jdbcUrl = "jdbc:postgresql://localhost:5432/ekonomisti";
+            jdbcUrl = "jdbc:postgresql://localhost:5433/ekonomisti";
         }
         
     

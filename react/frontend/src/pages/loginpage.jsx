@@ -1,38 +1,55 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { API_URL } from "../config.js";
-import { apiCall } from "../api.js";
+import { apiCall, getSessionToken } from "../api.js";
 
 function LoginPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    apiCall(`${API_URL}/api/user`, {
-      method: "GET",
-    })
-      .then((res) => {
-        if (res.ok) {
-          return res.json();
-        }
-        throw new Error("Not authenticated");
+    // Provjeri da li postoji token prije nego što pozoveš API
+    const token = getSessionToken();
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlToken = urlParams.get("token");
+
+    // Ako postoji token u URL-u, TokenHandler će ga obraditi
+    if (urlToken) {
+      setLoading(false);
+      return;
+    }
+
+    // Ako postoji token u localStorage, provjeri da li je korisnik već prijavljen
+    if (token) {
+      apiCall(`${API_URL}/api/user`, {
+        method: "GET",
       })
-      .then((data) => {
-        if (data.role === "ADMIN") {
-          navigate("/admin", { replace: true });
-        } else if (data.role === "RACUNOVODA") {
-          navigate("/racunovoda", { replace: true });
-        } else if (data.role === "KLIJENT") {
-          navigate("/klijent", { replace: true });
-        } else if (data.role === "RADNIK") {
-          navigate("/radnik", { replace: true });
-        } else {
-          navigate("/pocetna", { replace: true });
-        }
-      })
-      .catch(() => {
-        setLoading(false);
-      });
+        .then((res) => {
+          if (res.ok) {
+            return res.json();
+          }
+          throw new Error("Not authenticated");
+        })
+        .then((data) => {
+          if (data.role === "ADMIN") {
+            navigate("/admin", { replace: true });
+          } else if (data.role === "RACUNOVODA") {
+            navigate("/racunovoda", { replace: true });
+          } else if (data.role === "KLIJENT") {
+            navigate("/klijent", { replace: true });
+          } else if (data.role === "RADNIK") {
+            navigate("/radnik", { replace: true });
+          } else {
+            navigate("/pocetna", { replace: true });
+          }
+        })
+        .catch(() => {
+          setLoading(false);
+        });
+    } else {
+      // Ako nema tokena, samo prikaži login formu
+      setLoading(false);
+    }
   }, [navigate]);
 
   if (loading) {
