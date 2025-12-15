@@ -27,6 +27,9 @@ import Aktivnosti from "./USERI/ADMIN/Aktivnosti.jsx";
 import ListaKorisnika from "./USERI/ADMIN/ListaKorisnika.jsx";
 import { setSessionToken } from "./api.js";
 import { useUser } from "./UserContext.jsx";
+import NovaFaktura from "./USERI/KLIJENT/NovaFaktura.jsx";
+import Faktura from "./USERI/KLIJENT/Faktura.jsx";
+import DodajRadnika from "./USERI/KLIJENT/DodajRadnika.jsx";
 
 function TokenHandler() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -69,6 +72,9 @@ function App() {
           <Route path="/novinalog" element={<NoviNalog />} />
           <Route path="/racuni" element={<Racuni />} />
           <Route path="/podaci" element={<Podaci />} />
+          <Route path="/faktura" element={<Faktura />} />
+          <Route path="/novafaktura" element={<NovaFaktura />} />
+          <Route path="/dodajradnika" element={<DodajRadnika />} />
           <Route path="/Aktivnosti" element={<Aktivnosti />} />
           <Route path="/ListaKorisnika" element={<ListaKorisnika />} />
           <Route path="/DodajKorisnika" element={<DodajKorisnika />} />

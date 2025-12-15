@@ -31,9 +31,17 @@ function Klijent() {
           <Link to="/nalog" style={{ textDecoration: "none", color: "blue" }}>
             Putni nalog
           </Link>
+           <Link to="/faktura" style={{ textDecoration: "none", color: "blue" }}>
+            Nova faktura
+          </Link>
           <Link to="/racuni" style={{ textDecoration: "none", color: "blue" }}>
             Moji računi
           </Link>
+          <Link to="/dodajradnika" style={{ textDecoration: "none", color: "blue" }}>
+            Dodaj radnika
+          </Link>
+         
+
           <button onClick={handleLogout} className="logout-button">
             Odjava
           </button>

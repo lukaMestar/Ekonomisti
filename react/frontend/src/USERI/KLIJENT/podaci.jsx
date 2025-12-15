@@ -4,6 +4,10 @@ import { useKlijent } from "./KlijentContext";
 function Podaci() {
   const { podaci, putniNalozi, placeniRacuni, neplaceniRacuni } = useKlijent();
 
+  const safePutniNalozi = Array.isArray(putniNalozi) ? putniNalozi : [];
+  const safePlaceniRacuni = Array.isArray(placeniRacuni) ? placeniRacuni : [];
+  const safeNeplaceniRacuni = Array.isArray(neplaceniRacuni) ? neplaceniRacuni : [];
+
   return (
     <div>
       <h1>Podaci korisnika</h1>
@@ -53,11 +57,11 @@ function Podaci() {
       <h2>Putni nalozi i fakture</h2>
 
       <h3>Putni nalozi</h3>
-      {putniNalozi.length === 0 ? (
+      {safePutniNalozi.length === 0 ? (
         <p>Nema unesenih putnih naloga.</p>
       ) : (
         <ul>
-          {putniNalozi.map((nalozi) => (
+          {safePutniNalozi.map((nalozi) => (
             <li key={nalozi.id}>
               {nalozi.opis || "Putni nalog"} — {nalozi.datum || "Nepoznato"}
             </li>
@@ -66,11 +70,11 @@ function Podaci() {
       )}
 
       <h3>Neplaćeni računi</h3>
-      {neplaceniRacuni.length === 0 ? (
+      {safeNeplaceniRacuni.length === 0 ? (
         <p>Nema neplaćenih računa.</p>
       ) : (
         <ul>
-          {neplaceniRacuni.map((r) => (
+          {safeNeplaceniRacuni.map((r) => (
             <li key={r.id}>
               {r.naziv} — {r.iznos} € (dospijeće: {r.datum})
             </li>
@@ -79,11 +83,11 @@ function Podaci() {
       )}
 
       <h3>Plaćeni računi</h3>
-      {placeniRacuni.length === 0 ? (
+      {safePlaceniRacuni.length === 0 ? (
         <p>Nema plaćenih računa.</p>
       ) : (
         <ul>
-          {placeniRacuni.map((r) => (
+          {safePlaceniRacuni.map((r) => (
             <li key={r.id}>
               {r.naziv} — {r.iznos} € (plaćeno: {r.datum})
             </li>

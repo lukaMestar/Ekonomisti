@@ -48,12 +48,12 @@ function NoviNalog() {
       ostaliTroskovi: ""
     }); */
 
-    Navigate("/radnik");
+    Navigate(-1);
 
    }    catch (error) {
          /* console.error("Greška pri spremanju putnog naloga:", error);
          alert("Došlo je do greške pri spremanju putnog naloga!"); */
-         Navigate("/radnik");
+         Navigate(-1);
       }
    };
 

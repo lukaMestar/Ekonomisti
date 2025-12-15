@@ -1,22 +1,19 @@
 import { useKlijent } from "../../USERI/KLIJENT/KlijentContext.jsx";
 
 function Racuni() {
-   const { placeniRacuni, neplaceniRacuni } = useKlijent();
+  const { placeniRacuni, neplaceniRacuni } = useKlijent();
 
-   
+  const placeni = Array.isArray(placeniRacuni) ? placeniRacuni : [];
+  const neplaceni = Array.isArray(neplaceniRacuni) ? neplaceniRacuni : [];
 
   const handlePlati = (id) => {
     //placanje
     alert("Plaćanje uspješno izvršeno kreditnom karticom ✅");
   };
 
-  const placeni = placeniRacuni;
-  const neplaceni = neplaceniRacuni;
-
   return (
     <div>
       <h1>Pregled svih računa</h1>
-
 
       <h3>Neplaćeni računi</h3>
       {neplaceni.length === 0 ? (
