@@ -5,6 +5,12 @@ import { API_URL, FRONTEND_URL } from "../../config.js";
 
 function Racunovoda() {
   const { user } = useUser();
+  const racunovodaContext = useRacunovoda();
+
+  if (!racunovodaContext) {
+    return <p>Učitavanje...</p>;
+  }
+
   const {
     klijenti,
     setKlijenti,

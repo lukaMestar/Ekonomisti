@@ -15,11 +15,10 @@ const ROLE_MAP = {
 
 export default function DodajKorisnika() {
   const [email, setEmail] = useState("");
-  const [idUloge, setRole] = useState(2); //default je "RACUNOVODA"
+  const [idUloge, setRole] = useState(2);
 
   const handleRoleChange = (event) => {
     const selectedRole = event.target.value;
-    // pretvori ulogu u idUloge
     setRole(ROLE_MAP[selectedRole]);
   };
 
