@@ -3,11 +3,15 @@ import { useState } from "react";
 function Odabir({ opcije, onOdaberi }) {
   const [odabrano, setOdabrano] = useState("");
 
+  if (!opcije || !Array.isArray(opcije) || opcije.length === 0) {
+    return <p>Učitavanje opcija...</p>;
+  }
+
   const handleChange = (e) => {
     const value = e.target.value;
     setOdabrano(value);
     if (value) {
-      onOdaberi(value); 
+      onOdaberi(value);
     }
   };
 
