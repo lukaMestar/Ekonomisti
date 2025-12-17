@@ -16,12 +16,28 @@ export function RacunovodaProvider({ children }) {
     );
   };
 
-  const postaviCijenu = (id, novaCijena) => {
+  const postaviCijenu = async (id, novaCijena) => {
   setKlijenti((prev) =>
     prev.map((k) =>
       k.id === id ? { ...k, cijena: novaCijena } : k
     )
   );
+
+  // novo - post za postavljanje cijene
+  /*try {
+    const response = await fetch(`${API_URL}/api/cijene`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ idKlijenta: id, cijena: novaCijena }),
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      alert("Greška pri spremanju cijene na server: " + text);
+    }
+  } catch (error) {
+    alert("Greška pri spajanju na server: " + error.message);
+  }*/
 };
 
   // Inicijalizacija mock podataka
