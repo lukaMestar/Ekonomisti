@@ -65,6 +65,7 @@ CREATE TABLE jeZaposlen (
 CREATE TABLE Faktura (
     idFaktura SERIAL PRIMARY KEY,
     datum DATE NOT NULL,
+    dobavljac VARCHAR(250),
     iznos DECIMAL(10,2) NOT NULL,
     opis TEXT,
     tipFakture VARCHAR(50) CHECK (tipFakture IN ('prihod', 'rashod')) NOT NULL,
@@ -79,8 +80,10 @@ CREATE TABLE Faktura (
 
 CREATE TABLE PutniNalog (
     idPutniNalog SERIAL PRIMARY KEY,
-    relacija VARCHAR(100),
-    datumIzdavanja DATE,
+    polaziste VARCHAR(100),
+    destinacija VARCHAR(100),
+    datumPolaska DATE,
+    datumPovratka DATE,
     trosak DECIMAL(10,2),
     idZaposlenik INT REFERENCES Zaposlenik(idKorisnika) ON DELETE CASCADE,
     idFirma INT,
