@@ -19,6 +19,7 @@ function Izvjestaj() {
         setIzvjestaj(data);
         */
 
+        // mock - kasnije obrisati
         setIzvjestaj({
           prihodi: 5000,
           rashodi: 3000,

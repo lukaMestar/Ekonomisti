@@ -18,7 +18,6 @@ function Racunklijenti() {
       return;
     }
 
-    // Navigacija na izvještaj (ili kasnije API poziv)
     navigate(`/izvjestaj/${odabraniKlijent}/${odabraniMjesec}`);
   };
 

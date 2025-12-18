@@ -17,8 +17,7 @@ function PostaviCijenu() {
       alert("Unesite ispravnu brojčanu vrijednost!");
       return;
     }
-    postaviCijenu(klijent.id, broj);
-    alert(`Cijena za ${klijent.ime} postavljena na ${broj} e`);
+    postaviCijenu(klijent.id, broj, klijent.ime);
     setCijena("");
   };
 
