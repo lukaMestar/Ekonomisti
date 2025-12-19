@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../RADNIK/radnik.css"
+import { API_URL } from "../../config.js";
+import { apiCall } from "../../api.js";
 
 function NovaFaktura() {
   const navigate = useNavigate();
@@ -34,21 +36,34 @@ function NovaFaktura() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const fakturafin = {
+      datum: faktura.datum,
+      dobavljac: faktura.dobavljac,
+      iznos: Number(getUkupno()),
+      opis: faktura.napomene,
+      tipFakture: "prihod",
+      idFirma: 1,
+      idKlijent: 1
+    };
     try {
-      /* 
-      const response = await fetch("#", {
+      const response = await apiCall(`${API_URL}/api/addfaktura`, {
         method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(faktura),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(fakturafin),
       });
-      if (!response.ok) throw new Error("Neuspješno spremanje fakture");
-      alert("Faktura je uspješno spremljena!");
-      */
-      navigate(-1);
+
+      const responseText = await response.text();
+
+      if (response.ok) {
+        alert("Faktura added successfully");
+        
+      } else {
+        alert("Error adding faktura: " + responseText);
+      }
     } catch (error) {
-      /* console.error(error); alert("Greška pri spremanju fakture"); */
-      navigate(-1);
+      alert("Error adding faktura: " + error.message);
     }
   };
 

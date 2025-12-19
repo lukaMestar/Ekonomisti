@@ -1,6 +1,8 @@
 import { useState } from "react";
 import "./radnik.css";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../../config.js";
+import { apiCall } from "../../api.js";
 
 function NoviNalog() {
 
@@ -9,8 +11,8 @@ function NoviNalog() {
    const [putniNalog, setPutniNalog] = useState({
       polaziste: "",
       destinacija: "",
-      datumPolaska: "",
-      datumPovratka: "",
+      datumpolaska: "",
+      datumpovratka: "",
       svrhaPutovanja: "",
       prijevoznoSredstvo: "",
       troskoviSmjestaja: "",
@@ -18,42 +20,36 @@ function NoviNalog() {
    });
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  
-  try {
-    /* const response = await fetch("#", { // dodati pravi endpoint
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(putniNalog)
-    });
+   e.preventDefault();
+   const nalogfin = {
+         polaziste: putniNalog.polaziste,
+         destinacija: putniNalog.destinacija,
+         datumPolaska: putniNalog.datumpolaska,
+         datumPovratka: putniNalog.datumpovratka,
+         trosak: putniNalog.troskoviSmjestaja + putniNalog.ostaliTroskovi,
+         idZaposlenik: 1,
+         idFirma: 1,
+         idKlijent: 1
+    };
+   try {
+         const response = await apiCall(`${API_URL}/api/addnalog`, {
+         method: "POST",
+         headers: {
+            "Content-Type": "application/json",
+         },
+         body: JSON.stringify(nalogfin),
+         });
 
-    if (!response.ok) throw new Error("Failed to save travel order");
+         const responseText = await response.text();
 
-    const result = await response.json();
-    console.log("Putni nalog spremljen:", result);
-
-    alert("Putni nalog je uspješno spremljen!");
-    
-    setPutniNalog({
-      polaziste: "",
-      destinacija: "",
-      datumPolaska: "",
-      datumPovratka: "",
-      svrhaPutovanja: "",
-      prijevoznoSredstvo: "",
-      troskoviSmjestaja: "",
-      ostaliTroskovi: ""
-    }); */
-
-    Navigate(-1);
-
-   }    catch (error) {
-         /* console.error("Greška pri spremanju putnog naloga:", error);
-         alert("Došlo je do greške pri spremanju putnog naloga!"); */
-         Navigate(-1);
+         if (response.ok) {
+         alert("Nalog added successfully");
+         
+         } else {
+         alert("Error adding nalog: " + responseText);
+         }
+      } catch (error) {
+         alert("Error adding nalog: " + error.message);
       }
    };
 
