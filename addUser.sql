@@ -9,3 +9,7 @@ VALUES ('Luka', 'Mestrovic2', 'vecar222@gmail.com', 'google', 'vecar222@gmail.co
 ON CONFLICT (email) 
 DO NOTHING;
 
+INSERT INTO Korisnici (imeKorisnik, prezimeKorisnik, email, provider, providerUserId, idUloge, datumRegistracije)
+VALUES ('Ivan', 'Lovrinovic', 'ivan.lovrinovic.zg@gmail.com', 'google', 'ivan.lovrinovic.zg@gmail.com', 4, CURRENT_DATE)
+ON CONFLICT (email) 
+DO NOTHING;

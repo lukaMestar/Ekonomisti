@@ -30,6 +30,7 @@ import { useUser } from "./UserContext.jsx";
 import NovaFaktura from "./USERI/KLIJENT/NovaFaktura.jsx";
 import Faktura from "./USERI/KLIJENT/Faktura.jsx";
 import DodajRadnika from "./USERI/KLIJENT/DodajRadnika.jsx";
+import RequireRole from "./Auth/RequireRole"; 
 
 function TokenHandler() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -55,29 +56,28 @@ function App() {
       <Router>
         <TokenHandler />
         <Routes>
-          <Route path="/" element={<LoginPage />} />
-
-          <Route path="/pocetna" element={<FrontPage />} />
-          <Route path="/admin" element={<Admin />} />
-          <Route path="/klijent" element={<Klijent />} />
-          <Route path="/racunovoda" element={<Racunovoda />} />
-          <Route path="/racunklijenti" element={<Racunklijenti />} />
-          <Route path="/dodajklijenta" element={<Dodajklijenta />} />
-          <Route path="/izvjestaj/:klijentId/:mjesec" element={<Izvjestaj />} />
-          <Route path="/klijent/:klijentId" element={<KlijentInfo />} />
-          <Route path="/postaviCijenu/:klijentId" element={<PostaviCijenu />} />
-          <Route path="/radnik" element={<Radnik />} />
-          <Route path="/odabir" element={<Odabir />} />
-          <Route path="/nalog" element={<Nalog />} />
-          <Route path="/novinalog" element={<NoviNalog />} />
-          <Route path="/racuni" element={<Racuni />} />
-          <Route path="/podaci" element={<Podaci />} />
-          <Route path="/faktura" element={<Faktura />} />
-          <Route path="/novafaktura" element={<NovaFaktura />} />
-          <Route path="/dodajradnika" element={<DodajRadnika />} />
-          <Route path="/Aktivnosti" element={<Aktivnosti />} />
-          <Route path="/ListaKorisnika" element={<ListaKorisnika />} />
-          <Route path="/DodajKorisnika" element={<DodajKorisnika />} />
+          <Route path="/"                             element={                                                       <LoginPage />                     } />
+          <Route path="/pocetna"                      element={                                                       <FrontPage />                     } />
+          <Route path="/admin"                        element={<RequireRole roles={["ROLE_ADMIN"                ]}>   <Admin />           </RequireRole>} />
+          <Route path="/klijent"                      element={<RequireRole roles={["ROLE_KLIJENT"              ]}>   <Klijent />         </RequireRole>} />
+          <Route path="/racunovoda"                   element={<RequireRole roles={["ROLE_RACUNOVODA"           ]}>   <Racunovoda />      </RequireRole>} />
+          <Route path="/racunklijenti"                element={<RequireRole roles={["ROLE_RACUNOVODA"           ]}>   <Racunklijenti />   </RequireRole>} />
+          <Route path="/dodajklijenta"                element={<RequireRole roles={["ROLE_RACUNOVODA"           ]}>   <Dodajklijenta />   </RequireRole>} />
+          <Route path="/izvjestaj/:klijentId/:mjesec" element={<RequireRole roles={["ROLE_RACUNOVODA"           ]}>   <Izvjestaj />       </RequireRole>} />
+          <Route path="/klijent/:klijentId"           element={<RequireRole roles={["ROLE_RACUNOVODA"           ]}>   <KlijentInfo />     </RequireRole>} />
+          <Route path="/postaviCijenu/:klijentId"     element={<RequireRole roles={["ROLE_RACUNOVODA"           ]}>   <PostaviCijenu />   </RequireRole>} />
+          <Route path="/radnik"                       element={<RequireRole roles={["ROLE_RADNIK"               ]}>   <Radnik />          </RequireRole>} />
+          <Route path="/odabir"                       element={<RequireRole roles={["ROLE_RADNIK"               ]}>   <Odabir />          </RequireRole>} />
+          <Route path="/nalog"                        element={<RequireRole roles={["ROLE_RADNIK","ROLE_KLIJENT"]}>   <Nalog />           </RequireRole>} />
+          <Route path="/novinalog"                    element={<RequireRole roles={["ROLE_RADNIK","ROLE_KLIJENT"]}>   <NoviNalog />       </RequireRole>} />
+          <Route path="/racuni"                       element={<RequireRole roles={["ROLE_KLIJENT"              ]}>   <Racuni />          </RequireRole>} />
+          <Route path="/podaci"                       element={<RequireRole roles={["ROLE_KLIJENT"              ]}>   <Podaci />          </RequireRole>} />
+          <Route path="/faktura"                      element={<RequireRole roles={["ROLE_KLIJENT"              ]}>   <Faktura />         </RequireRole>} />
+          <Route path="/dodajradnika"                 element={<RequireRole roles={["ROLE_KLIJENT"              ]}>   <DodajRadnika />    </RequireRole>} />
+          <Route path="/novafaktura"                  element={<RequireRole roles={["ROLE_KLIJENT"              ]}>   <NovaFaktura />     </RequireRole>} />
+          <Route path="/Aktivnosti"                   element={<RequireRole roles={["ROLE_ADMIN"                ]}>   <Aktivnosti />      </RequireRole>} />
+          <Route path="/ListaKorisnika"               element={<RequireRole roles={["ROLE_ADMIN"                ]}>   <ListaKorisnika />  </RequireRole>} />
+          <Route path="/DodajKorisnika"               element={<RequireRole roles={["ROLE_ADMIN"                ]}>   <DodajKorisnika />  </RequireRole>} />
         </Routes>
       </Router>
     </UserProvider>
