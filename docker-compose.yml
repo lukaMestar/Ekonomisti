@@ -1,0 +1,86 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ekonomisti-db
+    environment:
+      POSTGRES_DB: ekonomisti
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-bazepodataka}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "5432:5432"
+    networks:
+      - ekonomisti-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./react/backend
+      dockerfile: Dockerfile
+    container_name: ekonomisti-backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/ekonomisti
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-bazepodataka}
+      SERVER_PORT: 9090
+      FRONTEND_URL: ${FRONTEND_URL:-https://ekonomisti.primakon.com}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      COOKIE_SECURE: "true"
+      COOKIE_SAME_SITE: "None"
+      SHOW_SQL: ${SHOW_SQL:-false}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - ekonomisti-network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./react/frontend
+      dockerfile: Dockerfile
+    container_name: ekonomisti-frontend
+    environment:
+      # U produkciji koristi relativnu putanju
+      VITE_API_URL: /backend
+      VITE_FRONTEND_URL: ${FRONTEND_URL:-https://ekonomisti.primakon.com}
+    volumes:
+      - frontend_dist:/output
+    networks:
+      - ekonomisti-network
+    restart: "no" # Frontend samo builda i kopira fajlove
+    command: sh -c "cp -r /usr/share/nginx/html/* /output/ && echo 'Frontend files copied to volume' && tail -f /dev/null"
+
+  nginx:
+    image: nginx:alpine
+    container_name: ekonomisti-nginx
+    ports:
+      - "4443:4443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - frontend_dist:/usr/share/nginx/html:ro
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - ekonomisti-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  frontend_dist:
+
+networks:
+  ekonomisti-network:
+    driver: bridge

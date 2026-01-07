@@ -1,0 +1,57 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ekonomisti-db-local
+    environment:
+      POSTGRES_DB: ekonomisti
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: bazepodataka
+    ports:
+      - "5433:5432" # Mapiran na 5433 da ne konfliktira s lokalnom instalacijom
+    volumes:
+      - postgres_data_local:/var/lib/postgresql/data
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+    networks:
+      - ekonomisti-network-local
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./react/backend
+      dockerfile: Dockerfile
+    container_name: ekonomisti-backend-local
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/ekonomisti
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: bazepodataka
+      SERVER_PORT: 9090
+      FRONTEND_URL: http://localhost:5173
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-188867089736-sa463uj75r7t2ijdd478obnid77nd4ds.apps.googleusercontent.com}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-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}
+      COOKIE_SECURE: "false"
+      COOKIE_SAME_SITE: "lax"
+      SHOW_SQL: "true"
+    ports:
+      - "9090:9090" # Dostupan na localhost:9090
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - ekonomisti-network-local
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  postgres_data_local:
+
+networks:
+  ekonomisti-network-local:
+    driver: bridge
