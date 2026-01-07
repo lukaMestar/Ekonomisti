@@ -12,11 +12,26 @@ export function RadnikProvider({ children }) {
       credentials: "include",
     })
       .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch tvrtke");
+        if (!res.ok) {
+          throw new Error(`Failed to fetch tvrtke: ${res.status}`);
+        }
         return res.json();
       })
-      .then((data) => setTvrtke(data))
-      .catch(() => {
+      .then((data) => {
+        if (data && Array.isArray(data) && data.length > 0) {
+          setTvrtke(data);
+        } else {
+          setTvrtke(["Tvrtka A", "Tvrtka B", "Tvrtka C"]);
+        }
+      })
+      .catch((err) => {
+        if (err.message.includes("404")) {
+          console.log(
+            "API endpoint /api/tvrtke ne postoji, koriste se mock podaci"
+          );
+        } else {
+          console.warn("Greška kod dohvaćanja tvrtki:", err.message);
+        }
         setTvrtke(["Tvrtka A", "Tvrtka B", "Tvrtka C"]);
       });
   }, []);
