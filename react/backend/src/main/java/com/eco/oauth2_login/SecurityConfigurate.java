@@ -58,11 +58,7 @@ public class SecurityConfigurate {
             if (url.contains("localhost")) {
                 url = "http://" + url;
             } else {
-                if (!url.contains(".") && !url.contains("localhost")) {
-                    url = "https://" + url + ".onrender.com";
-                } else {
-                    url = "https://" + url;
-                }
+                url = "https://" + url;
             }
         }
         
@@ -127,7 +123,6 @@ public class SecurityConfigurate {
         String allowedOrigin = getFrontendUrl();
        
         config.addAllowedOrigin(allowedOrigin);
-        config.addAllowedOrigin("https://ekonomisti-frontend.onrender.com");
         config.addAllowedOrigin("http://localhost:5173");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
@@ -160,9 +155,13 @@ class ExceptionHandlingFilter implements Filter {
                     try {
                         String frontendUrl = System.getenv("FRONTEND_URL");
                         if (frontendUrl == null || frontendUrl.isEmpty()) {
-                            frontendUrl = "https://ekonomisti-frontend.onrender.com";
+                            frontendUrl = "http://localhost:5173";
                         } else if (!frontendUrl.startsWith("http://") && !frontendUrl.startsWith("https://")) {
-                            frontendUrl = "https://" + frontendUrl;
+                            if (frontendUrl.contains("localhost")) {
+                                frontendUrl = "http://" + frontendUrl;
+                            } else {
+                                frontendUrl = "https://" + frontendUrl;
+                            }
                         }
                         httpResponse.sendRedirect(frontendUrl + "/?error=serverError");
                     } catch (Exception redirectEx) {
@@ -304,11 +303,7 @@ class CustomOAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSu
                 if (this.frontendUrl.contains("localhost")) {
                     this.frontendUrl = "http://" + this.frontendUrl;
                 } else {
-                    if (!this.frontendUrl.contains(".") && !this.frontendUrl.contains("localhost")) {
-                        this.frontendUrl = "https://" + this.frontendUrl + ".onrender.com";
-                    } else {
-                        this.frontendUrl = "https://" + this.frontendUrl;
-                    }
+                    this.frontendUrl = "https://" + this.frontendUrl;
                 }
             }
         }

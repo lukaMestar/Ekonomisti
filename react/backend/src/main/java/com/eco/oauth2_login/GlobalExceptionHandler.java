@@ -23,7 +23,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         if (requestURI != null && (requestURI.contains("/oauth2/") || requestURI.contains("/login/oauth2/"))) {
             String frontendUrl = System.getenv("FRONTEND_URL");
             if (frontendUrl == null || frontendUrl.isEmpty()) {
-                frontendUrl = "https://ekonomisti-frontend.onrender.com";
+                frontendUrl = "http://localhost:5173";
             } else if (!frontendUrl.startsWith("http://") && !frontendUrl.startsWith("https://")) {
                 if (frontendUrl.contains("localhost")) {
                     frontendUrl = "http://" + frontendUrl;

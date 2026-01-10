@@ -4,8 +4,8 @@ spring:
       client:
         registration:
           google:
-            client-id: ${GOOGLE_CLIENT_ID:188867089736-sa463uj75r7t2ijdd478obnid77nd4ds.apps.googleusercontent.com}
-            client-secret: ${GOOGLE_CLIENT_SECRET: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}
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
             client-name: Google
             scope:
               - openid
@@ -43,6 +43,7 @@ spring:
 server:
   port: ${PORT:${SERVER_PORT:9090}}
   address: 0.0.0.0
+  forward-headers-strategy: framework
   servlet:
     session:
       cookie:

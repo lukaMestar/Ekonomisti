@@ -18,9 +18,9 @@ FROM eclipse-temurin:21-jdk
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
-# Render sets PORT dynamically, but we expose a default for documentation
+# Expose default port
 EXPOSE 9090
 
 # Use exec form to ensure proper signal handling
-# Environment variables are automatically passed by Render at runtime
+# Environment variables are passed via docker-compose
 CMD ["java", "-jar", "app.jar"]
