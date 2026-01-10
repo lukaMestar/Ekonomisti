@@ -32,8 +32,8 @@ services:
       SERVER_PORT: 9090
       FRONTEND_URL: ${FRONTEND_URL:-https://ekonomisti.primakon.com}
       BASE_URL: ${BASE_URL:-}
-      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-1086536574496-77p8ij5mnglttkakaqeta9fslecuiqh71.apps.googleusercontent.com}
-      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-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}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       COOKIE_SECURE: "true"
       COOKIE_SAME_SITE: "None"
       SHOW_SQL: ${SHOW_SQL:-false}
@@ -56,7 +56,7 @@ services:
       - frontend_dist:/output
     networks:
       - ekonomisti-network
-    restart: "no" 
+    restart: "no"
     command: sh -c "cp -r /usr/share/nginx/html/* /output/ && echo 'Frontend files copied to volume' && tail -f /dev/null"
 
   nginx:

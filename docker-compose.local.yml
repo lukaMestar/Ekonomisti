@@ -31,8 +31,8 @@ services:
       SPRING_DATASOURCE_PASSWORD: bazepodataka
       SERVER_PORT: 9090
       FRONTEND_URL: http://localhost:5173
-      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-1086536574496-77p8ij5mnglttkakaqeta9fslecuiqh71.apps.googleusercontent.com}
-      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-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}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       COOKIE_SECURE: "false"
       COOKIE_SAME_SITE: "lax"
       SHOW_SQL: "true"

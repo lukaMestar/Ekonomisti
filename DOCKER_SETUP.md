@@ -12,7 +12,13 @@ Ovaj dokument opisuje kako pokrenuti aplikaciju lokalno i na produkcijskom serve
 
 ### Opcija 1: Bez Docker-a (razvoj)
 
+**VAŽNO:** Za lokalno pokretanje bez Docker-a, postavite environment varijable:
+
 ```bash
+# Postavite Google OAuth credentials
+export GOOGLE_CLIENT_ID="your-client-id"
+export GOOGLE_CLIENT_SECRET="your-client-secret"
+
 # Terminal 1: Backend
 cd react/backend
 mvn spring-boot:run
@@ -27,6 +33,12 @@ Aplikacija će biti dostupna na:
 
 - Frontend: http://localhost:5173
 - Backend: http://localhost:9090
+
+**Napomena:** Ako koristite `.env` datoteku, možete je učitati:
+
+```bash
+export $(cat .env | xargs)
+```
 
 ### Opcija 2: Docker Compose (backend + baza)
 
@@ -76,12 +88,21 @@ nano .env
 **Sadržaj .env:**
 
 ```env
-DB_PASSWORD=your-secure-password-here
+# Google OAuth Configuration (OBAVEZNO! - jedini izvor istine)
 GOOGLE_CLIENT_ID=your-google-client-id
 GOOGLE_CLIENT_SECRET=your-google-client-secret
+
+# Database Configuration
+DB_PASSWORD=your-secure-password-here
+
+# Frontend URL
 FRONTEND_URL=https://ekonomisti.primakon.com
+
+# Optional: SQL logging
 SHOW_SQL=false
 ```
+
+**VAŽNO:** Client ID i Secret se definiraju SAMO u `.env` datoteci. Ne postavljajte ih nigdje drugdje!
 
 ### Korak 3: Ažurirajte Google OAuth Redirect URI
 
