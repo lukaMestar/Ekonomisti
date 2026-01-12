@@ -38,12 +38,15 @@ public class UserController {
         
         String email = principal.getAttribute("email");
         String role = "USER";
+        Long id = 0L;
         
         if (email != null) {
             Optional<Korisnik> userOptional = userRepository.findByEmail(email);
+            
             if (userOptional.isPresent()) {
                 Korisnik user = userOptional.get();
                 Integer idUloge = user.getIdUloge();
+                id = user.getIdKorisnika();
                 if (idUloge != null) {
                     switch (idUloge) {
                         case 1 -> role = "ADMIN";
@@ -61,6 +64,9 @@ public class UserController {
         result.put("email", email != null ? email : "");
         result.put("picture", principal.getAttribute("picture") != null ? principal.getAttribute("picture") : "");
         result.put("role", role);
+        if(id!=0){
+            result.put("id", id);
+        }
         
         return ResponseEntity.ok(result);
     }

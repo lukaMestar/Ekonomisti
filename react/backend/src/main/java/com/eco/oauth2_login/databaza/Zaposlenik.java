@@ -14,8 +14,9 @@ public class Zaposlenik {
     @Column(name = "placa", precision = 10, scale = 2)
     private BigDecimal placa;
 
+    @MapsId
     @OneToOne
-    @JoinColumn(name = "idkorisnika", referencedColumnName = "idkorisnika", insertable = false, updatable = false)
+    @JoinColumn(name = "idkorisnika", referencedColumnName = "idkorisnika")
     private Korisnik korisnik;
 
     public Zaposlenik() {
@@ -43,8 +44,5 @@ public class Zaposlenik {
 
     public void setKorisnik(Korisnik korisnik) {
         this.korisnik = korisnik;
-        if (korisnik != null) {
-            this.idKorisnika = korisnik.getIdKorisnika();
-        }
     }
 }
