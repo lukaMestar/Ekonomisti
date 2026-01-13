@@ -4,19 +4,19 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "RacunovodjaKlijent") // DB table name stays as-is
+@Table(name = "racunovodjaklijent")
 @IdClass(RacunovodaKlijentId.class)
 public class RacunovodaKlijent {
 
     @Id
-    @Column(name = "idRacunovodja")
+    @Column(name = "idracunovodja")
     private Long idRacunovoda;
 
     @Id
-    @Column(name = "idKlijent")
+    @Column(name = "idklijent")
     private Long idKlijent;
 
-    @Column(name = "mjesecniTrosakUsluge")
+    @Column(name = "mjesecnitrosakusluge")
     private BigDecimal mjesecniTrosakUsluge;
 
     public Long getIdRacunovoda() {

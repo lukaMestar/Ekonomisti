@@ -128,6 +128,27 @@ AFTER INSERT OR UPDATE ON Korisnici
 FOR EACH ROW
 EXECUTE FUNCTION sync_klijent_role();
 
+--Trigger za računovođe
+CREATE OR REPLACE FUNCTION sync_racunovodja_role()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.idUloge = 2 THEN -- Računovođa
+        INSERT INTO Racunovodja(idKorisnika)
+        VALUES (NEW.idKorisnika)
+        ON CONFLICT DO NOTHING;
+    ELSE
+        DELETE FROM Racunovodja
+        WHERE idKorisnika = NEW.idKorisnika;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER sync_racunovodja_trigger
+AFTER INSERT OR UPDATE ON Korisnici
+FOR EACH ROW
+EXECUTE FUNCTION sync_racunovodja_role();
+
 -- Insert admin user
 INSERT INTO Korisnici (imeKorisnik, prezimeKorisnik, email, provider, providerUserId, idUloge, datumRegistracije) VALUES
 ('Luka', 'Mestrovic', 'luka.mestarm@gmail.com', 'google', 'luka.mestarm@gmail.com', 1, CURRENT_DATE)
