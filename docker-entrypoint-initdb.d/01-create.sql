@@ -104,6 +104,30 @@ INSERT INTO Uloge (imeUloge) VALUES
 ('Klijent'),
 ('Radnik');
 
+-- Triggeri da se automatski popuni "Klijent" tablica
+CREATE OR REPLACE FUNCTION sync_klijent_role()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- If user is Klijent and not already in Klijent table
+    IF NEW.idUloge IS NOT NULL AND NEW.idUloge = 3 THEN
+        INSERT INTO Klijent(idKorisnika)
+        VALUES (NEW.idKorisnika)
+        ON CONFLICT DO NOTHING;
+    ELSE
+        -- If user is no longer Klijent, remove from Klijent table
+        DELETE FROM Klijent
+        WHERE idKorisnika = NEW.idKorisnika;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER sync_klijent_trigger
+AFTER INSERT OR UPDATE ON Korisnici
+FOR EACH ROW
+EXECUTE FUNCTION sync_klijent_role();
+
 -- Insert admin user
 INSERT INTO Korisnici (imeKorisnik, prezimeKorisnik, email, provider, providerUserId, idUloge, datumRegistracije) VALUES
 ('Luka', 'Mestrovic', 'luka.mestarm@gmail.com', 'google', 'luka.mestarm@gmail.com', 1, CURRENT_DATE)

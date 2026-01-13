@@ -51,38 +51,40 @@ export function RacunovodaProvider({ children }) {
 
   // Inicijalizacija mock podataka - kasnije maknuti
   useEffect(() => {
-  setKlijenti([
-    { id: 1, ime: "Klijent A", status: "Neodrađen", cijena: 0 },
-    { id: 2, ime: "Klijent B", status: "Odrađen", cijena: 0 },
-    { id: 3, ime: "Klijent C", status: "Neodrađen", cijena: 0 },
-  ]);
-    }, []);
+  fetch(`${API_URL}/api/racunovoda/moji-klijenti`, {
+    credentials: "include",
+  })
+    .then(res => {
+      if (!res.ok) throw new Error("Ne mogu dohvatiti klijente");
+      return res.json();
+    })
+    .then(data => {
+      // Map server data to the format expected by your frontend
+      setKlijenti(
+        data.map(k => ({
+          id: k.id,
+          ime: `${k.ime} ${k.prezime}`,
+          status: "Neodrađen",
+          cijena: 0
+        }))
+      );
+    })
+    .catch(err => console.error(err));
+}, []);
 
 
 // dohvat klijenata/slobodnih klijenata - provjerit adrese
-/*
-  useEffect(() => {
-      fetch(`${API_URL}/api/klijenti`, {
-        credentials: "include",
+ useEffect(() => {
+    fetch(`${API_URL}/api/racunovoda/slobodni-klijenti`, {
+      credentials: "include",
+    })
+      .then(res => {
+        if (!res.ok) throw new Error("Ne mogu dohvatiti slobodne klijente");
+        return res.json();
       })
-        .then((res) => res.json())
-        .then((data) => setKlijenti(data))
-        .catch((err) =>
-          console.error("Greška kod dohvaćanja klijenata:", err)
-        );
-    }, []);
-
-    useEffect(() => {
-        fetch(`/slobodniKlijenti`, {
-          credentials: "include",
-        })
-          .then((res) => res.json())
-          .then((data) => setSlobodniKlijenti(data))
-          .catch((err) =>
-            console.error("Greška kod dohvaćanja slobodnih klijenata:", err)
-          );
-      }, []);
-*/
+      .then(setSlobodniKlijenti)
+      .catch(err => console.error(err));
+  }, []);
 
   return (
     <RacunovodaContext.Provider
