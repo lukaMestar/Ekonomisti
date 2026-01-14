@@ -3,91 +3,99 @@ import { useState } from "react";
 import { API_URL } from "../../config";
 
 function DodajKlijenta() {
-  const { slobodniKlijenti, setSlobodniKlijenti } = useRacunovoda();
-  const [mjesecniTrosak, setMjesecniTrosak] = useState({});
-  const [loadingId, setLoadingId] = useState(null);
+  const [form, setForm] = useState({
+    ime: "",
+    prezime: "",
+    email: "",
+    nazivFirme: "",
+    emailIzvjestaj: "",
+    pocetnoStanje: "",
+    mjesecniTrosakUsluge: "",
+  });
+
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleAddClient = async (klijentId) => {
-    const trosak = mjesecniTrosak[klijentId];
+  const handleChange = (e) => {
+    setForm(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
 
-    if (!trosak || Number(trosak) <= 0) {
-      setError("Unesite ispravan mjesečni trošak.");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    if (!form.ime || !form.prezime || !form.email || !form.nazivFirme) {
+      setError("Sva obavezna polja moraju biti popunjena.");
       return;
     }
 
-    setLoadingId(klijentId);
-    setError("");
+    setLoading(true);
 
     try {
-      const res = await fetch(
-        `${API_URL}/api/racunovoda/dodaj-klijenta`,
-        {
-          method: "POST",
-          credentials: "include", // 🔐 OAuth2 cookie
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            klijentId,
-            mjesecniTrosakUsluge: Number(trosak),
-          }),
-        }
-      );
+      const res = await fetch(`${API_URL}/api/racunovoda/novi-klijent`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...form,
+          pocetnoStanje: Number(form.pocetnoStanje || 0),
+          mjesecniTrosakUsluge: Number(form.mjesecniTrosakUsluge),
+        }),
+      });
 
       if (!res.ok) throw new Error("Greška pri dodavanju klijenta");
 
-      // remove client from free list
-      setSlobodniKlijenti(prev =>
-        prev.filter(k => k.id !== klijentId)
-      );
-
+      alert("Klijent uspješno dodan!");
+      setForm({
+        ime: "",
+        prezime: "",
+        email: "",
+        nazivFirme: "",
+        emailIzvjestaj: "",
+        pocetnoStanje: "",
+        mjesecniTrosakUsluge: "",
+      });
     } catch (err) {
       setError(err.message);
     } finally {
-      setLoadingId(null);
+      setLoading(false);
     }
   };
 
   return (
-    <div>
-      <h1>Dodaj klijenta</h1>
+    <form onSubmit={handleSubmit}>
+      <h1>Novi klijent</h1>
 
       {error && <p style={{ color: "red" }}>{error}</p>}
 
-      <ul>
-        {slobodniKlijenti.length === 0 && (
-          <p>Nema slobodnih klijenata.</p>
-        )}
+      <input name="ime" placeholder="Ime" value={form.ime} onChange={handleChange} />
+      <input name="prezime" placeholder="Prezime" value={form.prezime} onChange={handleChange} />
+      <input name="email" placeholder="Email" value={form.email} onChange={handleChange} />
 
-        {slobodniKlijenti.map(k => (
-          <li key={k.id}>
-            {k.ime}
+      <hr />
 
-            <input
-              type="number"
-              placeholder="Mjesečni trošak"
-              min="0"
-              step="0.01"
-              value={mjesecniTrosak[k.id] || ""}
-              onChange={(e) =>
-                setMjesecniTrosak(prev => ({
-                  ...prev,
-                  [k.id]: e.target.value,
-                }))
-              }
-              style={{ marginLeft: "10px" }}
-            />
+      <input name="nazivFirme" placeholder="Naziv firme" value={form.nazivFirme} onChange={handleChange} />
+      <input name="emailIzvjestaj" placeholder="Email za izvještaje" value={form.emailIzvjestaj} onChange={handleChange} />
+      <input name="pocetnoStanje" type="number" step="0.01" placeholder="Početno stanje" value={form.pocetnoStanje} onChange={handleChange} />
 
-            <button
-              onClick={() => handleAddClient(k.id)}
-              disabled={loadingId === k.id}
-              style={{ marginLeft: "10px" }}
-            >
-              {loadingId === k.id ? "Dodajem..." : "Dodaj"}
-            </button>
-          </li>
-        ))}
-      </ul>
-    </div>
+      <hr />
+
+      <input
+        name="mjesecniTrosakUsluge"
+        type="number"
+        step="0.01"
+        placeholder="Mjesečni trošak usluge"
+        value={form.mjesecniTrosakUsluge}
+        onChange={handleChange}
+      />
+
+      <button disabled={loading}>
+        {loading ? "Spremam..." : "Dodaj klijenta"}
+      </button>
+    </form>
   );
 }
 

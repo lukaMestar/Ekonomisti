@@ -15,6 +15,22 @@ public class FirmaId implements Serializable {
         this.idKlijent = idKlijent;
     }
 
+        public Long getIdFirma() {
+        return idFirma;
+    }
+
+    public void setIdFirma(Long idFirma) {
+        this.idFirma = idFirma;
+    }
+
+    public Long getIdKlijent() {
+        return idKlijent;
+    }
+
+    public void setIdKlijent(Long idKlijent) {
+        this.idKlijent = idKlijent;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

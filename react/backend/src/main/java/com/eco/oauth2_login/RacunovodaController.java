@@ -12,6 +12,7 @@ import com.eco.oauth2_login.databaza.RacunovodaKlijentRepository;
 import com.eco.oauth2_login.databaza.UserRepository;
 import com.eco.oauth2_login.dto.DodajKlijentaRequest;
 import com.eco.oauth2_login.dto.KlijentDTO;
+import com.eco.oauth2_login.dto.NoviKlijentRequest;
 
 import java.security.Principal;
 import java.util.List;
@@ -65,4 +66,14 @@ public class RacunovodaController {
 
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/novi-klijent")
+    public ResponseEntity<Void> dodajNovogKlijenta(
+            @RequestBody NoviKlijentRequest req,
+            @AuthenticationPrincipal OAuth2User user
+    ) {
+        racunovodaService.kreirajNovogKlijenta(req, user);
+        return ResponseEntity.ok().build();
+    }
+    
 }
