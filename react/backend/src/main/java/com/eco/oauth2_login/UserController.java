@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import com.eco.oauth2_login.databaza.Firma;
+import com.eco.oauth2_login.databaza.FirmaRepository;
 import com.eco.oauth2_login.databaza.Korisnik;
 import com.eco.oauth2_login.databaza.UserRepository;
 
@@ -23,10 +25,12 @@ import com.eco.oauth2_login.databaza.UserRepository;
 public class UserController {
 
     private final UserRepository userRepository;
+    private final FirmaRepository firmaRepository;
 
     @Autowired
-    public UserController(UserRepository userRepository) {
+    public UserController(UserRepository userRepository, FirmaRepository firmaRepository) {
         this.userRepository = userRepository;
+        this.firmaRepository = firmaRepository;
     }
 
     @GetMapping("/api/user")
@@ -70,4 +74,56 @@ public class UserController {
         
         return ResponseEntity.ok(result);
     }
+    @GetMapping("/api/klijent")
+    public ResponseEntity<Map<String, Object>> klijent(@AuthenticationPrincipal OAuth2User principal, HttpServletRequest request) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("error", "User not authenticated"));
+        }
+
+        String email = principal.getAttribute("email");
+        String role = "USER";
+        Long userId = 0L;
+        Long firmaId = null; 
+
+        if (email != null) {
+            Optional<Korisnik> userOptional = userRepository.findByEmail(email);
+
+            if (userOptional.isPresent()) {
+                Korisnik user = userOptional.get();
+                Integer idUloge = user.getIdUloge();
+                userId = user.getIdKorisnika();
+
+                // Determine role
+                if (idUloge != null) {
+                    switch (idUloge) {
+                        case 1 -> role = "ADMIN";
+                        case 2 -> role = "RACUNOVODA";
+                        case 3 -> role = "KLIJENT";
+                        case 4 -> role = "RADNIK";
+                        default -> role = "USER";
+                    }
+                }
+
+                
+                if (idUloge != null && idUloge == 3) { 
+                    Optional<Firma> firmaOptional = firmaRepository.findByIdKlijent(userId);
+                    System.out.println("WTF DAJ MI NESTO ZAS NE RADISSSS...................................");
+                    firmaId = firmaOptional.map(Firma::getIdFirma).orElse(null);
+                }
+            }
+        }
+
+        // Build response
+        Map<String, Object> result = new HashMap<>();
+        result.put("name", principal.getAttribute("name") != null ? principal.getAttribute("name") : "");
+        result.put("email", email != null ? email : "");
+        result.put("picture", principal.getAttribute("picture") != null ? principal.getAttribute("picture") : "");
+        result.put("role", role);
+        if (userId != 0) result.put("id", userId);
+        if (firmaId != null) result.put("firmaId", firmaId);
+
+        return ResponseEntity.ok(result);
+    }
+
 }

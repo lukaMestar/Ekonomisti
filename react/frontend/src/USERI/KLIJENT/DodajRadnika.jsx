@@ -72,6 +72,26 @@ function DodajRadnika() {
           body: JSON.stringify(radnikData2),
         });
 
+
+        //OV
+        let firmaId = null;
+        try {
+          const firmaResponse = await apiCall(`${API_URL}/api/klijent`);
+          if (firmaResponse.ok) {
+            const firmaData = await firmaResponse.json();
+            firmaId = firmaData.firmaId; 
+            console.log("Firma ID:", firmaId);
+          } else {
+            const errText = await firmaResponse.text();
+            alert("Nije moguće dohvatiti firmu: " + errText);
+            return; // prekini, jer idFirma je potreban
+          }
+        } catch (error) {
+          alert("Greška pri dohvaćanju firme: " + error.message);
+          return;
+        }
+        
+         
         const responseText2 = await response2.text();
         if(response2.ok) {
           console.log("uspjelo drugi");
@@ -79,10 +99,11 @@ function DodajRadnika() {
           console.log(user.id);
           const radnikData3 = {
             idZaposlenik: id,
-            idFirma: 2,
-            idKlijent: 1  //user.id STAVI KAD LOVRINOVIC OBAVI SVOJE
+            idFirma: firmaId,
+            idKlijent: user.id  //user.id STAVI KAD LOVRINOVIC OBAVI SVOJE
 
           };
+          //Error adding radnik: firmaData is not defined
 
           const response3 = await apiCall(`${API_URL}/api/addjezaposlen`, {
             method: "POST",
