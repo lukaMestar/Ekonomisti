@@ -34,16 +34,39 @@ function NovaFaktura() {
     return faktura.stavke.reduce((total, stavka) => total + stavka.kolicina * stavka.cijena, 0).toFixed(2);
   };
 
+
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    let firmaId = null;
+    let klijentId =null;
+    try {
+      const firmaResponse = await apiCall(`${API_URL}/api/klijent`);
+      if (firmaResponse.ok) {
+        const firmaData = await firmaResponse.json();
+        firmaId = firmaData.firmaId; 
+        klijentId = firmaData.id;
+        console.log("Firma ID:", firmaId);
+      } else {
+        const errText = await firmaResponse.text();
+        alert("Nije moguće dohvatiti firmu: " + errText);
+        return; // prekini, jer idFirma je potreban
+      }
+    } catch (error) {
+      alert("Greška pri dohvaćanju firme: " + error.message);
+      return;
+    }
+
     const fakturafin = {
       datum: faktura.datum,
       dobavljac: faktura.dobavljac,
       iznos: Number(getUkupno()),
       opis: faktura.napomene,
       tipFakture: "prihod",
-      idFirma: 1,
-      idKlijent: 1
+      idFirma: firmaId,
+      idKlijent: klijentId
     };
     try {
       const response = await apiCall(`${API_URL}/api/addfaktura`, {
