@@ -13,7 +13,6 @@ import com.eco.oauth2_login.databaza.Firma;
 
 import java.time.LocalDate;
 
-
 @Service
 public class AddFakturaService {
 
@@ -22,9 +21,8 @@ public class AddFakturaService {
 
     @Autowired
     public AddFakturaService(
-        FakturaRepository fakturaRepository,
-        FirmaRepository firmaRepository
-    ) {
+            FakturaRepository fakturaRepository,
+            FirmaRepository firmaRepository) {
         this.fakturaRepository = fakturaRepository;
         this.firmaRepository = firmaRepository;
     }
@@ -33,8 +31,8 @@ public class AddFakturaService {
     public void addFaktura(FakturaRequest req) {
         // ako želiš osnovnu validaciju
         Firma firma = firmaRepository
-            .findByIdFirmaAndIdKlijent(req.getIdFirma(), req.getIdKlijent())
-            .orElseThrow(() -> new RuntimeException("Firma ne postoji"));
+                .findByIdFirmaAndIdKlijent(req.getIdFirma(), req.getIdKlijent())
+                .orElseThrow(() -> new RuntimeException("Firma ne postoji"));
 
         Faktura f = new Faktura();
         f.setDatum(req.getDatum());
@@ -42,7 +40,7 @@ public class AddFakturaService {
         f.setIznos(req.getIznos());
         f.setOpis(req.getOpis());
         f.setTipFakture(req.getTipFakture());
-        f.setFirma(firma); 
+        f.setFirma(firma);
 
         fakturaRepository.save(f);
     }

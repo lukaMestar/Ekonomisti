@@ -17,6 +17,7 @@ spring:
             authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
             token-uri: https://www.googleapis.com/oauth2/v4/token
             user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/ekonomisti}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
@@ -41,6 +42,20 @@ spring:
           time_zone: UTC
         connection:
           provider_disables_autocommit: true
+
+  mail:
+    host: smtp-relay.brevo.com
+    port: 2525
+    username: a01edd001@smtp-brevo.com
+    password: ${BREVO_SMTP_KEY}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
 server:
   port: ${PORT:${SERVER_PORT:9090}}
   address: 0.0.0.0
@@ -52,6 +67,7 @@ server:
         http-only: true
         secure: ${COOKIE_SECURE:false}
         same-site: ${COOKIE_SAME_SITE:lax}
+
 logging:
   level:
     org:

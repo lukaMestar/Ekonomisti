@@ -15,6 +15,8 @@ import com.eco.oauth2_login.databaza.Zaposlenik;
 
 import java.time.LocalDate;
 
+import org.springframework.context.ApplicationEventPublisher;
+import com.eco.oauth2_login.databaza.PutniNalogCreatedEvent;
 
 @Service
 public class AddNalogService {
@@ -22,31 +24,31 @@ public class AddNalogService {
     private final PutniNalogRepository nalogRepository;
     private final FirmaRepository firmaRepository;
     private final ZaposlenikRepository zaposlenikRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Autowired
     public AddNalogService(
-        PutniNalogRepository nalogRepository,
-        FirmaRepository firmaRepository,
-        ZaposlenikRepository zaposlenikRepository
-    ) {
+            PutniNalogRepository nalogRepository,
+            FirmaRepository firmaRepository,
+            ZaposlenikRepository zaposlenikRepository,
+            ApplicationEventPublisher eventPublisher) {
         this.nalogRepository = nalogRepository;
         this.firmaRepository = firmaRepository;
         this.zaposlenikRepository = zaposlenikRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional
     public void addNalog(PutniNalogRequest req) {
-        // ako želiš osnovnu validaciju
-        System.out.println("-----------------"+req.getIdFirma() +"---" +  req.getIdKlijent() +"----" + req.getDestinacija());
+
         Firma firma = firmaRepository
-            .findByIdFirmaAndIdKlijent(req.getIdFirma(), req.getIdKlijent())
-            .orElseThrow(() -> new RuntimeException("Firma ne postoji"));
+                .findByIdFirmaAndIdKlijent(req.getIdFirma(), req.getIdKlijent())
+                .orElseThrow(() -> new RuntimeException("Firma ne postoji"));
         Zaposlenik zaposlenik = zaposlenikRepository
-            .findByIdKorisnika(req.getIdZaposlenik())
-            .orElseThrow(() -> new RuntimeException("Zaposlenik ne postoji"));
+                .findByIdKorisnika(req.getIdZaposlenik())
+                .orElseThrow(() -> new RuntimeException("Zaposlenik ne postoji"));
 
         PutniNalog pn = new PutniNalog();
-
         pn.setPolaziste(req.getPolaziste());
         pn.setDestinacija(req.getDestinacija());
         pn.setDatumPolaska(req.getDatumPolaska());
@@ -56,5 +58,7 @@ public class AddNalogService {
         pn.setZaposlenik(zaposlenik);
 
         nalogRepository.save(pn);
+
+        eventPublisher.publishEvent(new PutniNalogCreatedEvent(pn));
     }
 }
