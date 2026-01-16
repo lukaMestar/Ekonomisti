@@ -10,7 +10,7 @@ public class PutniNalog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idputninalog")
+    @Column(name = "i ")
     private Long idPutniNalog;
 
     @Column(name = "polaziste", length = 100)

@@ -1,5 +1,6 @@
 package com.eco.oauth2_login.databaza;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,4 +30,14 @@ public interface RacunovodaKlijentRepository extends JpaRepository<RacunovodaKli
     );
     
     Optional<RacunovodaKlijent> findByIdRacunovodaAndIdKlijent(Long idRacunovoda, Long idKlijent);
+
+    @Query("""
+    SELECT rk.mjesecniTrosakUsluge
+    FROM RacunovodaKlijent rk
+    WHERE rk.idKlijent = :klijentId
+    """)
+    BigDecimal findMjesecniTrosakUslugeByKlijentId(
+        @Param("klijentId") Long klijentId
+    );
+
 }
