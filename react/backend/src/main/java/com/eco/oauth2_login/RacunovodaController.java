@@ -8,11 +8,13 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
 import com.eco.oauth2_login.databaza.Korisnik;
+import com.eco.oauth2_login.databaza.MjesecniRacun;
 import com.eco.oauth2_login.databaza.RacunovodaKlijentRepository;
 import com.eco.oauth2_login.databaza.UserRepository;
 import com.eco.oauth2_login.dto.DodajKlijentaRequest;
 import com.eco.oauth2_login.dto.KlijentDTO;
 import com.eco.oauth2_login.dto.NoviKlijentRequest;
+import com.eco.oauth2_login.MjesecniRacunService;
 
 import java.security.Principal;
 import java.util.List;
@@ -24,10 +26,16 @@ public class RacunovodaController {
 
     private final UserRepository userRepository;
     private final RacunovodaService racunovodaService;
+    private final MjesecniRacunService mjesecniRacunService;
 
-    public RacunovodaController(RacunovodaService racunovodaService, UserRepository userRepository) {
+    public RacunovodaController(
+        RacunovodaService racunovodaService, 
+        UserRepository userRepository,
+        MjesecniRacunService mjesecniRacunService
+    ) {
         this.userRepository = userRepository;
         this.racunovodaService = racunovodaService;
+        this.mjesecniRacunService = mjesecniRacunService;
     }
 
     @Autowired
@@ -74,6 +82,30 @@ public class RacunovodaController {
     ) {
         racunovodaService.kreirajNovogKlijenta(req, user);
         return ResponseEntity.ok().build();
+    }
+    
+    /**
+     * Ručno generira račun za klijenta (za trenutni mjesec)
+     */
+    @PostMapping("/generiraj-racun/{klijentId}")
+    public ResponseEntity<String> generirajRacun(
+            @PathVariable Long klijentId,
+            @AuthenticationPrincipal OAuth2User oauthUser
+    ) {
+        try {
+            String email = oauthUser.getAttribute("email");
+            Korisnik racunovoda = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Računovođa nije pronađen"));
+            
+            MjesecniRacun racun = mjesecniRacunService.generirajRacunZaKlijenta(
+                racunovoda.getIdKorisnika(), 
+                klijentId
+            );
+            
+            return ResponseEntity.ok("Račun uspješno generiran za mjesec " + racun.getMjesec() + "/" + racun.getGodina());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Greška: " + e.getMessage());
+        }
     }
     
 }

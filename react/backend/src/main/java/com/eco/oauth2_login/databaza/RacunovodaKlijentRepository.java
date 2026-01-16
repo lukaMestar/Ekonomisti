@@ -1,6 +1,7 @@
 package com.eco.oauth2_login.databaza;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -26,4 +27,6 @@ public interface RacunovodaKlijentRepository extends JpaRepository<RacunovodaKli
     List<KlijentDTO> findKlijentiByRacunovodjaId(
         @Param("racunovodjaId") Long racunovodjaId
     );
+    
+    Optional<RacunovodaKlijent> findByIdRacunovodaAndIdKlijent(Long idRacunovoda, Long idKlijent);
 }

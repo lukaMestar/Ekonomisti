@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS MjesecniRacun ;
 DROP TABLE IF EXISTS RacunovodjaKlijent ;
 DROP TABLE IF EXISTS PutniNalog ;
 DROP TABLE IF EXISTS Faktura ;
@@ -97,6 +98,28 @@ CREATE TABLE RacunovodjaKlijent (
     mjesecniTrosakUsluge DECIMAL(10,2) CHECK (mjesecniTrosakUsluge >= 0),
     PRIMARY KEY (idRacunovodja, idKlijent)
 );
+
+CREATE TABLE MjesecniRacun (
+    idRacun SERIAL PRIMARY KEY,
+    idRacunovodja INT NOT NULL REFERENCES Racunovodja(idKorisnika) ON DELETE CASCADE,
+    idKlijent INT NOT NULL REFERENCES Klijent(idKorisnika) ON DELETE CASCADE,
+    idFirma INT NOT NULL,
+    mjesec INT NOT NULL CHECK (mjesec >= 1 AND mjesec <= 12),
+    godina INT NOT NULL,
+    iznos DECIMAL(10,2) NOT NULL CHECK (iznos >= 0),
+    datumGeneriranja DATE NOT NULL DEFAULT CURRENT_DATE,
+    datumRoka DATE NOT NULL,
+    statusPlacanja VARCHAR(20) DEFAULT 'neplaceno' CHECK (statusPlacanja IN ('neplaceno', 'placeno', 'otkazano', 'refundirano')),
+    mockPaymentId VARCHAR(255),
+    stripePaymentIntentId VARCHAR(255),
+    stripeCustomerId VARCHAR(255),
+    datumPlacanja DATE,
+    FOREIGN KEY (idFirma, idKlijent) REFERENCES Firma(idFirma, idKlijent) ON DELETE CASCADE,
+    UNIQUE(idRacunovodja, idKlijent, idFirma, mjesec, godina)
+);
+
+CREATE INDEX idx_mjesecni_racun_status ON MjesecniRacun(statusPlacanja);
+CREATE INDEX idx_mjesecni_racun_datum_roka ON MjesecniRacun(datumRoka);
 
 INSERT INTO Uloge (imeUloge) VALUES
 ('Admin'),

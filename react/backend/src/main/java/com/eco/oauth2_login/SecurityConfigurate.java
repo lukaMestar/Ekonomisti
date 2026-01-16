@@ -58,7 +58,7 @@ public class SecurityConfigurate {
             if (url.contains("localhost")) {
                 url = "http://" + url;
             } else {
-                url = "https://" + url;
+                    url = "https://" + url;
             }
         }
         
@@ -160,7 +160,7 @@ class ExceptionHandlingFilter implements Filter {
                             if (frontendUrl.contains("localhost")) {
                                 frontendUrl = "http://" + frontendUrl;
                             } else {
-                                frontendUrl = "https://" + frontendUrl;
+                            frontendUrl = "https://" + frontendUrl;
                             }
                         }
                         httpResponse.sendRedirect(frontendUrl + "/?error=serverError");
@@ -302,8 +302,8 @@ class CustomOAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSu
             if (!this.frontendUrl.startsWith("http://") && !this.frontendUrl.startsWith("https://")) {
                 if (this.frontendUrl.contains("localhost")) {
                     this.frontendUrl = "http://" + this.frontendUrl;
-                } else {
-                    this.frontendUrl = "https://" + this.frontendUrl;
+                    } else {
+                        this.frontendUrl = "https://" + this.frontendUrl;
                 }
             }
         }

@@ -35,14 +35,17 @@ function DodajKlijenta() {
     setLoading(true);
 
     try {
+      const pocetnoStanjeNum = Number(form.pocetnoStanje) || 0;
+      const mjesecniTrosakNum = Number(form.mjesecniTrosakUsluge) || 0;
+      
       const res = await fetch(`${API_URL}/api/racunovoda/novi-klijent`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
-          pocetnoStanje: Number(form.pocetnoStanje || 0),
-          mjesecniTrosakUsluge: Number(form.mjesecniTrosakUsluge),
+          pocetnoStanje: isNaN(pocetnoStanjeNum) ? 0 : pocetnoStanjeNum,
+          mjesecniTrosakUsluge: isNaN(mjesecniTrosakNum) ? 0 : mjesecniTrosakNum,
         }),
       });
 

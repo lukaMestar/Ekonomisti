@@ -1,7 +1,6 @@
 package com.eco.oauth2_login;
 
 import com.eco.oauth2_login.dto.KlijentDTO;
-import com.eco.oauth2_login.dto.KlijentProjection;
 import com.eco.oauth2_login.dto.NoviKlijentRequest;
 import com.eco.oauth2_login.databaza.RacunovodaKlijent;
 import com.eco.oauth2_login.databaza.Firma;
@@ -122,7 +121,11 @@ public class RacunovodaService {
         RacunovodaKlijent rk = new RacunovodaKlijent();
         rk.setIdRacunovoda(racunovodjaId);
         rk.setIdKlijent(klijentId);
-        rk.setMjesecniTrosakUsluge(req.getMjesecniTrosakUsluge());
+        rk.setMjesecniTrosakUsluge(
+                req.getMjesecniTrosakUsluge() != null
+                        ? req.getMjesecniTrosakUsluge()
+                        : BigDecimal.ZERO
+        );
 
         rkRepository.save(rk);
     }
