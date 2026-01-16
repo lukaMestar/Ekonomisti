@@ -10,7 +10,7 @@ import java.util.Properties;
 @Configuration
 public class MailConfig {
 
-   @Value("${BREVO_SMTP_KEY}")
+   @Value("${BREVO_SMTP_KEY:}")
    private String smtpKey;
 
    @Bean
