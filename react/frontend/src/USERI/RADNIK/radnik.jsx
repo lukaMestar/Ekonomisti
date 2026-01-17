@@ -29,7 +29,18 @@ function Radnik() {
   if (!tvrtke || tvrtke.length === 0) return <p>Učitavanje tvrtki...</p>;
 
   if (!trenutnaTvrtka) {
-    return <Odabir opcije={tvrtke} onOdaberi={setTrenutnaTvrtka} />;
+    return (
+      <Odabir
+        opcije={tvrtke}
+        onOdaberi={(value) => {
+          const [idFirma, idKlijent] = value.split("-").map(Number);
+          const tvrtka = tvrtke.find(
+            (t) => t.idFirma === idFirma && t.idKlijent === idKlijent
+          );
+          setTrenutnaTvrtka(tvrtka);
+        }}
+      />
+    );
   }
 
   return (
@@ -57,7 +68,7 @@ function Radnik() {
             <h3 className="info-title">Korisnički podaci:</h3>
             <p><strong>Ime:</strong> {user.name}</p>
             <p><strong>Email:</strong> {user.email}</p>
-            <p><strong>Tvrtka:</strong> {trenutnaTvrtka}</p>
+            <p><strong>Tvrtka:</strong> {trenutnaTvrtka?.naziv}</p>
           </div>
           {user.picture && (
             <div className="info-card">

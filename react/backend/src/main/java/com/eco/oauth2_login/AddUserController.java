@@ -9,11 +9,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.eco.oauth2_login.databaza.JeZaposlen;
 import com.eco.oauth2_login.databaza.JeZaposlenDTO;
 
 import com.eco.oauth2_login.databaza.Korisnik;
-import com.eco.oauth2_login.databaza.Zaposlenik;
 import com.eco.oauth2_login.databaza.ZaposlenikDTO;
 
 

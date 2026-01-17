@@ -5,13 +5,12 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "jezaposlen")
-@IdClass(JeZaposlenId.class) // Za kompozitni ključ
+@IdClass(JeZaposlenId.class)
 public class JeZaposlen {
 
     @Id
-    @ManyToOne
-    @JoinColumn(name = "idzaposlenik", referencedColumnName = "idkorisnika", nullable = false)
-    private Zaposlenik zaposlenik;
+    @Column(name = "idzaposlenik", nullable = false)
+    private Long idZaposlenik;
 
     @Id
     @Column(name = "idfirma", nullable = false)
@@ -21,6 +20,15 @@ public class JeZaposlen {
     @Column(name = "idklijent", nullable = false)
     private Long idKlijent;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+        name = "idzaposlenik",
+        referencedColumnName = "idkorisnika",
+        insertable = false,
+        updatable = false
+    )
+    private Zaposlenik zaposlenik;
+
     @Column(name = "datumzaposljavanja", nullable = false)
     private LocalDate datumZaposljavanja = LocalDate.now();
 
@@ -29,12 +37,12 @@ public class JeZaposlen {
 
     public JeZaposlen() {}
 
-    public Zaposlenik getZaposlenik() {
-        return zaposlenik;
+    public Long getIdZaposlenik() {
+        return idZaposlenik;
     }
 
-    public void setZaposlenik(Zaposlenik zaposlenik) {
-        this.zaposlenik = zaposlenik;
+    public void setIdZaposlenik(Long idZaposlenik) {
+        this.idZaposlenik = idZaposlenik;
     }
 
     public Long getIdFirma() {
@@ -51,6 +59,14 @@ public class JeZaposlen {
 
     public void setIdKlijent(Long idKlijent) {
         this.idKlijent = idKlijent;
+    }
+
+    public Zaposlenik getZaposlenik() {
+        return zaposlenik;
+    }
+
+    public void setZaposlenik(Zaposlenik zaposlenik) {
+        this.zaposlenik = zaposlenik;
     }
 
     public LocalDate getDatumZaposljavanja() {
