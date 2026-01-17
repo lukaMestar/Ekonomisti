@@ -79,7 +79,7 @@ public class AddUserService {
                         .orElseThrow(() -> new RuntimeException("Zaposlenik ne postoji"));
         JeZaposlen z = new JeZaposlen();
         System.out.println("PROSLO JE TESKI DIO");
-        z.setZaposlenik(k);
+        z.setIdZaposlenik(k.getIdKorisnika());
         System.out.println("PROSLO JE TESKI DIO 2");
 
         z.setIdFirma(dto.getIdFirma());

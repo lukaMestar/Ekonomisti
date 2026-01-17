@@ -5,14 +5,14 @@ import java.util.Objects;
 
 public class JeZaposlenId implements Serializable {
 
-    private Long zaposlenik; // idZaposlenik
+    private Long idZaposlenik;
     private Long idFirma;
     private Long idKlijent;
 
     public JeZaposlenId() {}
 
-    public JeZaposlenId(Long zaposlenik, Long idFirma, Long idKlijent) {
-        this.zaposlenik = zaposlenik;
+    public JeZaposlenId(Long idZaposlenik, Long idFirma, Long idKlijent) {
+        this.idZaposlenik = idZaposlenik;
         this.idFirma = idFirma;
         this.idKlijent = idKlijent;
     }
@@ -22,13 +22,13 @@ public class JeZaposlenId implements Serializable {
         if (this == o) return true;
         if (!(o instanceof JeZaposlenId)) return false;
         JeZaposlenId that = (JeZaposlenId) o;
-        return Objects.equals(zaposlenik, that.zaposlenik) &&
-               Objects.equals(idFirma, that.idFirma) &&
-               Objects.equals(idKlijent, that.idKlijent);
+        return Objects.equals(idZaposlenik, that.idZaposlenik)
+            && Objects.equals(idFirma, that.idFirma)
+            && Objects.equals(idKlijent, that.idKlijent);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(zaposlenik, idFirma, idKlijent);
+        return Objects.hash(idZaposlenik, idFirma, idKlijent);
     }
 }

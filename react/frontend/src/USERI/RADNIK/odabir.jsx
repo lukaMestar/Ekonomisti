@@ -34,8 +34,11 @@ function Odabir({ opcije, onOdaberi }) {
             Odaberi tvrtku
           </option>
           {opcije.map((option) => (
-            <option key={option} value={option}>
-              {option}
+            <option
+              key={`${option.idFirma}-${option.idKlijent}`}
+              value={`${option.idFirma}-${option.idKlijent}`}
+            >
+            {option.naziv}
             </option>
           ))}
         </select>

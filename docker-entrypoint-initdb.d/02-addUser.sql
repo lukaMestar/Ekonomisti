@@ -25,6 +25,8 @@ DO NOTHING;
 INSERT INTO Korisnici (imeKorisnik, prezimeKorisnik, email, provider, providerUserId, idUloge, datumRegistracije)
 VALUES ('Natali', 'Misic', 'misicnatali@gmail.com', 'google', 'misicnatali@gmail.com', 2 , CURRENT_DATE)
 ON CONFLICT (email) 
+DO NOTHING;INSERT INTO Korisnici (imeKorisnik, prezimeKorisnik, email, provider, providerUserId, idUloge, datumRegistracije)
+VALUES ('Simun', 'Covic', 'simun0942@gmail.com', 'google', 'simun0942@gmail.com', 4, CURRENT_DATE)
+ON CONFLICT (email) 
 DO NOTHING;
-
 
