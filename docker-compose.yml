@@ -47,6 +47,8 @@ services:
     networks:
       - ekonomisti-network
     restart: unless-stopped
+    volumes:
+      - ./react/backend/storage:/data
 
   frontend:
     build:

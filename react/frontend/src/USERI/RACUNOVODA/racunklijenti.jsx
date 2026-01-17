@@ -15,12 +15,13 @@ function Racunklijenti() {
   const [odabraniMjesec, setOdabraniMjesec] = useState("");
   const [generiranjeRacuna, setGeneriranjeRacuna] = useState({});
 
+
   const handleIzvjestaj = () => {
     if (!odabraniKlijent || !odabraniMjesec) {
       alert("Molim odaberite klijenta i mjesec!");
       return;
     }
-
+  
     navigate(`/izvjestaj/${odabraniKlijent}/${odabraniMjesec}`);
   };
 
@@ -166,6 +167,9 @@ function Racunklijenti() {
       <button onClick={handleIzvjestaj} className="primary-button">
         Prikaži izvještaj
       </button>
+
+
+
     </div>
   );
 }
