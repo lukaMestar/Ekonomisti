@@ -104,7 +104,9 @@ public class ReportService {
                 .stream()
                 .mapToDouble(pn -> pn.getTrosak().doubleValue())
                 .sum();
-
+        var mjesecniTrosak = racunovodaKlijentReportService.getMjesecniTrosakUsluge(klijentID).doubleValue();
+        var placaZaposlenika = zaposlenikRepositoryService.getPlacaZaposlenika(klijentID).doubleValue();
+        rashodi = rashodi + mjesecniTrosak + placaZaposlenika;
         double pdv = prihodi * 0.25;
 
         return new IzvjestajDTO(prihodi, rashodi, pdv);

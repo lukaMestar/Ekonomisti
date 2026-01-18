@@ -53,7 +53,7 @@ public class ReportPDFService {
 
 
         BigDecimal iznos = ukupanIznosFaktura.subtract(ukupanIznosMjesecnogTroska);
-        iznos = iznos.abs();
+        //iznos = iznos.abs();
         BigDecimal pdv = iznos.multiply(new BigDecimal("0.25"));
         try {
             Document document = new Document(PageSize.A4);
