@@ -1,5 +1,10 @@
 import React from "react";
 import { useKlijent } from "./KlijentContext";
+import { useEffect, useState } from "react";
+
+
+import { API_URL } from "../../config.js";
+import { apiCall } from "../../api.js";
 
 function Podaci() {
   const { podaci, putniNalozi, placeniRacuni, neplaceniRacuni } = useKlijent();
@@ -8,21 +13,58 @@ function Podaci() {
   const safePlaceniRacuni = Array.isArray(placeniRacuni) ? placeniRacuni : [];
   const safeNeplaceniRacuni = Array.isArray(neplaceniRacuni) ? neplaceniRacuni : [];
 
+  const [firmaNaziv, setFirmaNaziv] = useState(null);
+  const [stanjeRac, setStanjeRac] = useState(null);
+  const [emailIzvj, setEmailIzvj] = useState(null);
+
+  const [loading, setLoading] = useState(true); // novo
+
+  useEffect(() => {
+    async function fetchFirma() {
+      try {
+        const firmaResponse = await apiCall(`${API_URL}/api/klijent`);
+
+        if (firmaResponse.ok) {
+          const firmaData = await firmaResponse.json();
+          console.log(firmaData)
+          setFirmaNaziv(firmaData.nazivFirme)
+          setStanjeRac(firmaData.stanjeRacuna)
+          setEmailIzvj(firmaData.emailIzvjestaj)
+        } else {
+          const errText = await firmaResponse.text();
+          alert("Nije moguće dohvatiti firmu: " + errText);
+        }
+      } catch (error) {
+        alert("Greška pri dohvaćanju firme: " + error.message);
+      } finally {
+        setLoading(false); // signalizira da je dohvat završen
+      }
+    }
+
+    fetchFirma();
+  }, []);
+
+  if (loading) {
+    // prikazuje se dok se ne učitaju podaci
+    return <p>Učitavanje podataka o firmi...</p>;
+  }
+
+
   return (
     <div>
       <h1>Podaci korisnika</h1>
 
       {podaci ? (
         <div>
-          <p><strong>Ime firme/obrta:</strong> {podaci.firma || "N/A"}</p>
-          <p><strong>Ime i prezime vlasnika:</strong> {podaci.ime || "N/A"}</p>
+          <p><strong>Ime firme/obrta:</strong> {firmaNaziv || "N/A"}</p>
+          {/*<p><strong>Ime i prezime vlasnika:</strong> {podac || "N/A"}</p>
           <p><strong>OIB:</strong> {podaci.oib || "N/A"}</p>
-          <p><strong>Kontakt broj:</strong> {podaci.kontakt || "N/A"}</p>
-          <p><strong>E-mail za izvještaje:</strong> {podaci.email || "N/A"}</p>
+          <p><strong>Kontakt broj:</strong> {podaci.kontakt || "N/A"}</p>*/}
+          <p><strong>E-mail za izvještaje:</strong> {emailIzvj || "N/A"}</p>
 
           <h3>Financijsko stanje</h3>
-          <p><strong>Trenutačno stanje firme:</strong> {podaci.stanjeFirme ?? "N/A"} €</p>
-          <p><strong>PDV za platiti:</strong> {podaci.pdvZaPlatiti ?? "N/A"} €</p>
+          <p><strong>Trenutačno stanje firme:</strong> {stanjeRac ?? "N/A"} €</p>
+          
 
           <h3>Radnici</h3>
           {podaci.radnici && podaci.radnici.length > 0 ? (

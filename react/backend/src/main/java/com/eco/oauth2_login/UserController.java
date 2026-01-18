@@ -1,5 +1,6 @@
 package com.eco.oauth2_login;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -85,6 +86,9 @@ public class UserController {
         String role = "USER";
         Long userId = 0L;
         Long firmaId = null; 
+        String nazivFirme = null;
+        BigDecimal stanjeRacuna = null;
+        String emailIzvjestaj = null;
 
         if (email != null) {
             Optional<Korisnik> userOptional = userRepository.findByEmail(email);
@@ -110,6 +114,10 @@ public class UserController {
                     Optional<Firma> firmaOptional = firmaRepository.findByIdKlijent(userId);
                     System.out.println("WTF DAJ MI NESTO ZAS NE RADISSSS...................................");
                     firmaId = firmaOptional.map(Firma::getIdFirma).orElse(null);
+                    nazivFirme = firmaOptional.map(Firma::getNazivFirme).orElse(null);
+                    stanjeRacuna = firmaOptional.map(Firma::getStanjeRacuna).orElse(null);
+                    emailIzvjestaj = firmaOptional.map(Firma::getEmailIzvjestaj).orElse(null);
+
                 }
             }
         }
@@ -122,6 +130,9 @@ public class UserController {
         result.put("role", role);
         if (userId != 0) result.put("id", userId);
         if (firmaId != null) result.put("firmaId", firmaId);
+        if (nazivFirme != null) result.put("nazivFirme", nazivFirme);
+        if (stanjeRacuna != null) result.put("stanjeRacuna", stanjeRacuna);
+        if (emailIzvjestaj != null) result.put("emailIzvjestaj", emailIzvjestaj);
 
         return ResponseEntity.ok(result);
     }
