@@ -26,4 +26,13 @@ public class FakturaReportService {
 
         return fakturaRepository.findFaktureZaMjesec(idklijent, idfirma, pocetakMjeseca, krajMjeseca);
     }
+
+    public List<Faktura> getOdradjeneFakture(Long idklijent, long idfirma){
+        return fakturaRepository.findOdradjeneFakture(idklijent, idfirma);
+    }
+
+    public List<Faktura> getSveFakture(Long idklijent, long idfirma){
+       
+        return fakturaRepository.findSveFakture(idklijent, idfirma);
+    }
 }

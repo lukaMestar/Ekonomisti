@@ -21,4 +21,17 @@ public interface JeZaposlenRepository
           AND j.statusAktivnosti = true
     """)
     List<Firma> findFirmeZaZaposlenika(@Param("idZaposlenik") Long idZaposlenik);
+
+    @Query("""
+        SELECT j.zaposlenik
+        FROM JeZaposlen j
+        WHERE j.firma.idFirma = :idFirma
+          AND j.firma.idKlijent = :idKlijent
+          AND j.statusAktivnosti = true
+    """)
+    List<Zaposlenik> findPopisZaposlenikaZaFirmu(
+        @Param("idFirma") Long idFirma,
+        @Param("idKlijent") Long idKlijent
+    );
+
 }
