@@ -26,14 +26,6 @@ public interface PutniNalogRepository extends JpaRepository<PutniNalog, Long> {
         @Param("kraj") LocalDate kraj
     );
 
-     @Query(""" 
-        SELECT pn
-        FROM PutniNalog pn
-        WHERE pn.firma.idKlijent = :idKlijent 
-        AND pn.firma.idFirma = :idFirma 
-        AND pn.odradjeno = TRUE 
-    """) 
-    List<PutniNalog> findOdradjenePutneNaloge( @Param("idKlijent") Long idKlijent, @Param("idFirma") Long idFirma ); 
     @Query(""" 
         SELECT pn
         FROM PutniNalog pn

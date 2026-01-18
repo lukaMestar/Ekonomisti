@@ -28,6 +28,10 @@ public class PutniNalog {
     @Column(name = "trosak", precision = 10, scale = 2)
     private BigDecimal trosak;
 
+    @Column(name = "odradena", nullable = false)
+    private Boolean odradena = false;
+
+
     @ManyToOne
     @JoinColumn(name = "idzaposlenik", referencedColumnName = "idkorisnika")
     private Zaposlenik zaposlenik;
@@ -43,6 +47,12 @@ public class PutniNalog {
     public PutniNalog() {
     }
 
+    public boolean getOdradena() {
+        return odradena;
+    }
+     public void setOdradena(boolean odradena){
+        this.odradena = odradena;
+     }
 
     public Long getIdPutniNalog() {
         return idPutniNalog;

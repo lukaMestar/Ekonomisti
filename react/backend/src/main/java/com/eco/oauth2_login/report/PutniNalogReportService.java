@@ -28,10 +28,6 @@ public class PutniNalogReportService {
         return putniNalogRepository.findPutniNaloziZaMjesec(idklijent, idfirma,pocetakMjeseca, krajMjeseca);
     }
 
-    public List<PutniNalog> getOdradjenePutneNaloge(Long idklijent, long idfirma){
-        return putniNalogRepository.findOdradjenePutneNaloge(idklijent, idfirma);
-    }
-
     public List<PutniNalog> getSvePutneNaloge(Long idklijent, long idfirma){
        
         return putniNalogRepository.findSvePutneNaloge(idklijent, idfirma);

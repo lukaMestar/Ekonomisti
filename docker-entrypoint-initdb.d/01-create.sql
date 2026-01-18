@@ -126,6 +126,26 @@ CREATE TABLE MjesecniRacun (
     FOREIGN KEY (idFirma, idKlijent) REFERENCES Firma(idFirma, idKlijent) ON DELETE CASCADE,
     UNIQUE(idRacunovodja, idKlijent, idFirma, mjesec, godina)
 );
+CREATE TABLE OdradjeneFakture (
+    idFaktura INT NOT NULL,
+    idFirma INT NOT NULL,
+    idKlijent INT NOT NULL,
+    datumOdradjivanja TIMESTAMP DEFAULT now(),
+    PRIMARY KEY (idFaktura, idFirma, idKlijent),
+    FOREIGN KEY (idFaktura) REFERENCES Faktura(idFaktura) ON DELETE CASCADE,
+    FOREIGN KEY (idFirma, idKlijent) REFERENCES Firma(idFirma, idKlijent) ON DELETE CASCADE
+);
+
+CREATE TABLE OdradjeniPutniNalozi (
+    idPutniNalog INT NOT NULL,
+    idFirma INT NOT NULL,
+    idKlijent INT NOT NULL,
+    datumOdradjivanja TIMESTAMP DEFAULT now(),
+    PRIMARY KEY (idPutniNalog, idFirma, idKlijent),
+    FOREIGN KEY (idPutniNalog) REFERENCES PutniNalog(idPutniNalog) ON DELETE CASCADE,
+    FOREIGN KEY (idFirma, idKlijent) REFERENCES Firma(idFirma, idKlijent) ON DELETE CASCADE
+);
+
 
 CREATE INDEX idx_mjesecni_racun_status ON MjesecniRacun(statusPlacanja);
 CREATE INDEX idx_mjesecni_racun_datum_roka ON MjesecniRacun(datumRoka);
