@@ -3,6 +3,7 @@ DROP TABLE IF EXISTS RacunovodjaKlijent ;
 DROP TABLE IF EXISTS PutniNalog ;
 DROP TABLE IF EXISTS Faktura ;
 DROP TABLE IF EXISTS jeZaposlen ;
+DROP TABLE IF EXISTS Placa ;
 DROP TABLE IF EXISTS Firma ;
 DROP TABLE IF EXISTS Racunovodja ;
 DROP TABLE IF EXISTS Zaposlenik ;
@@ -62,6 +63,14 @@ CREATE TABLE jeZaposlen (
         ON DELETE CASCADE
 );
 
+CREATE TABLE Placa (
+    idZaposlenik INT NOT NULL,
+    idFirma INT NOT NULL,
+    iznosPlace DECIMAL(10,2) NOT NULL CHECK (iznosPlace >= 0),
+
+    PRIMARY KEY (idFirma, idZaposlenik)
+
+);
 
 CREATE TABLE Faktura (
     idFaktura SERIAL PRIMARY KEY,

@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface ZaposlenikRepository extends JpaRepository<Zaposlenik, Long> {
     Optional<Zaposlenik> findByIdKorisnika(Long idKorisnika); // opcionalno, custom metoda
+    boolean existsByIdKorisnika(Long idKorisnika);
 }

@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.eco.oauth2_login.databaza.JeZaposlenDTO;
 
+import com.eco.oauth2_login.databaza.Placa;
+
 import com.eco.oauth2_login.databaza.Korisnik;
 import com.eco.oauth2_login.databaza.ZaposlenikDTO;
 
@@ -23,16 +25,15 @@ public class AddUserController {
     
      @Autowired
     private AddUserService addUserService;
-
+    
     @PostMapping("/adduser")
     public ResponseEntity<String> addKorisnik(@RequestBody Korisnik korisnik) {
         try {
-            System.out.println("Izvana");
-
-            addUserService.addKorisnik(korisnik);
-            return ResponseEntity.ok(korisnik.getIdKorisnika().toString());
+            Long id = addUserService.addKorisnik(korisnik);
+            return ResponseEntity.ok(id.toString());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error adding korisnik");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                .body("Error adding korisnik: " + e.getMessage());
         }
     }
 
@@ -51,6 +52,17 @@ public class AddUserController {
     public ResponseEntity<String> addJeZaposlen(@RequestBody JeZaposlenDTO jezaposlen) {
         try {
             addUserService.addJeZaposlen(jezaposlen);
+            return ResponseEntity.ok("OK");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                             .body("Error adding zaposlenik: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/addplaca")
+    public ResponseEntity<String> addJeZaposlen(@RequestBody Placa placa) {
+        try {
+            addUserService.addPlaca(placa);
             return ResponseEntity.ok("OK");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

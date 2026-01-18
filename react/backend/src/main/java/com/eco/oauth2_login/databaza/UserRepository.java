@@ -5,4 +5,5 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<Korisnik, Long> {
     Optional<Korisnik> findByEmail(String email);
+    boolean existsByEmail(String email);
 }

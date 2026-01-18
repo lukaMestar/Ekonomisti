@@ -103,6 +103,11 @@ function DodajRadnika() {
             idKlijent: user.id  //user.id STAVI KAD LOVRINOVIC OBAVI SVOJE
 
           };
+          const radnikData4 = {
+            idZaposlenik: id,
+            idFirma: firmaId,
+            iznosPlace: parseFloat(placaValue)
+          };
           //Error adding radnik: firmaData is not defined
 
           const response3 = await apiCall(`${API_URL}/api/addjezaposlen`, {
@@ -113,9 +118,19 @@ function DodajRadnika() {
             body: JSON.stringify(radnikData3),
           });
 
+          const response4 = await apiCall(`${API_URL}/api/addplaca`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(radnikData4),
+          });
+
+
           const responseText3 = await response3.text();
-          if (!response3.ok) {
-            alert("Treci POST nije uspio: " + responseText3);
+          const responseText4 = await response4.text();
+          if (!(response3.ok && response4.ok)) {
+            alert("Treci POST nije uspio: " + responseText3 + responseText4);
           }
 
 

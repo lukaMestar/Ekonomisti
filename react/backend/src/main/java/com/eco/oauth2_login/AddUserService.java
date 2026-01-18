@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.eco.oauth2_login.databaza.JeZaposlen;
+import com.eco.oauth2_login.databaza.Placa;
 import com.eco.oauth2_login.databaza.JeZaposlenDTO;
 import com.eco.oauth2_login.databaza.JeZaposlenRepository;
 import com.eco.oauth2_login.databaza.Korisnik;
@@ -11,9 +12,11 @@ import com.eco.oauth2_login.databaza.UserRepository;
 import com.eco.oauth2_login.databaza.Zaposlenik;
 import com.eco.oauth2_login.databaza.ZaposlenikDTO;
 import com.eco.oauth2_login.databaza.ZaposlenikRepository;
+import com.eco.oauth2_login.databaza.PlacaRepository;
 
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
+import java.util.Optional;
 
 
 @Service
@@ -22,33 +25,49 @@ public class AddUserService {
     private final UserRepository userRepository;
     private final ZaposlenikRepository zaposlenikRepository;
     private final JeZaposlenRepository jezaposlenRepository;
+    private final PlacaRepository placaRepository;
 
     @Autowired
     public AddUserService(
         UserRepository userRepository,
         ZaposlenikRepository zaposlenikRepository,
-        JeZaposlenRepository jezaposlenRepository
+        JeZaposlenRepository jezaposlenRepository,
+        PlacaRepository placaRepository
     ) {
         this.userRepository = userRepository;
         this.zaposlenikRepository = zaposlenikRepository;
         this.jezaposlenRepository = jezaposlenRepository;
+        this.placaRepository =  placaRepository;
     }
 
     @Transactional
-    public void addKorisnik(Korisnik korisnik){
+    public Long addKorisnik(Korisnik korisnik){
+        // Ako korisnik već postoji, pronađi ga
+        Optional<Korisnik> existing = userRepository.findByEmail(korisnik.getEmail());
+        if(existing.isPresent()){
+            return existing.get().getIdKorisnika(); // vrati id postojećeg korisnika
+        }
+
+        // Ako ne postoji, spremi novog
         korisnik.setImeKorisnik("Placeholder");
         korisnik.setPrezimeKorisnik("Placeholder");
         korisnik.setProvider("google");
         korisnik.setProviderUserId(korisnik.getEmail() != null ? korisnik.getEmail() : "placeholder");
         korisnik.setDatumRegistracije(LocalDate.now());
-        
+
         userRepository.save(korisnik);
+        return korisnik.getIdKorisnika(); // vrati id novog korisnika
     }
     @Transactional
     public void addZaposlenik(ZaposlenikDTO dto){
         System.out.println("Unutra");
         // 1. Dohvati korisnika po ID
         System.out.println("DTO idKorisnika = " + dto.getIdKorisnika());
+
+        if (zaposlenikRepository.existsByIdKorisnika(dto.getIdKorisnika())) {
+            System.out.println("Korisnik već postoji: " + dto.getIdKorisnika());
+            return; // samo izađe iz metode
+        }
 
         Korisnik k = userRepository.findById(dto.getIdKorisnika())
                         .orElseThrow(() -> new RuntimeException("Korisnik ne postoji"));
@@ -92,4 +111,10 @@ public class AddUserService {
 
         jezaposlenRepository.save(z);
     }
+    @Transactional
+    public void addPlaca(Placa p){
+        
+        placaRepository.save(p);
+    }
 }
+
