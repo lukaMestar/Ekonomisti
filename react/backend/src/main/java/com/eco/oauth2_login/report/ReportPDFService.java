@@ -22,6 +22,11 @@ public class ReportPDFService {
                 ? report.getMjesecniTrosakUsluge()
                 : BigDecimal.ZERO;
 
+        BigDecimal placaZaposlenika =
+            report.getPlacaZaposlenika() != null
+                ? report.getPlacaZaposlenika()
+                : BigDecimal.ZERO;
+
         List<Faktura> listaFaktura =
             report.getListaFaktura() != null
                 ? report.getListaFaktura()
@@ -43,7 +48,8 @@ public class ReportPDFService {
         BigDecimal ukupanIznosMjesecnogTroska = BigDecimal.ZERO;
 
         ukupanIznosMjesecnogTroska = ukupanIznosMjesecnogTroska.add(mjesecniTrosakUsluge)
-                                                                .add(ukupanIznosPutnihNaloga);
+                                                                .add(ukupanIznosPutnihNaloga)
+                                                                .add(placaZaposlenika);
 
 
         BigDecimal iznos = ukupanIznosFaktura.subtract(ukupanIznosMjesecnogTroska);

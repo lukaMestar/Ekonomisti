@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import com.eco.oauth2_login.databaza.Faktura;
 import com.eco.oauth2_login.databaza.FirmaRepository;
 import com.eco.oauth2_login.databaza.PutniNalog;
+import com.eco.oauth2_login.databaza.ZaposlenikRepository;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,16 +21,18 @@ public class ReportService {
     private final RacunovodaKlijentReportService racunovodaKlijentReportService;
     private final ReportPDFService reportPDFService;
     private final FirmaRepository firmaRepository;
-
+    private final ZaposlenikRepositoryService zaposlenikRepositoryService;
     
 
     public ReportService(FakturaReportService FakturaReportService,PutniNalogReportService putniNalogReportService,
-        RacunovodaKlijentReportService racunovodaKlijentReportService,ReportPDFService reportPDFService, FirmaRepository firmaRepository) {
+        RacunovodaKlijentReportService racunovodaKlijentReportService,ReportPDFService reportPDFService, FirmaRepository firmaRepository, 
+        ZaposlenikRepositoryService zaposlenikRepositoryService) {
         this.FakturaReportService = FakturaReportService;
         this.putniNalogReportService = putniNalogReportService;
         this.racunovodaKlijentReportService = racunovodaKlijentReportService;
         this.reportPDFService = reportPDFService;
         this.firmaRepository = firmaRepository;
+        this.zaposlenikRepositoryService = zaposlenikRepositoryService;
     }
 
     public Path savePdfToStorage(byte[] pdf,Long firmaId,YearMonth mjesec) throws Exception {
@@ -66,11 +69,13 @@ public class ReportService {
         List<PutniNalog> putniNalozi = putniNalogReportService.getPutniNaloziZaTekuciMjesec(klijentId, firmaId, mjesec);
 
         var mjesecniTrosak = racunovodaKlijentReportService.getMjesecniTrosakUsluge(klijentId);
+        var placaZaposlenika = zaposlenikRepositoryService.getPlacaZaposlenika(klijentId);
 
         ReportDTO report = new ReportDTO();
         report.setListaFaktura(fakture);
         report.setListaPutnihNaloga(putniNalozi);
         report.setMjesecniTrosakUsluge(mjesecniTrosak);
+        report.setPlacaZaposlenika(placaZaposlenika);
         
         return reportPDFService.generirajIzvjestaj(report);
     }

@@ -28,6 +28,7 @@ public class MonthlyReportJob {
     //@Scheduled(cron = "*/50 * * * * ?") //- za testiranje salje se svako 30sek
     public void generateAndSendReports() {
         YearMonth mjesec = YearMonth.now().minusMonths(1);
+        // YearMonth mjesec = YearMonth.now();
 
         List<Firma> firme = firmaRepository.findAll();
 
