@@ -15,12 +15,10 @@ public interface FakturaRepository extends JpaRepository<Faktura, Long> {
    @Query("""
     SELECT f
     FROM Faktura f 
-    WHERE f.firma.idKlijent = :idKlijent
-      AND f.firma.idFirma = :idFirma
+    WHERE f.firma.idFirma = :idFirma
       AND f.datum BETWEEN :pocetak AND :kraj
     """)
     List<Faktura> findFaktureZaMjesec(
-        @Param("idKlijent") Long idKlijent,
         @Param("idFirma") Long idFirma,
         @Param("pocetak") LocalDate pocetak,
         @Param("kraj") LocalDate kraj
@@ -29,9 +27,8 @@ public interface FakturaRepository extends JpaRepository<Faktura, Long> {
     @Query(""" 
         SELECT f 
         FROM Faktura f 
-        WHERE f.firma.idKlijent = :idKlijent 
-        AND f.firma.idFirma = :idFirma 
+        WHERE f.firma.idFirma = :idFirma 
     """) 
-        List<Faktura> findSveFakture( @Param("idKlijent") Long idKlijent, @Param("idFirma") Long idFirma );
+        List<Faktura> findSveFakture(@Param("idFirma") Long idFirma );
     
 }

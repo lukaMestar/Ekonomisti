@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import com.eco.oauth2_login.databaza.Faktura;
+import com.eco.oauth2_login.databaza.Placa;
 import com.eco.oauth2_login.databaza.PutniNalog;
 import com.lowagie.text.Document;
 import com.lowagie.text.Font;
@@ -22,11 +23,11 @@ public class ReportPDFService {
                 ? report.getMjesecniTrosakUsluge()
                 : BigDecimal.ZERO;
 
-        BigDecimal placaZaposlenika =
+        List<Placa> placaZaposlenika =
             report.getPlacaZaposlenika() != null
                 ? report.getPlacaZaposlenika()
-                : BigDecimal.ZERO;
-
+                : List.of();;
+            
         List<Faktura> listaFaktura =
             report.getListaFaktura() != null
                 ? report.getListaFaktura()
@@ -40,6 +41,10 @@ public class ReportPDFService {
         BigDecimal ukupanIznosFaktura = listaFaktura.stream()
                                                     .map(Faktura::getIznos)
                                                     .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal ukupanIznosPlaca = placaZaposlenika.stream()
+                                                    .map(Placa::getIznosPlace)
+                                                    .reduce(BigDecimal.ZERO, BigDecimal::add);
         
         BigDecimal ukupanIznosPutnihNaloga = listaPutniNalog.stream()
                                                     .map(PutniNalog::getTrosak)
@@ -49,7 +54,7 @@ public class ReportPDFService {
 
         ukupanIznosMjesecnogTroska = ukupanIznosMjesecnogTroska.add(mjesecniTrosakUsluge)
                                                                 .add(ukupanIznosPutnihNaloga)
-                                                                .add(placaZaposlenika);
+                                                                .add(ukupanIznosPlaca);
 
 
         BigDecimal iznos = ukupanIznosFaktura.subtract(ukupanIznosMjesecnogTroska);

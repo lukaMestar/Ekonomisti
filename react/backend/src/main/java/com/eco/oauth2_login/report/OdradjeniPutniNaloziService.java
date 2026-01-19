@@ -1,10 +1,14 @@
 package com.eco.oauth2_login.report;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.eco.oauth2_login.databaza.Faktura;
 import com.eco.oauth2_login.databaza.OdradjeniPutniNalozi;
 import com.eco.oauth2_login.databaza.OdradjeniPutniNaloziRepository;
+import com.eco.oauth2_login.databaza.PutniNalog;
 
 
 @Service
@@ -28,5 +32,9 @@ public class OdradjeniPutniNaloziService {
             new OdradjeniPutniNalozi(idPutniNalog, idFirma, idKlijent);
 
         odradjeniRepo.save(opn);
+    }
+
+    public List<PutniNalog> odrPN(Long idFirma, Long klijentid){
+        return odradjeniRepo.odradjeniPutniNalozi(klijentid);
     }
 }

@@ -20,10 +20,20 @@ public class OdradjeniPutniNalozi {
     @Column(name = "idklijent")
     private Long idKlijent;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+        name = "idputninalog",
+        referencedColumnName = "idputninalog",
+        insertable = false,
+        updatable = false
+    )
+    private PutniNalog putniNalog;
+
     @Column(name = "datumodradjivanja")
     private LocalDateTime datumOdradjivanja = LocalDateTime.now();
 
     public OdradjeniPutniNalozi() {}
+
 
     public OdradjeniPutniNalozi(Long idPutniNalog, Long idFirma, Long idKlijent) {
         this.idPutniNalog = idPutniNalog;

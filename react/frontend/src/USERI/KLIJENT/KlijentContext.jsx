@@ -1,100 +1,81 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { API_URL } from "../../config.js";
+import { apiCall } from "../../api.js";
+
 
 const KlijentContext = createContext();
 
 export function KlijentProvider({ children }) {
-  const [putniNalozi, setPutniNalozi] = useState([]);
-  const [placeniRacuni, setPlaceniRacuni] = useState([]);
-  const [neplaceniRacuni, setNeplaceniRacuni] = useState([]);
-  const [podaci, setPodaci] = useState({});
+
+  const [firmaNaziv, setFirmaNaziv] = useState(null);
+  const [stanjeRac, setStanjeRac] = useState(null);
+  const [emailIzvj, setEmailIzvj] = useState(null);
+
+  const[listaZaposlenika, setListaZaposlenika] = useState([]);
+  const[listaRacuna, setListaRacuna] = useState([]);
+  const[PN, setPutniNalozi] = useState([]);
+  const[PNN, setPutniNaloziNeodradjeni] = useState([]);
+  const[F, setF] = useState([]);
+  const[FN, setFN] = useState([]);
+
+  const [loading, setLoading] = useState(true); 
 
   useEffect(() => {
-    fetch(`${API_URL}/api/podaci`, {
-      credentials: "include",
-    })
-      .then((res) => res.json())
-      .then((data) => setPodaci(data))
-      .catch((err) => console.error("Greška kod dohvaćanja podataka:", err));
+    async function fetchAll() {
+      try {
+        const [
+          firmaRes,
+          racuniRes,
+          zaposleniciRes,
+          fRes,
+          pnRes
+        ] = await Promise.all([
+          apiCall(`${API_URL}/api/klijent`),
+          apiCall(`${API_URL}/api/izvjestaj/dohvacanjeRacuna`),
+          apiCall(`${API_URL}/api/izvjestaj/dohvacanjeZaposlenika`),
+          apiCall(`${API_URL}/api/izvjestaj/listaF`),
+          apiCall(`${API_URL}/api/izvjestaj/listaPN`)
+        ]);
+  
+        if (firmaRes.ok) {
+          const firmaData = await firmaRes.json();
+          setFirmaNaziv(firmaData.nazivFirme);
+          setStanjeRac(firmaData.stanjeRacuna);
+          setEmailIzvj(firmaData.emailIzvjestaj);
+        }
+  
+        if (racuniRes.ok) setListaRacuna(await racuniRes.json());
+        if (zaposleniciRes.ok) setListaZaposlenika(await zaposleniciRes.json());
+        if (fRes.ok) {
+          const FakturData = await fRes.json();
+          setF(FakturData.odradjeni);
+          setFN(FakturData.neodradjeni);
+        };
+        if (pnRes.ok) {
+          const PNData = await pnRes.json();
+          setPutniNalozi(PNData.odradjeni);
+          setPutniNaloziNeodradjeni(PNData.neodradjeni);
+        };
+  
+      } catch (err) {
+        alert("Greška pri dohvaćanju podataka" + err);
+      } finally {
+        setLoading(false);
+      }
+    }
+  
+    fetchAll();
   }, []);
 
-  useEffect(() => {
-    fetch(`${API_URL}/api/placeniRacuni`, {
-      credentials: "include",
-    })
-      .then((res) => res.json())
-      .then((data) => setPlaceniRacuni(data))
-      .catch((err) =>
-        console.error("Greška kod dohvaćanja placenih racuna:", err)
-      );
-  }, []);
+  
+  console.log("Tuu saammmmmm --------------------------");
 
-  useEffect(() => {
-    fetch(`${API_URL}/api/neplaceniRacuni`, {
-      credentials: "include",
-    })
-      .then((res) => res.json())
-      .then((data) => setNeplaceniRacuni(data))
-      .catch((err) =>
-        console.error("Greška kod dohvaćanja neplacenih racuna:", err)
-      );
-  }, []);
-
-  useEffect(() => {
-    fetch(`${API_URL}/api/putniNalozi`, {
-      credentials: "include",
-    })
-      .then((res) => res.json())
-      .then((data) => setPutniNalozi(data))
-      .catch((err) => console.error("Greška kod dohvaćanja naloga:", err));
-  }, []);
-
-  useEffect(() => {
-    const mockRacuni = [
-      {
-        id: 1,
-        naziv: "Račun 1",
-        iznos: 25.6,
-        datum: "2025-10-10",
-        placen: false,
-      },
-      {
-        id: 2,
-        naziv: "Račun 2",
-        iznos: 75.2,
-        datum: "2025-10-15",
-        placen: true,
-      },
-      {
-        id: 3,
-        naziv: "Račun 3",
-        iznos: 33.5,
-        datum: "2025-10-20",
-        placen: false,
-      },
-      {
-        id: 4,
-        naziv: "Račun 4",
-        iznos: 42.8,
-        datum: "2025-09-30",
-        placen: true,
-      },
-    ];
-    setPlaceniRacuni(mockRacuni.filter((r) => r.placen));
-    setNeplaceniRacuni(mockRacuni.filter((r) => !r.placen));
-  }, []);
+  if (loading) { return <p>Učitavanje podataka...</p>;}
 
   return (
     <KlijentContext.Provider
       value={{
-        putniNalozi,
-        setPutniNalozi,
-        placeniRacuni,
-        setPlaceniRacuni,
-        neplaceniRacuni,
-        setNeplaceniRacuni,
-        podaci,
-        setPodaci,
+        firmaNaziv, stanjeRac, emailIzvj, listaZaposlenika, listaRacuna, PN, PNN, F, FN
       }}
     >
       {children}

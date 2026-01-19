@@ -20,10 +20,20 @@ public class OdradjeneFakture {
     @Column(name = "idklijent")
     private Long idKlijent;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+        name = "idfaktura",
+        referencedColumnName = "idfaktura",
+        insertable = false,
+        updatable = false
+    )
+    private Faktura faktura;
+
     @Column(name = "datumodradjivanja")
     private LocalDateTime datumOdradjivanja = LocalDateTime.now();
 
     public OdradjeneFakture() {}
+
 
     public OdradjeneFakture(Long idFaktura, Long idFirma, Long idKlijent) {
         this.idFaktura = idFaktura;

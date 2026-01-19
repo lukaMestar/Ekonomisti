@@ -6,7 +6,8 @@ import java.time.LocalDate;
 public record MjesecniRacunDTO(
     String statusPlacanja, // neplaceno , placeno , refundirano, otkazano
     BigDecimal iznos,
-    LocalDate datumGeneriranja
+    LocalDate datumGeneriranja,
+    Long idRacuna
 
 ) {
     

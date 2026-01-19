@@ -6,23 +6,61 @@ const RacunovodaContext = createContext();
 export function RacunovodaProvider({ children }) {
   const [klijenti, setKlijenti] = useState([]);
   const [slobodniKlijenti, setSlobodniKlijenti] = useState([]);
+  const [trebaAzurirat, setTrebaAzurirat] = useState({});
+
+  // const oznaciOdradjen = (id) => {
+  //   setKlijenti((prev) =>
+  //     prev.map((k) =>
+  //       k.id === id
+  //         ? { ...k, status: k.status === "Odrađen" ? "Neodrađen" : "Odrađen" }
+  //         : k
+  //     )
+  //   );
 
   const oznaciOdradjen = (id) => {
-    setKlijenti((prev) =>
-      prev.map((k) =>
-        k.id === id
-          ? { ...k, status: k.status === "Odrađen" ? "Neodrađen" : "Odrađen" }
-          : k
-      )
-    );
-
-    fetch(`${API_URL}/api/klijenti/${id}/odradjen`, {
+    fetch(`${API_URL}/api/gumbOdradjeno/${id}`, {
       method: "POST",
       credentials: "include",
-    }).catch(() => {
-      console.warn("Greška pri slanju statusa backendu");
-    });
+    })
+      .then(() => {
+        setTrebaAzurirat((prev) => ({
+            ...prev,
+            [id]: false,
+          }));
+        })
+      .catch(() => {
+        console.warn("Greška pri slanju backendu");
+      });
   };
+
+  // useEffect(() => {
+  //   klijenti.forEach((k) => {
+  //     fetch(`${API_URL}/api/klijenti/${k.id}/treba-azurirat`, {
+  //       credentials: "include",
+  //     })
+  //       .then((res) => res.json())
+  //       .then((data) => {
+  //         setTrebaAzurirat((prev) => ({
+  //           ...prev,
+  //           [k.id]: data,
+  //         }));
+  //       }).catch((err) => console.error(err));
+  //   });
+  // }, [klijenti]);
+
+
+
+  useEffect(() => {
+    fetch(`${API_URL}/api/klijenti/treba-azurirat`, {
+      credentials: "include",
+    })
+      .then(res => res.json())
+      .then(setTrebaAzurirat)
+      .catch(console.error);
+  }, []);
+
+console.log(trebaAzurirat);
+
 
   const postaviCijenu = async (klijentId, cijena) => {
   try {
@@ -59,12 +97,10 @@ export function RacunovodaProvider({ children }) {
       return res.json();
     })
     .then(data => {
-      // Map server data to the format expected by your frontend
       setKlijenti(
         data.map(k => ({
           id: k.id,
           ime: `${k.ime} ${k.prezime}`,
-          status: "Neodrađen",
           cijena: 0
         }))
       );
@@ -88,7 +124,7 @@ export function RacunovodaProvider({ children }) {
 
   return (
     <RacunovodaContext.Provider
-      value={{ klijenti, setKlijenti, slobodniKlijenti, setSlobodniKlijenti, oznaciOdradjen, postaviCijenu }}
+      value={{ klijenti, setKlijenti, slobodniKlijenti, setSlobodniKlijenti, oznaciOdradjen, postaviCijenu , trebaAzurirat}}
     >
       {children}
     </RacunovodaContext.Provider>

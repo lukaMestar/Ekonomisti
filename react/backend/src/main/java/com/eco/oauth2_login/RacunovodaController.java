@@ -37,7 +37,6 @@ public class RacunovodaController {
         this.racunovodaService = racunovodaService;
         this.mjesecniRacunService = mjesecniRacunService;
     }
-
     @Autowired
     private RacunovodaKlijentRepository racunovodaKlijentRepository;
 

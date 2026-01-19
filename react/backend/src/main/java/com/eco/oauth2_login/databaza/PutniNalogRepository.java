@@ -15,12 +15,10 @@ public interface PutniNalogRepository extends JpaRepository<PutniNalog, Long> {
     @Query("""
     SELECT pn
     FROM PutniNalog pn
-    WHERE pn.firma.idKlijent = :idKlijent
-      AND pn.firma.idFirma = :idFirma
+    WHERE pn.firma.idFirma = :idFirma
       AND pn.datumPovratka BETWEEN :pocetak AND :kraj
     """)
     List<PutniNalog> findPutniNaloziZaMjesec(
-        @Param("idKlijent") Long idKlijent,
         @Param("idFirma") Long idFirma,
         @Param("pocetak") LocalDate pocetak,
         @Param("kraj") LocalDate kraj
@@ -29,9 +27,9 @@ public interface PutniNalogRepository extends JpaRepository<PutniNalog, Long> {
     @Query(""" 
         SELECT pn
         FROM PutniNalog pn
-        WHERE pn.firma.idKlijent = :idKlijent 
-        AND pn.firma.idFirma = :idFirma 
+        WHERE pn.firma.idFirma = :idFirma 
     """) 
-        List<PutniNalog> findSvePutneNaloge( @Param("idKlijent") Long idKlijent, @Param("idFirma") Long idFirma );
+        List<PutniNalog> findSvePutneNaloge( @Param("idFirma") Long idFirma );
 
+        
 }

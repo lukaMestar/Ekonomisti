@@ -1,8 +1,11 @@
 package com.eco.oauth2_login.report;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.eco.oauth2_login.databaza.Faktura;
 import com.eco.oauth2_login.databaza.OdradjeneFakture;
 import com.eco.oauth2_login.databaza.OdradjeneFaktureRepository;
 
@@ -26,5 +29,9 @@ public class OdradjeneFaktureService {
         }
         OdradjeneFakture of = new OdradjeneFakture(idFaktura, idFirma, idKlijent);
         odradjeneRepo.save(of);
+    }
+
+    public List<Faktura> odrF(Long klijentid){
+        return odradjeneRepo.OdradjeneFakture(klijentid);
     }
 }

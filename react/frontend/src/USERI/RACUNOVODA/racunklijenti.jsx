@@ -8,7 +8,7 @@ import { API_URL } from "../../config";
 
 function Racunklijenti() {
   const navigate = useNavigate();
-  const { klijenti, oznaciOdradjen } = useRacunovoda();
+  const { klijenti, oznaciOdradjen , trebaAzurirat} = useRacunovoda();
 
   // Lokalni state za odabir
   const [odabraniKlijent, setOdabraniKlijent] = useState("");
@@ -86,17 +86,23 @@ function Racunklijenti() {
             <span style={{ color: k.status === "Odrađen" ? "green" : "gray" }}>
               {k.status}
             </span>
-            <button
-              onClick={() => oznaciOdradjen(k.id)}
-              style={{
-                marginLeft: "10px",
-                color: "grey",
-                borderRadius: "6px",
-                cursor: "pointer",
-              }}
-            >
-              {k.status === "Odrađen" ? "Poništi" : "Označi kao odrađen"}
-            </button>
+                <button
+                  disabled={!trebaAzurirat[k.id]}
+                  onClick={() => oznaciOdradjen(k.id)}
+                  style={{
+                    marginLeft: "10px",
+                    borderRadius: "6px",
+                    cursor: !trebaAzurirat[k.id] ? "not-allowed" : "pointer",
+                    backgroundColor: !trebaAzurirat[k.id] ? "#ccc" : "#28a745",
+                    color: "white",
+                    border: "none",
+                    padding: "5px 15px",
+                  }}
+                >
+                  {trebaAzurirat[k.id]
+                    ? "Označi kao odrađen"
+                    : "Sve odrađeno"}
+                </button>
             <button
               onClick={() => handleGenerirajRacun(k.id)}
               disabled={generiranjeRacuna[k.id]}

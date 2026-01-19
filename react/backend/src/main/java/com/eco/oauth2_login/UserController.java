@@ -1,9 +1,13 @@
 package com.eco.oauth2_login;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,6 +16,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,7 +26,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import com.eco.oauth2_login.databaza.Firma;
 import com.eco.oauth2_login.databaza.FirmaRepository;
 import com.eco.oauth2_login.databaza.Korisnik;
+import com.eco.oauth2_login.databaza.PutniNalog;
+import com.eco.oauth2_login.databaza.RacunovodaKlijentRepository;
 import com.eco.oauth2_login.databaza.UserRepository;
+import com.eco.oauth2_login.dto.KlijentDTO;
 
 @RestController
 @CrossOrigin(origins = {"${FRONTEND_URL:http://localhost:5173}", "http://localhost:5173"}, allowCredentials = "true")
@@ -27,11 +37,17 @@ public class UserController {
 
     private final UserRepository userRepository;
     private final FirmaRepository firmaRepository;
+    private final StatusOdradjenosti statusOdradjenosti;
+    private final RacunovodaKlijentRepository racunovodaKlijentRepository;
 
     @Autowired
-    public UserController(UserRepository userRepository, FirmaRepository firmaRepository) {
+    public UserController(UserRepository userRepository, FirmaRepository firmaRepository, StatusOdradjenosti statusOdradjenosti,
+        RacunovodaKlijentRepository racunovodaKlijentRepository
+    ) {
         this.userRepository = userRepository;
         this.firmaRepository = firmaRepository;
+        this.statusOdradjenosti = statusOdradjenosti;
+        this.racunovodaKlijentRepository = racunovodaKlijentRepository;
     }
 
     @GetMapping("/api/user")
@@ -135,6 +151,44 @@ public class UserController {
         if (emailIzvjestaj != null) result.put("emailIzvjestaj", emailIzvjestaj);
 
         return ResponseEntity.ok(result);
+    }
+
+
+    @PostMapping("/api/gumbOdradjeno/{id}")
+    public ResponseEntity<Void> promijeniStatus(@PathVariable Long id) {
+        statusOdradjenosti.promijeniStatusFaktura(id);
+        statusOdradjenosti.promijeniStatusPN(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/api/klijenti/treba-azurirat")
+    public ResponseEntity<Map<Long, Boolean>> imaNeodradjenih(@AuthenticationPrincipal OAuth2User principal) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        Map<Long, Boolean> rezultat = new HashMap<>();
+        String email = principal.getAttribute("email");
+
+        Long userId = 0L;
+        
+        if (email != null) {
+            Optional<Korisnik> userOptional = userRepository.findByEmail(email);
+            
+
+            if (userOptional.isPresent()) {
+                Korisnik user = userOptional.get();
+                Integer idUloge = user.getIdUloge();
+                userId = user.getIdKorisnika();
+
+                List<KlijentDTO> listaKljenata = racunovodaKlijentRepository.findKlijentiByRacunovodjaId(userId);
+                for (KlijentDTO k : listaKljenata){
+                    Long id = k.getId();
+                    boolean ima = statusOdradjenosti.trebaAzurirat(id);
+                    rezultat.put(id, ima);
+                }
+            }
+        }
+        return ResponseEntity.ok(rezultat);
     }
 
 }

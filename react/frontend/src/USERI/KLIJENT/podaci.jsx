@@ -7,54 +7,21 @@ import { API_URL } from "../../config.js";
 import { apiCall } from "../../api.js";
 
 function Podaci() {
-  const { podaci, putniNalozi, placeniRacuni, neplaceniRacuni } = useKlijent();
+  const klijent = useKlijent();
 
-  const safePutniNalozi = Array.isArray(putniNalozi) ? putniNalozi : [];
-  const safePlaceniRacuni = Array.isArray(placeniRacuni) ? placeniRacuni : [];
-  const safeNeplaceniRacuni = Array.isArray(neplaceniRacuni) ? neplaceniRacuni : [];
-
-  const [firmaNaziv, setFirmaNaziv] = useState(null);
-  const [stanjeRac, setStanjeRac] = useState(null);
-  const [emailIzvj, setEmailIzvj] = useState(null);
-
-  const [loading, setLoading] = useState(true); // novo
-
-  useEffect(() => {
-    async function fetchFirma() {
-      try {
-        const firmaResponse = await apiCall(`${API_URL}/api/klijent`);
-
-        if (firmaResponse.ok) {
-          const firmaData = await firmaResponse.json();
-          console.log(firmaData)
-          setFirmaNaziv(firmaData.nazivFirme)
-          setStanjeRac(firmaData.stanjeRacuna)
-          setEmailIzvj(firmaData.emailIzvjestaj)
-        } else {
-          const errText = await firmaResponse.text();
-          alert("Nije moguće dohvatiti firmu: " + errText);
-        }
-      } catch (error) {
-        alert("Greška pri dohvaćanju firme: " + error.message);
-      } finally {
-        setLoading(false); // signalizira da je dohvat završen
-      }
-    }
-
-    fetchFirma();
-  }, []);
-
-  if (loading) {
-    // prikazuje se dok se ne učitaju podaci
-    return <p>Učitavanje podataka o firmi...</p>;
+  if (!klijent) {
+    return <p>Učitavanje konteksta...</p>;
   }
+    const {firmaNaziv, stanjeRac, emailIzvj, listaZaposlenika, listaRacuna, PN, PNN,  F, FN} = klijent;
 
+  console.log("PN:", PNN);
+  console.log("Tuu saammmmmm --------------------------");
 
+  // if (loading) { return <p>Učitavanje podataka...</p>;}
+  
   return (
     <div>
       <h1>Podaci korisnika</h1>
-
-      {podaci ? (
         <div>
           <p><strong>Ime firme/obrta:</strong> {firmaNaziv || "N/A"}</p>
           {/*<p><strong>Ime i prezime vlasnika:</strong> {podac || "N/A"}</p>
@@ -63,28 +30,23 @@ function Podaci() {
           <p><strong>E-mail za izvještaje:</strong> {emailIzvj || "N/A"}</p>
 
           <h3>Financijsko stanje</h3>
-          <p><strong>Trenutačno stanje firme:</strong> {stanjeRac ?? "N/A"} €</p>
-          
+          <p><strong>Trenutačno stanje firme:</strong> {stanjeRac ?? "N/A"} €</p> 
 
-          <h3>Radnici</h3>
-          {podaci.radnici && podaci.radnici.length > 0 ? (
+       <h3>Radnici</h3>
+          {Array.isArray(listaZaposlenika) && listaZaposlenika.length > 0 ? (
             <table border="1" cellPadding="6" style={{ borderCollapse: "collapse" }}>
               <thead>
                 <tr>
-                  <th>Ime i prezime</th>
+                  <th>Ime zaposlenika</th>
                   <th>Plaća (€)</th>
-                  <th>Status zaposlenja</th>
                 </tr>
               </thead>
               <tbody>
-                {podaci.radnici.map((radnik) => (
-                  <tr key={radnik.id}>
-                    <td>{radnik.ime}</td>
-                    <td>{radnik.placa}</td>
-                    <td style={{ color: radnik.aktivan ? "green" : "gray" }}>
-                      {radnik.aktivan ? "Zaposlen" : "Nezaposlen"}
-                    </td>
-                  </tr>
+                {listaZaposlenika.map((z) => (
+                  <tr key={z.idKorisnika}>
+                    <td>{z.imeZaposlenik}</td>
+                    <td>{z.placa ?? "N/A"}</td>
+                </tr>
                 ))}
               </tbody>
             </table>
@@ -92,50 +54,81 @@ function Podaci() {
             <p>Nema unesenih radnika.</p>
           )}
         </div>
-      ) : (
-        <p>Učitavanje podataka o korisniku...</p>
-      )}
 
-      <h2>Putni nalozi i fakture</h2>
+
+      <h2>Lista putnih naloga i faktura</h2>
 
       <h3>Putni nalozi</h3>
-      {safePutniNalozi.length === 0 ? (
-        <p>Nema unesenih putnih naloga.</p>
+      {Array.isArray(PN) && PN.length === 0 ? (
+        <p>Nema odrađenih putnih naloga.</p>
       ) : (
         <ul>
-          {safePutniNalozi.map((nalozi) => (
-            <li key={nalozi.id}>
-              {nalozi.opis || "Putni nalog"} — {nalozi.datum || "Nepoznato"}
+          <p> Odradjeni putni nalozi</p>
+           {(PN ??[]).map(nalozi => (
+            <li key={nalozi.idPutniNalog}>
+              {nalozi.destinacija || "Putni nalog"} : {nalozi.trosak || "Nepoznato"}
+            </li>
+          ))}
+        </ul>
+          )}
+       
+
+    {Array.isArray(PNN) && PNN.length === 0 ? (
+        <p>Nema neodrađenih putnih naloga.</p>
+      ) : (
+        <ul>
+          <p> Neodradjeni putni nalozi </p>
+           {(PNN ?? []).map(nalozi => (
+            <li key={nalozi.idPutniNalog}>
+              {nalozi.destinacija || "Putni nalog"} : {nalozi.trosak || "Nepoznato"}
+            </li>
+          ))}
+        </ul>
+      )}
+       
+     
+    
+      
+      <h3>Fakture</h3>
+      {Array.isArray(F) && F.length === 0 ? (
+        <p>Nema odrađenih faktura.</p>
+      ) : (
+        <ul>
+          <p> Odradjene Fakture</p>
+          {(F ??[]).map(nalozi => (
+            <li key={nalozi.idFaktura}>
+              Datum fakture: {nalozi.datum} :  {nalozi.iznos || "iznos"} € 
+            </li>
+          ))}
+            </ul>
+      )}
+    
+      {Array.isArray(FN) && FN.length === 0 ? (
+        <p>Nema neodrađenih faktura.</p>
+      ) : (
+        <ul>
+          <p> Neodradjene Fakture</p>
+          {(FN ??[]).map(nalozi => (
+            <li key={nalozi.idFaktura}>
+              Datum fakture: {nalozi.datum} :  {nalozi.iznos || "iznos"} € 
             </li>
           ))}
         </ul>
       )}
 
-      <h3>Neplaćeni računi</h3>
-      {safeNeplaceniRacuni.length === 0 ? (
+      <h3>Pregled racuna</h3>
+      {Array.isArray(listaRacuna) && listaRacuna.length === 0  ? (
         <p>Nema neplaćenih računa.</p>
       ) : (
         <ul>
-          {safeNeplaceniRacuni.map((r) => (
-            <li key={r.id}>
-              {r.naziv} — {r.iznos} € (dospijeće: {r.datum})
+          {listaRacuna.map((r) => (
+            <li key={r.idRacuna}>
+              Placanje troskova racunovodji: {r.datumGeneriranja} : {r.iznos} € (statusRacuna: {r.statusPlacanja})
             </li>
           ))}
         </ul>
       )}
 
-      <h3>Plaćeni računi</h3>
-      {safePlaceniRacuni.length === 0 ? (
-        <p>Nema plaćenih računa.</p>
-      ) : (
-        <ul>
-          {safePlaceniRacuni.map((r) => (
-            <li key={r.id}>
-              {r.naziv} — {r.iznos} € (plaćeno: {r.datum})
-            </li>
-          ))}
-        </ul>
-      )}
     </div>
   );
 }

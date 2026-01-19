@@ -4,9 +4,12 @@ import org.springframework.stereotype.Service;
 
 import com.eco.oauth2_login.databaza.Faktura;
 import com.eco.oauth2_login.databaza.FirmaRepository;
+import com.eco.oauth2_login.databaza.Placa;
+import com.eco.oauth2_login.databaza.PlacaRepository;
 import com.eco.oauth2_login.databaza.PutniNalog;
-import com.eco.oauth2_login.databaza.ZaposlenikRepository;
 
+
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -21,18 +24,18 @@ public class ReportService {
     private final RacunovodaKlijentReportService racunovodaKlijentReportService;
     private final ReportPDFService reportPDFService;
     private final FirmaRepository firmaRepository;
-    private final ZaposlenikRepositoryService zaposlenikRepositoryService;
+    private final PlacaRepository placaRepository;
     
 
     public ReportService(FakturaReportService FakturaReportService,PutniNalogReportService putniNalogReportService,
         RacunovodaKlijentReportService racunovodaKlijentReportService,ReportPDFService reportPDFService, FirmaRepository firmaRepository, 
-        ZaposlenikRepositoryService zaposlenikRepositoryService) {
+        PlacaRepository placaRepository) {
         this.FakturaReportService = FakturaReportService;
         this.putniNalogReportService = putniNalogReportService;
         this.racunovodaKlijentReportService = racunovodaKlijentReportService;
         this.reportPDFService = reportPDFService;
         this.firmaRepository = firmaRepository;
-        this.zaposlenikRepositoryService = zaposlenikRepositoryService;
+        this.placaRepository = placaRepository;
     }
 
     public Path savePdfToStorage(byte[] pdf,Long firmaId,YearMonth mjesec) throws Exception {
@@ -66,10 +69,10 @@ public class ReportService {
 
         List<Faktura> fakture = FakturaReportService.getFaktureZaMjesec(klijentId, firmaId, mjesec);
 
-        List<PutniNalog> putniNalozi = putniNalogReportService.getPutniNaloziZaTekuciMjesec(klijentId, firmaId, mjesec);
+        List<PutniNalog> putniNalozi = putniNalogReportService.getPutniNaloziZaTekuciMjesec(firmaId, mjesec);
 
         var mjesecniTrosak = racunovodaKlijentReportService.getMjesecniTrosakUsluge(klijentId);
-        var placaZaposlenika = zaposlenikRepositoryService.getPlacaZaposlenika(klijentId);
+        List<Placa> placaZaposlenika = placaRepository.findByIdFirma(firmaId);
 
         ReportDTO report = new ReportDTO();
         report.setListaFaktura(fakture);
@@ -100,13 +103,17 @@ public class ReportService {
                 .sum();
 
         double rashodi = putniNalogReportService
-                .getPutniNaloziZaTekuciMjesec(klijentID, firmaId, mjesec)
+                .getPutniNaloziZaTekuciMjesec(firmaId, mjesec)
                 .stream()
                 .mapToDouble(pn -> pn.getTrosak().doubleValue())
                 .sum();
         var mjesecniTrosak = racunovodaKlijentReportService.getMjesecniTrosakUsluge(klijentID).doubleValue();
-        var placaZaposlenika = zaposlenikRepositoryService.getPlacaZaposlenika(klijentID).doubleValue();
-        rashodi = rashodi + mjesecniTrosak + placaZaposlenika;
+        List<Placa> placaZaposlenika = placaRepository.findByIdFirma(firmaId);
+
+        BigDecimal ukupanIznosPlaca = placaZaposlenika.stream()
+                                                    .map(Placa::getIznosPlace)
+                                                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+        rashodi = rashodi + mjesecniTrosak + ukupanIznosPlaca.doubleValue();
         double pdv = prihodi * 0.25;
 
         return new IzvjestajDTO(prihodi, rashodi, pdv);

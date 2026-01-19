@@ -10,7 +10,7 @@ public class PutniNalog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "i ")
+    @Column(name = "idputninalog")
     private Long idPutniNalog;
 
     @Column(name = "polaziste", length = 100)
@@ -28,9 +28,6 @@ public class PutniNalog {
     @Column(name = "trosak", precision = 10, scale = 2)
     private BigDecimal trosak;
 
-    @Column(name = "odradena", nullable = false)
-    private Boolean odradena = false;
-
 
     @ManyToOne
     @JoinColumn(name = "idzaposlenik", referencedColumnName = "idkorisnika")
@@ -46,13 +43,6 @@ public class PutniNalog {
 
     public PutniNalog() {
     }
-
-    public boolean getOdradena() {
-        return odradena;
-    }
-     public void setOdradena(boolean odradena){
-        this.odradena = odradena;
-     }
 
     public Long getIdPutniNalog() {
         return idPutniNalog;
