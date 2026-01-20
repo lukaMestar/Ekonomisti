@@ -16,24 +16,24 @@ import com.eco.oauth2_login.databaza.Placa;
 import com.eco.oauth2_login.databaza.Korisnik;
 import com.eco.oauth2_login.databaza.ZaposlenikDTO;
 
-
 @RestController
-@CrossOrigin(origins = {"${FRONTEND_URL:http://localhost:5173}", "http://localhost:5173"}, allowCredentials = "true")
+@CrossOrigin(origins = { "${FRONTEND_URL:http://localhost:5173}", "http://localhost:5173" }, allowCredentials = "true")
 
 @RequestMapping("/api")
 public class AddUserController {
-    
-     @Autowired
+
+    @Autowired
     private AddUserService addUserService;
-    
+
     @PostMapping("/adduser")
     public ResponseEntity<String> addKorisnik(@RequestBody Korisnik korisnik) {
         try {
             Long id = addUserService.addKorisnik(korisnik);
+            System.out.println("PRIMLJENO IME: " + korisnik.getImeKorisnik());
             return ResponseEntity.ok(id.toString());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                .body("Error adding korisnik: " + e.getMessage());
+                    .body("Error adding korisnik: " + e.getMessage());
         }
     }
 
@@ -45,9 +45,10 @@ public class AddUserController {
             return ResponseEntity.ok("OK");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                             .body("Error adding zaposlenik: " + e.getMessage());
+                    .body("Error adding zaposlenik: " + e.getMessage());
         }
     }
+
     @PostMapping("/addjezaposlen")
     public ResponseEntity<String> addJeZaposlen(@RequestBody JeZaposlenDTO jezaposlen) {
         try {
@@ -55,7 +56,7 @@ public class AddUserController {
             return ResponseEntity.ok("OK");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                             .body("Error adding zaposlenik: " + e.getMessage());
+                    .body("Error adding zaposlenik: " + e.getMessage());
         }
     }
 
@@ -66,7 +67,7 @@ public class AddUserController {
             return ResponseEntity.ok("OK");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                             .body("Error adding zaposlenik: " + e.getMessage());
+                    .body("Error adding zaposlenik: " + e.getMessage());
         }
     }
 }

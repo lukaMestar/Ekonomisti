@@ -1,14 +1,12 @@
 package com.eco.oauth2_login.report;
 
 import java.math.BigDecimal;
-import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.eco.oauth2_login.MjesecniRacunService;
+import com.eco.oauth2_login.databaza.Korisnik;
 import com.eco.oauth2_login.databaza.KorisnikRepository;
 import com.eco.oauth2_login.databaza.MjesecniRacun;
 import com.eco.oauth2_login.databaza.Zaposlenik;
@@ -21,45 +19,37 @@ public class NoviService {
     private final JeZaposlenService jeZaposlenService;
 
     @Autowired
-    public NoviService(KorisnikRepository korisnikRepository, MjesecniRacunService mjesecniRacunService
-        ,JeZaposlenService jeZaposlenService) {
+    public NoviService(KorisnikRepository korisnikRepository, MjesecniRacunService mjesecniRacunService,
+            JeZaposlenService jeZaposlenService) {
         this.korisnikRepository = korisnikRepository;
-        this.mjesecniRacunService =  mjesecniRacunService;
+        this.mjesecniRacunService = mjesecniRacunService;
         this.jeZaposlenService = jeZaposlenService;
     }
-    
 
-    public List<ZaposlenikDTO> popisZaposlenika(Long klijentID, Long firmaId){
-        List<Zaposlenik> listaZaposlenika = jeZaposlenService.listaZaposlenikaZaFirmu(firmaId, klijentID);  
-        List<ZaposlenikDTO>  listaDTO = new ArrayList<>(); 
-        for(Zaposlenik z : listaZaposlenika){
+    public List<ZaposlenikDTO> popisZaposlenika(Long klijentID, Long firmaId) {
+        List<Zaposlenik> listaZaposlenika = jeZaposlenService.listaZaposlenikaZaFirmu(firmaId, klijentID);
+        List<ZaposlenikDTO> listaDTO = new ArrayList<>();
+        for (Zaposlenik z : listaZaposlenika) {
             ZaposlenikDTO zap = new ZaposlenikDTO();
-            Long idZaposlenik = z.getIdKorisnika();
-            String imeZaposlenika = korisnikRepository.findById(idZaposlenik)
-                                                .orElseThrow(() -> new RuntimeException("Korisnik ne postoji"))
-                                                .getImeKorisnik();
-            String prezimeZap = korisnikRepository.findById(idZaposlenik)
-                                                .orElseThrow(() -> new RuntimeException("Korisnik ne postoji"))
-                                                .getPrezimeKorisnik();
-            zap.setImeZaposlenik(imeZaposlenika +  " " + prezimeZap);
-            zap.setIdKorisnika(idZaposlenik);
+            Long idZap = z.getIdKorisnika();
+            Korisnik kor = korisnikRepository.findById(idZap)
+                    .orElseThrow(() -> new RuntimeException("Korisnik ne postoji"));
+
+            zap.setImeZaposlenik(kor.getImeKorisnik() + " " + kor.getPrezimeKorisnik());
+            zap.setIdKorisnika(idZap);
             zap.setPlaca(z.getPlaca());
             listaDTO.add(zap);
-        }        
+        }
         return listaDTO;
     }
 
-    public List<MjesecniRacunDTO> ispisRacuna(Long klijentID){
+    public List<MjesecniRacunDTO> ispisRacuna(Long klijentID) {
         List<MjesecniRacun> racuni = mjesecniRacunService.getRacuniZaKlijenta(klijentID);
-        List<MjesecniRacunDTO> listaRacuna = new  ArrayList<>();
-        for (MjesecniRacun r :racuni){
-            listaRacuna.add(new MjesecniRacunDTO(r.getStatusPlacanja(),
-                                                r.getIznos(),
-                                                r.getDatumGeneriranja(),
-                                                r.getIdRacun())
-                                            );
+        List<MjesecniRacunDTO> listaRacuna = new ArrayList<>();
+        for (MjesecniRacun r : racuni) {
+            listaRacuna.add(
+                    new MjesecniRacunDTO(r.getStatusPlacanja(), r.getIznos(), r.getDatumGeneriranja(), r.getIdRacun()));
         }
         return listaRacuna;
     }
-
 }
