@@ -2,21 +2,10 @@ package com.eco.oauth2_login;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.eco.oauth2_login.databaza.PutniNalog;
-import com.eco.oauth2_login.databaza.PutniNalogRepository;
-import com.eco.oauth2_login.databaza.ZaposlenikRepository;
-import com.eco.oauth2_login.databaza.FirmaRepository;
-
 import jakarta.transaction.Transactional;
-import com.eco.oauth2_login.databaza.PutniNalogRequest;
-import com.eco.oauth2_login.databaza.Firma;
-import com.eco.oauth2_login.databaza.Zaposlenik;
-
-import java.time.LocalDate;
-
 import org.springframework.context.ApplicationEventPublisher;
-import com.eco.oauth2_login.databaza.PutniNalogCreatedEvent;
+import com.eco.oauth2_login.databaza.*;
+import java.time.LocalDate;
 
 @Service
 public class AddNalogService {
@@ -39,26 +28,31 @@ public class AddNalogService {
     }
 
     @Transactional
-    public void addNalog(PutniNalogRequest req) {
+    public void addNalog(PutniNalog req) {
+        Long idFirma = req.getIdFirma();
+        Long idKlijent = req.getIdKlijent();
+        Long idZaposlenika = req.getIdZaposlenik();
+
+        if (idFirma == null || idZaposlenika == null) {
+            throw new RuntimeException("Missing ID parameters");
+        }
 
         Firma firma = firmaRepository
-                .findByIdFirmaAndIdKlijent(req.getIdFirma(), req.getIdKlijent())
-                .orElseThrow(() -> new RuntimeException("Firma ne postoji"));
+                .findByIdFirmaAndIdKlijent(idFirma, idKlijent)
+                .orElseThrow(() -> new RuntimeException("Firma not found"));
+
         Zaposlenik zaposlenik = zaposlenikRepository
-                .findByIdKorisnika(req.getIdZaposlenik())
-                .orElseThrow(() -> new RuntimeException("Zaposlenik ne postoji"));
+                .findByIdKorisnika(idZaposlenika)
+                .orElseThrow(() -> new RuntimeException("Zaposlenik not found"));
 
-        PutniNalog pn = new PutniNalog();
-        pn.setPolaziste(req.getPolaziste());
-        pn.setDestinacija(req.getDestinacija());
-        pn.setDatumPolaska(req.getDatumPolaska());
-        pn.setDatumPovratka(req.getDatumPovratka());
-        pn.setTrosak(req.getTrosak());
-        pn.setFirma(firma);
-        pn.setZaposlenik(zaposlenik);
+        req.setFirma(firma);
+        req.setZaposlenik(zaposlenik);
 
-        nalogRepository.save(pn);
+        if (req.getDatumIzdavanja() == null) {
+            req.setDatumIzdavanja(LocalDate.now());
+        }
 
-        eventPublisher.publishEvent(new PutniNalogCreatedEvent(pn));
+        nalogRepository.save(req);
+        eventPublisher.publishEvent(new PutniNalogCreatedEvent(req));
     }
 }

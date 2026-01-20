@@ -10,31 +10,28 @@ import com.eco.oauth2_login.databaza.OdradjeniPutniNalozi;
 import com.eco.oauth2_login.databaza.OdradjeniPutniNaloziRepository;
 import com.eco.oauth2_login.databaza.PutniNalog;
 
-
 @Service
 public class OdradjeniPutniNaloziService {
 
     private final OdradjeniPutniNaloziRepository odradjeniRepo;
 
     public OdradjeniPutniNaloziService(
-        OdradjeniPutniNaloziRepository odradjeniRepo) {
+            OdradjeniPutniNaloziRepository odradjeniRepo) {
         this.odradjeniRepo = odradjeniRepo;
     }
 
     @Transactional
-    public void oznaciPutniNalogOdradjenim(Long idPutniNalog, Long idFirma, Long idKlijent
-    ) {
-        if (odradjeniRepo.existsByIdPutniNalogAndIdFirmaAndIdKlijent( idPutniNalog, idFirma, idKlijent)) {
+    public void oznaciPutniNalogOdradjenim(Long idPutniNalog, Long idFirma, Long idKlijent) {
+        if (odradjeniRepo.existsByIdPutniNalogAndIdFirmaAndIdKlijent(idPutniNalog, idFirma, idKlijent)) {
             return;
         }
 
-        OdradjeniPutniNalozi opn =
-            new OdradjeniPutniNalozi(idPutniNalog, idFirma, idKlijent);
+        OdradjeniPutniNalozi opn = new OdradjeniPutniNalozi(idPutniNalog, idFirma, idKlijent);
 
         odradjeniRepo.save(opn);
     }
 
-    public List<PutniNalog> odrPN(Long idFirma, Long klijentid){
+    public List<PutniNalog> odrPN(Long idFirma, Long klijentid) {
         return odradjeniRepo.odradjeniPutniNalozi(klijentid);
     }
 }

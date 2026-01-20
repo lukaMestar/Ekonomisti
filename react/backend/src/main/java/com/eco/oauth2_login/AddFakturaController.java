@@ -13,12 +13,13 @@ import com.eco.oauth2_login.databaza.Faktura;
 import com.eco.oauth2_login.databaza.FakturaRequest;
 
 @RestController
-@CrossOrigin(origins = {"${FRONTEND_URL:http://localhost:5173}", "https://ekonomisti-frontend.onrender.com", "http://localhost:5173"}, allowCredentials = "true")
+@CrossOrigin(origins = { "${FRONTEND_URL:http://localhost:5173}", "https://ekonomisti-frontend.onrender.com",
+        "http://localhost:5173" }, allowCredentials = "true")
 
 @RequestMapping("/api")
 public class AddFakturaController {
-    
-     @Autowired
+
+    @Autowired
     private AddFakturaService addFakturaService;
 
     @PostMapping("/addfaktura")

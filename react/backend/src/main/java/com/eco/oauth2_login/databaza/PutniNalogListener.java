@@ -4,9 +4,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import com.eco.oauth2_login.databaza.PutniNalogCreatedEvent;
-import com.eco.oauth2_login.databaza.EmailService;
-
 @Component
 public class PutniNalogListener {
 

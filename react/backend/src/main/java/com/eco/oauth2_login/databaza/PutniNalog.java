@@ -10,38 +10,78 @@ public class PutniNalog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idputninalog")
+    @Column(name = "idPutniNalog")
     private Long idPutniNalog;
 
-    @Column(name = "polaziste", length = 100)
+    @Column(name = "polaziste", length = 100, nullable = false)
     private String polaziste;
 
-    @Column(name = "destinacija", length = 100)
-    private String destinacija;
+    @Column(name = "odrediste", length = 100, nullable = false)
+    private String odrediste;
 
-    @Column(name = "datumpolaska")
+    @Column(name = "datumPolaska")
     private LocalDate datumPolaska;
 
-    @Column(name = "datumpovratka")
+    @Column(name = "datumPovratka")
     private LocalDate datumPovratka;
+
+    @Column(name = "svrhaPutovanja")
+    private String svrhaPutovanja;
+
+    @Column(name = "prijevoznoSredstvo", length = 50)
+    private String prijevoznoSredstvo;
 
     @Column(name = "trosak", precision = 10, scale = 2)
     private BigDecimal trosak;
 
+    @Column(name = "datumIzdavanja")
+    private LocalDate datumIzdavanja;
 
-    @ManyToOne
-    @JoinColumn(name = "idzaposlenik", referencedColumnName = "idkorisnika")
-    private Zaposlenik zaposlenik;
-
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = true)
     @JoinColumns({
-        @JoinColumn(name = "idfirma", referencedColumnName = "idfirma"),
-        @JoinColumn(name = "idklijent", referencedColumnName = "idklijent")
+            @JoinColumn(name = "idFirma", referencedColumnName = "idFirma"),
+            @JoinColumn(name = "idKlijent", referencedColumnName = "idKlijent")
     })
     private Firma firma;
 
+    @ManyToOne
+    @JoinColumn(name = "idZaposlenik", referencedColumnName = "idKorisnika")
+    private Zaposlenik zaposlenik;
+
+    @Transient
+    private Long idFirma;
+
+    @Transient
+    private Long idKlijent;
+
+    @Transient
+    private Long idZaposlenik;
 
     public PutniNalog() {
+    }
+
+    public Long getIdFirma() {
+        return idFirma;
+    }
+
+    public void setIdFirma(Long idFirma) {
+        this.idFirma = idFirma;
+    }
+
+    public Long getIdKlijent() {
+        return idKlijent;
+    }
+
+    public void setIdKlijent(Long idKlijent) {
+        this.idKlijent = idKlijent;
+    }
+
+    public Long getIdZaposlenik() {
+        return idZaposlenik;
+    }
+
+    public void setIdZaposlenik(Long idZaposlenik) {
+        this.idZaposlenik = idZaposlenik;
     }
 
     public Long getIdPutniNalog() {
@@ -60,12 +100,12 @@ public class PutniNalog {
         this.polaziste = polaziste;
     }
 
-    public String getDestinacija() {
-        return destinacija;
+    public String getOdrediste() {
+        return odrediste;
     }
 
-    public void setDestinacija(String destinacija) {
-        this.destinacija = destinacija;
+    public void setOdrediste(String odrediste) {
+        this.odrediste = odrediste;
     }
 
     public LocalDate getDatumPolaska() {
@@ -82,6 +122,30 @@ public class PutniNalog {
 
     public void setDatumPovratka(LocalDate datumPovratka) {
         this.datumPovratka = datumPovratka;
+    }
+
+    public String getSvrhaPutovanja() {
+        return svrhaPutovanja;
+    }
+
+    public void setSvrhaPutovanja(String svrhaPutovanja) {
+        this.svrhaPutovanja = svrhaPutovanja;
+    }
+
+    public String getPrijevoznoSredstvo() {
+        return prijevoznoSredstvo;
+    }
+
+    public void setPrijevoznoSredstvo(String prijevoznoSredstvo) {
+        this.prijevoznoSredstvo = prijevoznoSredstvo;
+    }
+
+    public LocalDate getDatumIzdavanja() {
+        return datumIzdavanja;
+    }
+
+    public void setDatumIzdavanja(LocalDate datumIzdavanja) {
+        this.datumIzdavanja = datumIzdavanja;
     }
 
     public BigDecimal getTrosak() {

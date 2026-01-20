@@ -59,7 +59,7 @@ function Nalog() {
           <p> Odradjeni putni nalozi</p>
            {(PN ??[]).map(nalozi => (
             <li key={nalozi.idPutniNalog}>
-              {nalozi.destinacija || "Putni nalog"} : {nalozi.trosak || "Nepoznato"}
+              {nalozi.odrediste || "Putni nalog"} : {nalozi.trosak || "Nepoznato"}
             </li>
           ))}
         </ul>
@@ -73,7 +73,7 @@ function Nalog() {
           <p> Neodradjeni putni nalozi </p>
            {(PNN ?? []).map(nalozi => (
             <li key={nalozi.idPutniNalog}>
-              {nalozi.destinacija || "Putni nalog"} : {nalozi.trosak || "Nepoznato"}
+              {nalozi.odrediste || "Putni nalog"} : {nalozi.trosak || "Nepoznato"}
             </li>
           ))}
         </ul>

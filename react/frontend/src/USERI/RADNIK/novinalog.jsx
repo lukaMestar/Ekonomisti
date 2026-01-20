@@ -10,9 +10,9 @@ function NoviNalog() {
    const Navigate = useNavigate();  
    const [putniNalog, setPutniNalog] = useState({
       polaziste: "",
-      destinacija: "",
-      datumpolaska: "",
-      datumpovratka: "",
+      odrediste: "",
+      datumPolaska: "",
+      datumPovratka: "",
       svrhaPutovanja: "",
       prijevoznoSredstvo: "",
       troskoviSmjestaja: "",
@@ -23,10 +23,12 @@ function NoviNalog() {
    e.preventDefault();
    const nalogfin = {
          polaziste: putniNalog.polaziste,
-         destinacija: putniNalog.destinacija,
-         datumPolaska: putniNalog.datumpolaska,
-         datumPovratka: putniNalog.datumpovratka,
+         odrediste: putniNalog.odrediste,
+         datumPolaska: putniNalog.datumPolaska,
+         datumPovratka: putniNalog.datumPovratka,
          trosak: putniNalog.troskoviSmjestaja + putniNalog.ostaliTroskovi,
+         svrhaPutovanja: putniNalog.svrhaPutovanja,
+         prijevoznoSredstvo: putniNalog.prijevoznoSredstvo,
          idZaposlenik: 1,
          idFirma: 1,
          idKlijent: 1
@@ -71,12 +73,12 @@ function NoviNalog() {
             </div>
 
             <div className="form-group">
-               <label>Destinacija:</label>
+               <label>Odredište:</label>
                <input
                   type="text"
-                  value={putniNalog.destinacija}
+                  value={putniNalog.odrediste}
                   onChange={(e) =>
-                     setPutniNalog({ ...putniNalog, destinacija: e.target.value })
+                     setPutniNalog({ ...putniNalog, odrediste: e.target.value })
                   }
                   required
                />

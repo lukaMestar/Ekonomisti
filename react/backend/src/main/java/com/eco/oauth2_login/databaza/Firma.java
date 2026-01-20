@@ -9,11 +9,11 @@ import java.math.BigDecimal;
 public class Firma {
 
     @Id
-    @Column(name = "idfirma")
+    @Column(name = "idFirma")
     private Long idFirma;
 
     @Id
-    @Column(name = "idklijent")
+    @Column(name = "idKlijent")
     private Long idKlijent;
 
     @Column(name = "nazivfirme", length = 100)
@@ -29,11 +29,8 @@ public class Firma {
     @JoinColumn(name = "idklijent", referencedColumnName = "idkorisnika", insertable = false, updatable = false)
     private Klijent klijent;
 
-   
     public Firma() {
     }
-
-  
 
     public Long getIdFirma() {
         return idFirma;

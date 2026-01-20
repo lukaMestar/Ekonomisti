@@ -6,7 +6,7 @@ import java.time.LocalDate;
 public class PutniNalogRequest {
 
     private String polaziste;
-    private String destinacija;
+    private String odrediste;
     private LocalDate datumPolaska;
     private LocalDate datumPovratka;
     private BigDecimal trosak;
@@ -14,7 +14,6 @@ public class PutniNalogRequest {
     private Long idZaposlenik;
     private Long idFirma;
     private Long idKlijent;
-
 
     public String getPolaziste() {
         return polaziste;
@@ -24,12 +23,12 @@ public class PutniNalogRequest {
         this.polaziste = polaziste;
     }
 
-    public String getDestinacija() {
-        return destinacija;
+    public String getOdrediste() {
+        return odrediste;
     }
 
-    public void setDestinacija(String destinacija) {
-        this.destinacija = destinacija;
+    public void setOdrediste(String odrediste) {
+        this.odrediste = odrediste;
     }
 
     public LocalDate getDatumPolaska() {

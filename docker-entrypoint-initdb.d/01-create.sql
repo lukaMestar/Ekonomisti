@@ -89,9 +89,14 @@ CREATE TABLE Faktura (
 
 CREATE TABLE PutniNalog (
     idPutniNalog SERIAL PRIMARY KEY,
-    relacija VARCHAR(100),
-    datumIzdavanja DATE,
+    polaziste VARCHAR(100) NOT NULL,
+    odrediste VARCHAR(100) NOT NULL,
+    datumPolaska DATE,
+    datumPovratka DATE,
+    svrhaPutovanja TEXT,
+    prijevoznoSredstvo VARCHAR(50),
     trosak DECIMAL(10,2),
+    datumIzdavanja DATE,
     idZaposlenik INT REFERENCES Zaposlenik(idKorisnika) ON DELETE CASCADE,
     idFirma INT,
     idKlijent INT,
@@ -200,6 +205,27 @@ CREATE TRIGGER sync_racunovodja_trigger
 AFTER INSERT OR UPDATE ON Korisnici
 FOR EACH ROW
 EXECUTE FUNCTION sync_racunovodja_role();
+
+CREATE OR REPLACE FUNCTION sync_to_zaposlenik()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Ako je korisnik Klijent (3) ILI Radnik (4), mora biti u tablici Zaposlenik
+    IF NEW.idUloge IN (3, 4) THEN
+        INSERT INTO Zaposlenik(idKorisnika, placa)
+        VALUES (NEW.idKorisnika, 0.00)
+        ON CONFLICT (idKorisnika) DO NOTHING;
+    ELSE
+        -- Ako mu se uloga promijeni u nešto drugo, brišemo ga iz zaposlenika
+        DELETE FROM Zaposlenik WHERE idKorisnika = NEW.idKorisnika;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_sync_zaposlenik
+AFTER INSERT OR UPDATE ON Korisnici
+FOR EACH ROW
+EXECUTE FUNCTION sync_to_zaposlenik();
 
 -- Insert admin user
 INSERT INTO Korisnici (imeKorisnik, prezimeKorisnik, email, provider, providerUserId, idUloge, datumRegistracije) VALUES
