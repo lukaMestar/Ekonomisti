@@ -101,9 +101,112 @@ export default function ListaKorisnika() {
     }));
   };
 
-  const handleSave = () => {
-    // Gumb ne radi - treba implementirati funkcionalnost spremanja
-    alert("Funkcionalnost spremanja nije implementirana");
+  const handleSave = async () => {
+    if (!selectedKorisnik) {
+      alert("Nema odabranog korisnika");
+      return;
+    }
+
+    if (!formData.email || !formData.imeKorisnik || !formData.prezimeKorisnik) {
+      alert("Molimo unesite sva obavezna polja (email, ime, prezime)");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/updateuser/${selectedKorisnik.idKorisnika}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            idKorisnika: selectedKorisnik.idKorisnika,
+            email: formData.email,
+            imeKorisnik: formData.imeKorisnik,
+            prezimeKorisnik: formData.prezimeKorisnik,
+            provider: formData.provider,
+            providerUserId: formData.providerUserId,
+            datumRegistracije: formData.datumRegistracije,
+            idUloge: formData.idUloge,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Greška pri ažuriranju korisnika");
+      }
+
+      const updatedKorisnik = await response.json();
+
+      setKorisnici((prev) =>
+        prev.map((k) =>
+          k.idKorisnika === updatedKorisnik.idKorisnika
+            ? updatedKorisnik
+            : k
+        )
+      );
+      setIsModalOpen(false);
+      setSelectedKorisnik(null);
+      setOriginalKorisnik(null);
+      setFormData({
+        email: "",
+        imeKorisnik: "",
+        prezimeKorisnik: "",
+        provider: "",
+        providerUserId: "",
+        datumRegistracije: "",
+        idUloge: 1,
+      });
+
+      alert("Korisnik je uspješno ažuriran");
+    } catch (error) {
+      console.error("Greška pri ažuriranju korisnika:", error);
+      alert(error.message || "Greška pri ažuriranju korisnika");
+    }
+  };
+
+  const handleDelete = async (korisnik) => {
+    if (korisnik.idUloge !== ROLE_MAP.RACUNOVODA) {
+      alert("Može se obrisati samo računovođa");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Jeste li sigurni da želite obrisati računovođu "${korisnik.email}"?`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/deleteuser/${korisnik.idKorisnika}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
+
+      const data = await response.text();
+
+      if (!response.ok) {
+        throw new Error(data || "Greška pri brisanju korisnika");
+      }
+
+      // Ukloni korisnika iz liste
+      setKorisnici((prev) =>
+        prev.filter((k) => k.idKorisnika !== korisnik.idKorisnika)
+      );
+
+      alert("Računovođa je uspješno obrisan");
+    } catch (error) {
+      console.error("Greška pri brisanju korisnika:", error);
+      alert(error.message || "Greška pri brisanju korisnika");
+    }
   };
 
   if (loading) {
@@ -152,12 +255,15 @@ export default function ListaKorisnika() {
                 >
                   Uredi
                 </button>
-                <button
-                  className="tablica-btn"
-                  style={{ backgroundColor: "red", color: "white" }}
-                >
-                  Izbrisi
-                </button>
+                {korisnik.idUloge === ROLE_MAP.RACUNOVODA && (
+                  <button
+                    className="tablica-btn"
+                    style={{ backgroundColor: "red", color: "white" }}
+                    onClick={() => handleDelete(korisnik)}
+                  >
+                    Izbrisi
+                  </button>
+                )}
               </td>
             </tr>
           ))}

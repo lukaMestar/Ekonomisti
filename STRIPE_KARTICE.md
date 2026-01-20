@@ -24,8 +24,6 @@ forma za unos kartice, koristite ove test kartice za testiranje plaćanja.
 
 ### Odbijena kartica
 
-- **Broj kartice:** `4000 0000 0000 0002`
-
 ### Nedovoljno sredstava
 
 - **Broj kartice:** `4000 0000 0000 9995`
