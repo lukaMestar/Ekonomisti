@@ -123,11 +123,6 @@ public class FetchUsersController {
         
         Korisnik korisnik = userToDelete.get();
         
-        if (korisnik.getIdUloge() == null || korisnik.getIdUloge() != 2) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Može se obrisati samo računovođa");
-        }
-        
         if (korisnik.getIdKorisnika().equals(adminOpt.get().getIdKorisnika())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Ne možete obrisati samog sebe");
@@ -135,7 +130,7 @@ public class FetchUsersController {
         
         userRepository.delete(korisnik);
         
-        return ResponseEntity.ok("Računovođa je uspješno obrisan");
+        return ResponseEntity.ok("Korisnik je uspješno obrisan");
     }
     
 }

@@ -15,7 +15,7 @@ const ROLE_MAP = {
 
 export default function DodajKorisnika() {
   const [email, setEmail] = useState("");
-  const [idUloge, setRole] = useState(2);
+  const [idUloge, setRole] = useState(ROLE_MAP.RACUNOVODA);
 
   const handleRoleChange = (event) => {
     const selectedRole = event.target.value;
@@ -74,11 +74,8 @@ export default function DodajKorisnika() {
             )}
             onChange={handleRoleChange}
           >
-            {Object.keys(ROLE_MAP).map((roleName) => (
-              <option key={roleName} value={roleName}>
-                {roleName}
-              </option>
-            ))}
+            <option value="ADMIN">ADMIN</option>
+            <option value="RACUNOVODA">RACUNOVODA</option>
           </select>
         </label>
 

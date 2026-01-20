@@ -169,13 +169,12 @@ export default function ListaKorisnika() {
   };
 
   const handleDelete = async (korisnik) => {
-    if (korisnik.idUloge !== ROLE_MAP.RACUNOVODA) {
-      alert("Može se obrisati samo računovođa");
-      return;
-    }
+    const roleName = Object.keys(ROLE_MAP).find(
+      (key) => ROLE_MAP[key] === korisnik.idUloge
+    ) || "korisnik";
 
     const confirmed = window.confirm(
-      `Jeste li sigurni da želite obrisati računovođu "${korisnik.email}"?`
+      `Jeste li sigurni da želite obrisati ${roleName.toLowerCase()} "${korisnik.email}"?`
     );
 
     if (!confirmed) {
@@ -202,7 +201,7 @@ export default function ListaKorisnika() {
         prev.filter((k) => k.idKorisnika !== korisnik.idKorisnika)
       );
 
-      alert("Računovođa je uspješno obrisan");
+      alert("Korisnik je uspješno obrisan");
     } catch (error) {
       console.error("Greška pri brisanju korisnika:", error);
       alert(error.message || "Greška pri brisanju korisnika");
@@ -255,15 +254,13 @@ export default function ListaKorisnika() {
                 >
                   Uredi
                 </button>
-                {korisnik.idUloge === ROLE_MAP.RACUNOVODA && (
-                  <button
-                    className="tablica-btn"
-                    style={{ backgroundColor: "red", color: "white" }}
-                    onClick={() => handleDelete(korisnik)}
-                  >
-                    Izbrisi
-                  </button>
-                )}
+                <button
+                  className="tablica-btn"
+                  style={{ backgroundColor: "red", color: "white" }}
+                  onClick={() => handleDelete(korisnik)}
+                >
+                  Izbrisi
+                </button>
               </td>
             </tr>
           ))}
