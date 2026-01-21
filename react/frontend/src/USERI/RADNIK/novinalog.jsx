@@ -29,9 +29,13 @@ function NoviNalog() {
          trosak: putniNalog.troskoviSmjestaja + putniNalog.ostaliTroskovi,
          svrhaPutovanja: putniNalog.svrhaPutovanja,
          prijevoznoSredstvo: putniNalog.prijevoznoSredstvo,
-         idZaposlenik: 1,
-         idFirma: 1,
-         idKlijent: 1
+         firma: {
+            idFirma: 1,
+            idKlijent: 1
+         },
+         zaposlenik: {
+            idKorisnika: 1
+         },
     };
    try {
          const response = await apiCall(`${API_URL}/api/addnalog`, {
