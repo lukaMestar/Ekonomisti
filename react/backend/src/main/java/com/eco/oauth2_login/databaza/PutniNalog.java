@@ -48,40 +48,7 @@ public class PutniNalog {
     @JoinColumn(name = "idZaposlenik", referencedColumnName = "idKorisnika")
     private Zaposlenik zaposlenik;
 
-    @Transient
-    private Long idFirma;
-
-    @Transient
-    private Long idKlijent;
-
-    @Transient
-    private Long idZaposlenik;
-
     public PutniNalog() {
-    }
-
-    public Long getIdFirma() {
-        return idFirma;
-    }
-
-    public void setIdFirma(Long idFirma) {
-        this.idFirma = idFirma;
-    }
-
-    public Long getIdKlijent() {
-        return idKlijent;
-    }
-
-    public void setIdKlijent(Long idKlijent) {
-        this.idKlijent = idKlijent;
-    }
-
-    public Long getIdZaposlenik() {
-        return idZaposlenik;
-    }
-
-    public void setIdZaposlenik(Long idZaposlenik) {
-        this.idZaposlenik = idZaposlenik;
     }
 
     public Long getIdPutniNalog() {

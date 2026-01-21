@@ -29,9 +29,9 @@ public class AddNalogService {
 
     @Transactional
     public void addNalog(PutniNalog req) {
-        Long idFirma = req.getIdFirma();
-        Long idKlijent = req.getIdKlijent();
-        Long idZaposlenika = req.getIdZaposlenik();
+        Long idFirma = req.getFirma().getIdFirma();
+        Long idKlijent = req.getFirma().getIdKlijent();
+        Long idZaposlenika = req.getZaposlenik().getIdKorisnika();
 
         if (idFirma == null || idZaposlenika == null) {
             throw new RuntimeException("Missing ID parameters");
