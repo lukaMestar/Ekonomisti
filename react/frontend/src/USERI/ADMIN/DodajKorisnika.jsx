@@ -25,8 +25,15 @@ export default function DodajKorisnika() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    if (!email.trim()) {
+      alert("Molimo unesite email");
+      return;
+    }
+
     const korisnikData = {
       email: email.trim(),
+      imeKorisnik: "",
+      prezimeKorisnik: "",
       idUloge,
     };
 
