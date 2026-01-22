@@ -76,3 +76,8 @@ logs/
 
 # backend storage (PDF-ovi, lokalni podaci)
 react/backend/storage/
+
+# Eclipse
+.classpath
+.project
+.settings/
