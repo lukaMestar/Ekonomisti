@@ -69,6 +69,7 @@ function Radnik() {
             <p><strong>Ime:</strong> {user.name}</p>
             <p><strong>Email:</strong> {user.email}</p>
             <p><strong>Tvrtka:</strong> {trenutnaTvrtka?.naziv}</p>
+            <p><strong>OIB:</strong> {user.oib || "Nije unesen"}</p>
           </div>
           {user.picture && (
             <div className="info-card">
