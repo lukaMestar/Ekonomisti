@@ -12,26 +12,70 @@ public class FakturaRequest {
     private String tipFakture;
     private Long idFirma;
     private Long idKlijent;
+    private Boolean odradena;
+
+    public Boolean getOdradena() {
+        return odradena;
+    }
+
+    public void setOdradena(Boolean odradena) {
+        this.odradena = odradena;
+    }
 
     // GETTERI I SETTERI (OBAVEZNO za Jackson)
-    public LocalDate getDatum() { return datum; }
-    public void setDatum(LocalDate datum) { this.datum = datum; }
+    public LocalDate getDatum() {
+        return datum;
+    }
 
-    public String getDobavljac() { return dobavljac; }
-    public void setDobavljac(String dobavljac) { this.dobavljac = dobavljac; }
+    public void setDatum(LocalDate datum) {
+        this.datum = datum;
+    }
 
-    public BigDecimal getIznos() { return iznos; }
-    public void setIznos(BigDecimal iznos) { this.iznos = iznos; }
+    public String getDobavljac() {
+        return dobavljac;
+    }
 
-    public String getOpis() { return opis; }
-    public void setOpis(String opis) { this.opis = opis; }
+    public void setDobavljac(String dobavljac) {
+        this.dobavljac = dobavljac;
+    }
 
-    public String getTipFakture() { return tipFakture; }
-    public void setTipFakture(String tipFakture) { this.tipFakture = tipFakture; }
+    public BigDecimal getIznos() {
+        return iznos;
+    }
 
-    public Long getIdFirma() { return idFirma; }
-    public void setIdFirma(Long idFirma) { this.idFirma = idFirma; }
+    public void setIznos(BigDecimal iznos) {
+        this.iznos = iznos;
+    }
 
-    public Long getIdKlijent() { return idKlijent; }
-    public void setIdKlijent(Long idKlijent) { this.idKlijent = idKlijent; }
+    public String getOpis() {
+        return opis;
+    }
+
+    public void setOpis(String opis) {
+        this.opis = opis;
+    }
+
+    public String getTipFakture() {
+        return tipFakture;
+    }
+
+    public void setTipFakture(String tipFakture) {
+        this.tipFakture = tipFakture;
+    }
+
+    public Long getIdFirma() {
+        return idFirma;
+    }
+
+    public void setIdFirma(Long idFirma) {
+        this.idFirma = idFirma;
+    }
+
+    public Long getIdKlijent() {
+        return idKlijent;
+    }
+
+    public void setIdKlijent(Long idKlijent) {
+        this.idKlijent = idKlijent;
+    }
 }

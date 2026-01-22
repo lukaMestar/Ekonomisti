@@ -80,6 +80,7 @@ CREATE TABLE Faktura (
     tipFakture VARCHAR(50) CHECK (tipFakture IN ('prihod', 'rashod')) NOT NULL,
     idFirma INT,
     idKlijent INT,
+    odradena BOOLEAN NOT NULL DEFAULT FALSE,
     FOREIGN KEY (idFirma, idKlijent)
         REFERENCES Firma(idFirma, idKlijent)
         ON DELETE CASCADE
