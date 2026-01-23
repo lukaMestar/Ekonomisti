@@ -47,15 +47,40 @@ public class AddUserController {
                     .body("Email nije dostupan");
         }
         
-        Optional<Korisnik> adminOpt = userRepository.findByEmail(email);
-        if (adminOpt.isEmpty() || adminOpt.get().getIdUloge() == null || adminOpt.get().getIdUloge() != 1) {
+        Optional<Korisnik> currentUserOpt = userRepository.findByEmail(email);
+        if (currentUserOpt.isEmpty() || currentUserOpt.get().getIdUloge() == null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("Samo administrator može dodavati korisnike");
+                    .body("Korisnik nije pronađen ili nema ulogu");
         }
         
-        if (korisnik.getIdUloge() == null || (korisnik.getIdUloge() != 1 && korisnik.getIdUloge() != 2)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Može se dodati samo administrator ili računovođa");
+        Korisnik currentUser = currentUserOpt.get();
+        Integer currentUserRole = currentUser.getIdUloge();
+        Integer newUserRole = korisnik.getIdUloge();
+        
+        // Provjeri dozvole ovisno o ulozi trenutnog korisnika
+        if (currentUserRole == 1) {
+            // Administrator može dodavati admina (1) ili računovođu (2)
+            if (newUserRole == null || (newUserRole != 1 && newUserRole != 2)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Administrator može dodati samo administratora ili računovođu");
+            }
+        } else if (currentUserRole == 2) {
+            // Računovođa može dodavati klijenta (3)
+            // Napomena: Računovođa već ima endpoint /api/racunovoda/novi-klijent za dodavanje klijenta
+            // Ali dozvoljavamo i ovdje za konzistentnost
+            if (newUserRole == null || newUserRole != 3) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Računovođa može dodati samo klijenta");
+            }
+        } else if (currentUserRole == 3) {
+            // Klijent može dodavati radnika (4)
+            if (newUserRole == null || newUserRole != 4) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Klijent može dodati samo radnika");
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Nemate dozvolu za dodavanje korisnika");
         }
         
         try {

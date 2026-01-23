@@ -17,6 +17,7 @@ export default function ListaKorisnika() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedKorisnik, setSelectedKorisnik] = useState(null);
   const [originalKorisnik, setOriginalKorisnik] = useState(null);
+  const [sortOrder, setSortOrder] = useState(null); // 'id-asc', 'id-desc', 'date-asc', 'date-desc'
   const [formData, setFormData] = useState({
     email: "",
     imeKorisnik: "",
@@ -208,6 +209,45 @@ export default function ListaKorisnika() {
     }
   };
 
+  const handleSortById = () => {
+    const sorted = [...korisnici];
+    if (sortOrder === 'id-asc') {
+      sorted.sort((a, b) => (b.idKorisnika || 0) - (a.idKorisnika || 0));
+      setSortOrder('id-desc');
+    } else {
+      sorted.sort((a, b) => (a.idKorisnika || 0) - (b.idKorisnika || 0));
+      setSortOrder('id-asc');
+    }
+    setKorisnici(sorted);
+  };
+
+  const handleSortByDate = () => {
+    const sorted = [...korisnici];
+    if (sortOrder === 'date-asc') {
+      sorted.sort((a, b) => {
+        const dateA = a.datumRegistracije ? new Date(a.datumRegistracije) : new Date(0);
+        const dateB = b.datumRegistracije ? new Date(b.datumRegistracije) : new Date(0);
+        return dateB - dateA; // Descending
+      });
+      setSortOrder('date-desc');
+    } else {
+      sorted.sort((a, b) => {
+        const dateA = a.datumRegistracije ? new Date(a.datumRegistracije) : new Date(0);
+        const dateB = b.datumRegistracije ? new Date(b.datumRegistracije) : new Date(0);
+        return dateA - dateB; // Ascending
+      });
+      setSortOrder('date-asc');
+    }
+    setKorisnici(sorted);
+  };
+
+  const getRoleDisplay = (idUloge) => {
+    const roleName = Object.keys(ROLE_MAP).find(
+      (key) => ROLE_MAP[key] === idUloge
+    );
+    return roleName ? `${idUloge} (${roleName})` : idUloge;
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -225,8 +265,26 @@ export default function ListaKorisnika() {
       </div>
 
       <div className="tablica-toolbar">
-        <button className="tablica-btn">Sortiraj po idKorisnik</button>
-        <button className="tablica-btn">Sortiraj vremenski</button>
+        <button 
+          className="tablica-btn" 
+          onClick={handleSortById}
+          style={{ 
+            backgroundColor: sortOrder?.startsWith('id') ? '#4CAF50' : undefined,
+            color: sortOrder?.startsWith('id') ? 'white' : undefined
+          }}
+        >
+          Sortiraj po ID {sortOrder === 'id-asc' ? '↑' : sortOrder === 'id-desc' ? '↓' : ''}
+        </button>
+        <button 
+          className="tablica-btn" 
+          onClick={handleSortByDate}
+          style={{ 
+            backgroundColor: sortOrder?.startsWith('date') ? '#4CAF50' : undefined,
+            color: sortOrder?.startsWith('date') ? 'white' : undefined
+          }}
+        >
+          Sortiraj vremenski {sortOrder === 'date-asc' ? '↑' : sortOrder === 'date-desc' ? '↓' : ''}
+        </button>
       </div>
 
       <table className="tablica-table">
@@ -245,7 +303,7 @@ export default function ListaKorisnika() {
               <td>{korisnik.idKorisnika}</td>
               <td>{korisnik.email}</td>
               <td>{korisnik.datumRegistracije}</td>
-              <td>{korisnik.idUloge}</td>
+              <td>{getRoleDisplay(korisnik.idUloge)}</td>
               <td>
                 <button
                   className="tablica-btn"

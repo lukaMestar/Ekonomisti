@@ -23,7 +23,6 @@ import { UserProvider } from "./UserContext.jsx";
 import Racuni from "./USERI/KLIJENT/racuni.jsx";
 import Podaci from "./USERI/KLIJENT/podaci.jsx";
 import DodajKorisnika from "./USERI/ADMIN/DodajKorisnika.jsx";
-import Aktivnosti from "./USERI/ADMIN/Aktivnosti.jsx";
 import ListaKorisnika from "./USERI/ADMIN/ListaKorisnika.jsx";
 import { setSessionToken } from "./api.js";
 import { useUser } from "./UserContext.jsx";
@@ -75,7 +74,6 @@ function App() {
           <Route path="/faktura"                      element={<RequireRole roles={["ROLE_KLIJENT"              ]}>   <Faktura />         </RequireRole>} />
           <Route path="/dodajradnika"                 element={<RequireRole roles={["ROLE_KLIJENT"              ]}>   <DodajRadnika />    </RequireRole>} />
           <Route path="/novafaktura"                  element={<RequireRole roles={["ROLE_KLIJENT"              ]}>   <NovaFaktura />     </RequireRole>} />
-          <Route path="/Aktivnosti"                   element={<RequireRole roles={["ROLE_ADMIN"                ]}>   <Aktivnosti />      </RequireRole>} />
           <Route path="/ListaKorisnika"               element={<RequireRole roles={["ROLE_ADMIN"                ]}>   <ListaKorisnika />  </RequireRole>} />
           <Route path="/DodajKorisnika"               element={<RequireRole roles={["ROLE_ADMIN"                ]}>   <DodajKorisnika />  </RequireRole>} />
         </Routes>

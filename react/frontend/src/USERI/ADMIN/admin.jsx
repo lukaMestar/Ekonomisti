@@ -72,12 +72,6 @@ function Admin() {
           >
             Upravljaj korisnicima
           </Link>
-          <Link
-            to="/Aktivnosti"
-            style={{ textDecoration: "none", color: "blue" }}
-          >
-            Aktivnosti
-          </Link>
           <button onClick={handleLogout} className="logout-button">
             Odjava
           </button>
