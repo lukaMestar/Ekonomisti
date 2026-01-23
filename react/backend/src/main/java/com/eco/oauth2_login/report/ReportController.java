@@ -13,10 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.eco.oauth2_login.databaza.UserRepository;
 import com.eco.oauth2_login.databaza.ZaposlenikDTO;
 import com.eco.oauth2_login.databaza.Faktura;
@@ -28,7 +25,6 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/izvjestaj")
-
 public class ReportController {
 
     private final ReportService reportService;
@@ -40,9 +36,11 @@ public class ReportController {
     private final FakturaReportService fakturaReportService;
     private final PutniNalogReportService putniNalogReportService;
 
-    public ReportController(ReportService reportService, UserRepository userRepository, FirmaReportService firmaReportService,
-        NoviService noviService, OdradjeneFaktureService odradjeneFaktureService, OdradjeniPutniNaloziService odradjeniPutniNaloziService
-        , FakturaReportService fakturaReportService, PutniNalogReportService putniNalogReportService) {
+    public ReportController(ReportService reportService, UserRepository userRepository,
+            FirmaReportService firmaReportService,
+            NoviService noviService, OdradjeneFaktureService odradjeneFaktureService,
+            OdradjeniPutniNaloziService odradjeniPutniNaloziService, FakturaReportService fakturaReportService,
+            PutniNalogReportService putniNalogReportService) {
         this.reportService = reportService;
         this.userRepository = userRepository;
         this.firmaReportService = firmaReportService;
@@ -59,178 +57,120 @@ public class ReportController {
         return reportService.generirajMjesecniIzvjestajJson(klijentId, ym);
     }
 
-
     @GetMapping("/dohvacanjeZaposlenika")
-    public ResponseEntity<List<ZaposlenikDTO>> dohvatiZaposlenike(@AuthenticationPrincipal OAuth2User principal, HttpServletRequest request) {
-        if (principal == null) {
+    public ResponseEntity<List<ZaposlenikDTO>> dohvatiZaposlenike(@AuthenticationPrincipal OAuth2User principal,
+            HttpServletRequest request) {
+        if (principal == null)
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-
         String email = principal.getAttribute("email");
-
-        Long userId = 0L;
-        Long firmaId = null; 
-
         List<ZaposlenikDTO> lista = new ArrayList<>();
-        
         if (email != null) {
             Optional<Korisnik> userOptional = userRepository.findByEmail(email);
-
             if (userOptional.isPresent()) {
                 Korisnik user = userOptional.get();
-                Integer idUloge = user.getIdUloge();
-                userId = user.getIdKorisnika();
-                if (idUloge == 3) { 
-                    Firma firma = firmaReportService.vratiFirmu(userId);
-                    if (firma == null) {
-                        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                if (user.getIdUloge() == 3) {
+                    Firma firma = firmaReportService.vratiFirmu(user.getIdKorisnika());
+                    if (firma != null) {
+                        lista = noviService.popisZaposlenika(user.getIdKorisnika(), firma.getIdFirma());
                     }
-                    // id firme i idkorisnika userid mi je idkorisnik
-                    firmaId = firma.getIdFirma();
-                    lista = noviService.popisZaposlenika(userId, firmaId);
                 }
             }
         }
         return ResponseEntity.ok(lista);
     }
-
-
 
     @GetMapping("/dohvacanjeRacuna")
-    public ResponseEntity<List<MjesecniRacunDTO>> dohvatiRacune(@AuthenticationPrincipal OAuth2User principal, HttpServletRequest request) {
-        if (principal == null) {
+    public ResponseEntity<List<MjesecniRacunDTO>> dohvatiRacune(@AuthenticationPrincipal OAuth2User principal,
+            HttpServletRequest request) {
+        if (principal == null)
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
         String email = principal.getAttribute("email");
-        Long userId = 0L;
         List<MjesecniRacunDTO> lista = new ArrayList<>();
-        
         if (email != null) {
             Optional<Korisnik> userOptional = userRepository.findByEmail(email);
-
-            if (userOptional.isPresent()) {
-                Korisnik user = userOptional.get();
-                Integer idUloge = user.getIdUloge();
-                userId = user.getIdKorisnika();
-                if (idUloge == 3) { 
-                    Firma firma = firmaReportService.vratiFirmu(userId);
-                    if (firma == null) {
-                        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-                    }
-                    lista = noviService.ispisRacuna(userId);
-
-
-                }
+            if (userOptional.isPresent() && userOptional.get().getIdUloge() == 3) {
+                lista = noviService.ispisRacuna(userOptional.get().getIdKorisnika());
             }
         }
         return ResponseEntity.ok(lista);
-
     }
 
-
     @GetMapping("/listaPN")
-    public ResponseEntity<Map<String, List<PutniNalog>>> dohvatiPN(@AuthenticationPrincipal OAuth2User principal, HttpServletRequest request) {
-        if (principal == null) {
+    public ResponseEntity<Map<String, List<PutniNalog>>> dohvatiPN(
+            @AuthenticationPrincipal OAuth2User principal,
+            @RequestParam(required = false) Long odabranaFirmaId) {
+
+        if (principal == null)
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
 
         String email = principal.getAttribute("email");
+        Map<String, List<PutniNalog>> rezultat = new HashMap<>();
 
-        Long userId = 0L;
-
-        List<PutniNalog> listaOdradjenihPN = new ArrayList<>();
-        List<PutniNalog> listaNeodredjenihPN = new ArrayList<>();
-        
         if (email != null) {
             Optional<Korisnik> userOptional = userRepository.findByEmail(email);
-
             if (userOptional.isPresent()) {
                 Korisnik user = userOptional.get();
+                Long userId = user.getIdKorisnika();
                 Integer idUloge = user.getIdUloge();
-                userId = user.getIdKorisnika();
-                if (idUloge == 3) { 
-                    Firma firma = firmaReportService.vratiFirmu(userId);
-                    if (firma == null) {
-                        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+
+                Long firmaid = odabranaFirmaId;
+
+                if (idUloge == 3) {
+                    if (firmaid == null) {
+                        Firma firma = firmaReportService.vratiFirmu(userId);
+                        if (firma == null)
+                            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                        firmaid = firma.getIdFirma();
                     }
+                    List<PutniNalog> odradjeni = odradjeniPutniNaloziService.odrPN(firmaid, userId);
+                    List<PutniNalog> sviFirma = putniNalogReportService.getSvePutneNaloge(firmaid);
 
-                    Long firmaid = firma.getIdFirma();
-                    listaOdradjenihPN = odradjeniPutniNaloziService.odrPN(firmaid, userId);
-                    listaNeodredjenihPN = putniNalogReportService.getSvePutneNaloge(firmaid);
+                    Set<Long> odradjeniIds = odradjeni.stream().map(PutniNalog::getIdPutniNalog)
+                            .collect(Collectors.toSet());
+                    List<PutniNalog> neodradjeni = sviFirma.stream()
+                            .filter(pn -> !odradjeniIds.contains(pn.getIdPutniNalog())).toList();
 
-                    Set<Long> odradjeniIds = listaOdradjenihPN.stream().map(PutniNalog::getIdPutniNalog)
-                        .collect(Collectors.toSet());
-                    listaNeodredjenihPN = listaNeodredjenihPN.stream()
-                        .filter(pn -> !odradjeniIds.contains(pn.getIdPutniNalog()))
-                        .toList();
+                    rezultat.put("odradjeni", odradjeni);
+                    rezultat.put("neodradjeni", neodradjeni);
+                    return ResponseEntity.ok(rezultat);
                 }
 
-            if (idUloge == 4) { 
-                    Firma firma = firmaReportService.vratiFrimuRadnik(userId);
-                    if (firma == null) {
-                        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                if (idUloge == 4) {
+                    if (firmaid == null) {
+                        Firma firma = firmaReportService.vratiFrimuRadnik(userId);
+                        if (firma == null)
+                            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                        firmaid = firma.getIdFirma();
                     }
-
-                    Long firmaid = firma.getIdFirma();
-                    listaOdradjenihPN = odradjeniPutniNaloziService.odrPNRadnik(firmaid, userId);
-                    System.out.println(firmaid + "hooooooooooooooooooooooooooooooooooooooooooooooooooo");
-                    listaNeodredjenihPN = putniNalogReportService.getRadnikPN(firmaid,userId);
-
-                    Set<Long> odradjeniIds = listaOdradjenihPN.stream().map(PutniNalog::getIdPutniNalog)
-                        .collect(Collectors.toSet());
-                    listaNeodredjenihPN = listaNeodredjenihPN.stream()
-                        .filter(pn -> !odradjeniIds.contains(pn.getIdPutniNalog()))
-                        .toList();
+                    List<PutniNalog> sviRadnikPN = putniNalogReportService.getRadnikPN(firmaid, userId);
+                    rezultat.put("svi", sviRadnikPN);
+                    return ResponseEntity.ok(rezultat);
                 }
             }
         }
-        Map<String, List<PutniNalog>> rezultat = new HashMap<>();
-        rezultat.put("odradjeni", listaOdradjenihPN);
-        rezultat.put("neodradjeni", listaNeodredjenihPN);
         return ResponseEntity.ok(rezultat);
-
     }
 
     @GetMapping("/listaF")
-    public ResponseEntity<Map<String, List<Faktura>>> dohvatiF(@AuthenticationPrincipal OAuth2User principal, HttpServletRequest request) {
-        if (principal == null) {
+    public ResponseEntity<Map<String, List<Faktura>>> dohvatiF(@AuthenticationPrincipal OAuth2User principal) {
+        if (principal == null)
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-
         String email = principal.getAttribute("email");
-
-        Long userId = 0L;
-
         List<Faktura> odradjeneFakture = new ArrayList<>();
-         List<Faktura> neodradjeneFakture = new ArrayList<>();
-        
+        List<Faktura> neodradjeneFakture = new ArrayList<>();
         if (email != null) {
             Optional<Korisnik> userOptional = userRepository.findByEmail(email);
-
-            if (userOptional.isPresent()) {
-                Korisnik user = userOptional.get();
-                Integer idUloge = user.getIdUloge();
-                userId = user.getIdKorisnika();
-                if (idUloge == 3) { 
-                    Firma firma = firmaReportService.vratiFirmu(userId);
-                    if (firma == null) {
-                        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-                    }
-
-                    Long firmaid = firma.getIdFirma();
-                    odradjeneFakture = odradjeneFaktureService.odrF(firmaid);
-                    neodradjeneFakture = fakturaReportService.getNeodradjeneFakture(firmaid);
+            if (userOptional.isPresent() && userOptional.get().getIdUloge() == 3) {
+                Firma firma = firmaReportService.vratiFirmu(userOptional.get().getIdKorisnika());
+                if (firma != null) {
+                    odradjeneFakture = odradjeneFaktureService.odrF(firma.getIdFirma());
+                    neodradjeneFakture = fakturaReportService.getNeodradjeneFakture(firma.getIdFirma());
                 }
             }
         }
-
         Map<String, List<Faktura>> rezultat = new HashMap<>();
         rezultat.put("odradjeni", odradjeneFakture);
         rezultat.put("neodradjeni", neodradjeneFakture);
-
         return ResponseEntity.ok(rezultat);
-
     }
-
 }
-

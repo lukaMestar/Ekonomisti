@@ -16,12 +16,13 @@ function NoviNalog() {
 
    let fId, uId, kId;
 
+
    if (user?.role === "KLIJENT") {
       fId = klijentCtx?.firmaId;
       uId = klijentCtx?.userId;
       kId = klijentCtx?.userId; 
    } else {
-      fId = radnikCtx?.idFirme;
+      fId = radnikCtx?.firmaId;  
       uId = radnikCtx?.idKorisnika;
       kId = radnikCtx?.idKlijenta;
    }
@@ -39,7 +40,13 @@ function NoviNalog() {
 
    const handleSubmit = async (e) => {
       e.preventDefault();
-      
+
+      if (!fId || !uId) {
+         alert("Greška: Podaci o firmi ili korisniku nisu učitani. Pokušajte ponovno.");
+         console.error("Nedostaju podaci:", { fId, uId, kId });
+         return;
+      }
+
       const nalogfin = {
          polaziste: putniNalog.polaziste,
          odrediste: putniNalog.odrediste,
@@ -50,7 +57,7 @@ function NoviNalog() {
          prijevoznoSredstvo: putniNalog.prijevoznoSredstvo,
          
          firma: {
-            idFirma: fId,
+            idFirma: fId, 
             idKlijent: kId
          },
          zaposlenik: {
@@ -80,75 +87,57 @@ function NoviNalog() {
    return (
       <div className="nalog-container">
          <h1>Putni nalog</h1>
-         
          <form onSubmit={handleSubmit} className="nalog-form">
             <div className="form-group">
                <label>Polazište:</label>
                <input
                   type="text"
                   value={putniNalog.polaziste}
-                  onChange={(e) =>
-                     setPutniNalog({ ...putniNalog, polaziste: e.target.value })
-                  }
+                  onChange={(e) => setPutniNalog({ ...putniNalog, polaziste: e.target.value })}
                   required
                />
             </div>
-
             <div className="form-group">
                <label>Odredište:</label>
                <input
                   type="text"
                   value={putniNalog.odrediste}
-                  onChange={(e) =>
-                     setPutniNalog({ ...putniNalog, odrediste: e.target.value })
-                  }
+                  onChange={(e) => setPutniNalog({ ...putniNalog, odrediste: e.target.value })}
                   required
                />
             </div>
-
             <div className="form-group">
                <label>Datum polaska:</label>
                <input
                   type="date"
                   value={putniNalog.datumPolaska}
-                  onChange={(e) =>
-                     setPutniNalog({ ...putniNalog, datumPolaska: e.target.value })
-                  }
+                  onChange={(e) => setPutniNalog({ ...putniNalog, datumPolaska: e.target.value })}
                   required
                />
             </div>
-
             <div className="form-group">
                <label>Datum povratka:</label>
                <input
                   type="date"
                   value={putniNalog.datumPovratka}
-                  onChange={(e) =>
-                     setPutniNalog({ ...putniNalog, datumPovratka: e.target.value })
-                  }
+                  onChange={(e) => setPutniNalog({ ...putniNalog, datumPovratka: e.target.value })}
                   required
                />
             </div>
-
             <div className="form-group">
                <label>Svrha putovanja:</label>
                <textarea
                   value={putniNalog.svrhaPutovanja}
-                  onChange={(e) =>
-                     setPutniNalog({ ...putniNalog, svrhaPutovanja: e.target.value })
-                  }
+                  onChange={(e) => setPutniNalog({ ...putniNalog, svrhaPutovanja: e.target.value })}
                   rows="3"
                   required
                />
             </div>
-
             <div className="form-group">
                <label>Prijevozno sredstvo:</label>
                <select
                   value={putniNalog.prijevoznoSredstvo}
-                  onChange={(e) =>
-                     setPutniNalog({ ...putniNalog, prijevoznoSredstvo: e.target.value })
-                  }
+                  onChange={(e) => setPutniNalog({ ...putniNalog, prijevoznoSredstvo: e.target.value })}
                   required
                >
                   <option value="">Odaberite prijevozno sredstvo</option>
@@ -160,33 +149,26 @@ function NoviNalog() {
                   <option value="ostalo">Ostalo</option>
                </select>
             </div>
-
             <div className="form-group">
                <label>Troškovi smještaja (€):</label>
                <input
                   type="number"
                   value={putniNalog.troskoviSmjestaja}
-                  onChange={(e) =>
-                     setPutniNalog({ ...putniNalog, troskoviSmjestaja: e.target.value })
-                  }
+                  onChange={(e) => setPutniNalog({ ...putniNalog, troskoviSmjestaja: e.target.value })}
                   min="0"
                   step="0.01"
                />
             </div>
-
             <div className="form-group">
                <label>Ostali troškovi (€):</label>
                <input
                   type="number"
                   value={putniNalog.ostaliTroskovi}
-                  onChange={(e) =>
-                     setPutniNalog({ ...putniNalog, ostaliTroskovi: e.target.value })
-                  }
+                  onChange={(e) => setPutniNalog({ ...putniNalog, ostaliTroskovi: e.target.value })}
                   min="0"
                   step="0.01"
                />
             </div>
-
             <button type="submit" className="submit-button">
                Spremi putni nalog
             </button>

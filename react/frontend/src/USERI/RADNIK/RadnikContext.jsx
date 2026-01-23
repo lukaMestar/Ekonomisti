@@ -5,10 +5,26 @@ const RadnikContext = createContext();
 
 export function RadnikProvider({ children, user }) {
   const [tvrtke, setTvrtke] = useState([]);
-  const [trenutnaTvrtka, setTrenutnaTvrtka] = useState(null);
+  const [trenutnaTvrtka, setTrenutnaTvrtkaState] = useState(() => {
+    try {
+      const saved = localStorage.getItem("odabranaTvrtka");
+      return saved ? JSON.parse(saved) : null;
+    } catch (error) {
+      return null;
+    }
+  });
+
+  const setTrenutnaTvrtka = (tvrtka) => {
+    setTrenutnaTvrtkaState(tvrtka);
+    if (tvrtka) {
+      localStorage.setItem("odabranaTvrtka", JSON.stringify(tvrtka));
+    } else {
+      localStorage.removeItem("odabranaTvrtka");
+    }
+  };
 
   const idKorisnika = user?.id;
-  const idFirme = trenutnaTvrtka ? trenutnaTvrtka.idFirma : user?.id_firme;
+  const firmaId = trenutnaTvrtka ? trenutnaTvrtka.idFirma : user?.id_firme;
   const idKlijenta = trenutnaTvrtka ? trenutnaTvrtka.idKlijent : user?.id_klijenta;
   const imeKorisnik = user?.name;
   const prezimeKorisnik = user?.prezime;
@@ -28,17 +44,23 @@ export function RadnikProvider({ children, user }) {
       .then((data) => {
         if (data && Array.isArray(data) && data.length > 0) {
           setTvrtke(data);
+          if (trenutnaTvrtka) {
+            const postoji = data.find(
+              (t) => t.idFirma === trenutnaTvrtka.idFirma && t.idKlijent === trenutnaTvrtka.idKlijent
+            );
+            if (!postoji) {
+              setTrenutnaTvrtka(null);
+            }
+          }
         } else {
-          setTvrtke(["Tvrtka A", "Tvrtka B", "Tvrtka C"]);
+          setTvrtke([]);
         }
       })
       .catch((err) => {
         console.warn("Greška kod dohvaćanja tvrtki:", err.message);
-        setTvrtke(["Tvrtka A", "Tvrtka B", "Tvrtka C"]);
+        setTvrtke([]);
       });
   }, [idKorisnika]);
-
-  
 
   return (
     <RadnikContext.Provider
@@ -49,7 +71,7 @@ export function RadnikProvider({ children, user }) {
         setTvrtke, 
         trenutnaTvrtka, 
         setTrenutnaTvrtka,
-        idFirme,
+        firmaId,
         idKorisnika,
         idKlijenta
       }}

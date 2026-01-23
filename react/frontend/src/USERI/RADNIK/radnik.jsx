@@ -3,6 +3,7 @@ import { useRadnik } from "../../USERI/RADNIK/RadnikContext.jsx";
 import Odabir from "./odabir.jsx";
 import { Link } from "react-router-dom";
 import { API_URL, FRONTEND_URL } from "../../config.js";
+import { useEffect } from "react";
 
 function Radnik() {
   const { user } = useUser();
@@ -12,8 +13,10 @@ function Radnik() {
 
   const { tvrtke, trenutnaTvrtka, setTrenutnaTvrtka } = radnikContext;
 
+
   const handleLogout = async () => {
     try {
+      localStorage.removeItem("odabranaTvrtka"); 
       await fetch(`${API_URL}/logout`, {
         method: "POST",
         credentials: "include",
@@ -25,8 +28,14 @@ function Radnik() {
     }
   };
 
+
+  const promjeniTvrtku = () => {
+    setTrenutnaTvrtka(null);
+  };
+
   if (!user) return <p>Učitavanje korisnika...</p>;
   if (!tvrtke || tvrtke.length === 0) return <p>Učitavanje tvrtki...</p>;
+
 
   if (!trenutnaTvrtka) {
     return (
@@ -48,18 +57,29 @@ function Radnik() {
       <div className="content-container">
         <div className="header">
           <h1 className="page-title">Dobrodošli, {user.name}!</h1>
-          <Link to="/nalog" style={{ textDecoration: "none", color: "blue" }}>
-            Putni nalog
-          </Link>
-          <button onClick={handleLogout} className="logout-button">
-            Odjava
-          </button>
+          
+          <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
+            <Link to="/nalog" style={{ textDecoration: "none", color: "blue" }}>
+              Putni nalog
+            </Link>
+            
+            <button 
+              onClick={promjeniTvrtku}
+              style={{ background: "none", border: "none", color: "orange", cursor: "pointer", textDecoration: "underline" }}
+            >
+              Promijeni tvrtku
+            </button>
+
+            <button onClick={handleLogout} className="logout-button">
+              Odjava
+            </button>
+          </div>
         </div>
 
         <div className="success-message">
           <h2 className="success-title">Uspješno ste prijavljeni!</h2>
           <p className="success-text">
-            Dobrodošli, <strong>{user.name}</strong>
+            Dobrodošli, <strong>{user.name}</strong> u tvrtku <strong>{trenutnaTvrtka?.naziv}</strong>
           </p>
         </div>
 
