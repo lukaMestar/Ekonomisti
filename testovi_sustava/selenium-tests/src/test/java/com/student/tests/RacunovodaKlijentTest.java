@@ -46,8 +46,24 @@ public class RacunovodaKlijentTest {
 	@DisplayName("Test dodavanja klijenta s nula vrijednostima")
 	void testDodajKlijentaSNulama() {
 		// 1. Idi na stranicu s klijentima
-		driver.get(baseUrl + "/racunklijenti");
+		driver.get(baseUrl);
+		WebDriverWait shortWait = new WebDriverWait(driver, Duration.ofSeconds(3));
 
+		try {
+			// Provjeri postoji li gumb za prijavu
+			WebElement loginButton = shortWait.until(ExpectedConditions
+					.presenceOfElementLocated(By.xpath("//button[contains(text(), 'Prijavi se s Auth2.0')]")));
+
+			System.out.println("Pokrećem prijavu...");
+			loginButton.click();
+
+			wait.until(ExpectedConditions.urlContains("/racunovoda"));
+			System.out.println("Prijava uspješna.");
+
+		} catch (TimeoutException e) {
+			// već smo ulogirani
+			System.out.println("Nastavljam kao već prijavljen korisnik.");
+		}
 		driver.get(baseUrl + "/racunklijenti");
 		System.out.println("Trenutni URL: " + driver.getCurrentUrl());
 
@@ -126,19 +142,19 @@ public class RacunovodaKlijentTest {
 	@Order(3)
 	@DisplayName("Nepostojeća funkcionalnost: Pristup neimplementiranoj ruti /arhiva")
 	void testPristupNepostojecojRuti() {
-	    // 1. pokušaj pristupa
-	    driver.get(baseUrl + "/arhiva");
+		// 1. pokušaj pristupa
+		driver.get(baseUrl + "/arhiva");
 
-	    // 2. Čekaj kratko
-	    wait.until(ExpectedConditions.presenceOfElementLocated(By.tagName("body")));
+		// 2. Čekaj kratko
+		wait.until(ExpectedConditions.presenceOfElementLocated(By.tagName("body")));
 
-	    // 3. Provjera: je li se učitao naslov forme (ne bi trebao)
-	    boolean naslovPrisutan = driver.findElements(By.xpath("//h1")).size() > 0;
-	    
-	    // Provjera teksta na stranici
-	    String content = driver.findElement(By.tagName("body")).getText();
+		// 3. Provjera: je li se učitao naslov forme (ne bi trebao)
+		boolean naslovPrisutan = driver.findElements(By.xpath("//h1")).size() > 0;
 
-	    assertTrue(!naslovPrisutan || content.length() < 100, 
-	               "Sustav ne bi trebao prikazati funkcionalan sadržaj na ruti /arhiva.");
+		// Provjera teksta na stranici
+		String content = driver.findElement(By.tagName("body")).getText();
+
+		assertTrue(!naslovPrisutan || content.length() < 100,
+				"Sustav ne bi trebao prikazati funkcionalan sadržaj na ruti /arhiva.");
 	}
 }

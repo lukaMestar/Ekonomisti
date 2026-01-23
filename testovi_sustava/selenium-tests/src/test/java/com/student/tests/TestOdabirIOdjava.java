@@ -37,9 +37,26 @@ public class TestOdabirIOdjava {
     @Test
     @DisplayName("Test odjave korisnika - Uloga Radnik")
     void testOdjavaRadnik() {
-        // 1. 2x get
-        driver.get(baseUrl + "/radnik");
-        driver.get(baseUrl + "/radnik");
+        // 1. 
+    	driver.get(baseUrl);
+    	WebDriverWait shortWait = new WebDriverWait(driver, Duration.ofSeconds(3));
+
+    	try {
+    	    // Provjeri postoji li gumb za prijavu na stranici
+    	    WebElement loginButton = shortWait.until(ExpectedConditions.presenceOfElementLocated(
+    	            By.xpath("//button[contains(text(), 'Prijavi se s Auth2.0')]")));
+
+    	    System.out.println("Pokrećem prijavu...");
+    	    loginButton.click();
+
+    	    wait.until(ExpectedConditions.urlContains("/radnik"));
+    	    System.out.println("Prijava uspješna.");
+    	    
+    	} catch (TimeoutException e) {
+    	    // već smo ulogirani
+    	    System.out.println("Nastavljam kao već prijavljen korisnik.");
+        	driver.get(baseUrl + "/radnik");
+    	}
 
         // 2. ČEKANJE NA NESTANAK LOADING PORUKA
         wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//p[contains(text(), 'Učitavanje')]")));
