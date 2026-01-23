@@ -132,6 +132,7 @@ export function UserProvider({ children }) {
       {user.role === "KLIJENT" ? (
         <KlijentProvider user={user}>{children}</KlijentProvider>
       ) : user.role === "RADNIK" ? (
+        // Ovdje šaljemo 'user' objekt u RadnikProvider
         <RadnikProvider user={user}>{children}</RadnikProvider>
       ) : user.role === "RACUNOVODA" ? (
         <RacunovodaProvider user={user}>{children}</RacunovodaProvider>

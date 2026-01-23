@@ -51,45 +51,48 @@ public class UserController {
     }
 
     @GetMapping("/api/user")
-    public ResponseEntity<Map<String, Object>> user(@AuthenticationPrincipal OAuth2User principal,
-            HttpServletRequest request) {
-        if (principal == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("error", "User not authenticated"));
-        }
+    public ResponseEntity<Map<String, Object>> user(@AuthenticationPrincipal OAuth2User principal) {
+        if (principal == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
         String email = principal.getAttribute("email");
-        String role = "USER";
-        Long id = 0L;
-        String oib = null;
-        if (email != null) {
-            Optional<Korisnik> userOptional = userRepository.findByEmail(email);
+        Map<String, Object> result = new HashMap<>();
 
-            if (userOptional.isPresent()) {
-                Korisnik user = userOptional.get();
-                Integer idUloge = user.getIdUloge();
-                id = user.getIdKorisnika();
-                oib = user.getOib() != null ? (user.getOib()) : null;
-                if (idUloge != null) {
-                    switch (idUloge) {
-                        case 1 -> role = "ADMIN";
-                        case 2 -> role = "RACUNOVODA";
-                        case 3 -> role = "KLIJENT";
-                        case 4 -> role = "RADNIK";
-                        default -> role = "USER";
-                    }
+        Optional<Korisnik> userOptional = userRepository.findByEmail(email);
+        if (userOptional.isPresent()) {
+            Korisnik user = userOptional.get();
+            Long userId = user.getIdKorisnika();
+            Integer idUloge = user.getIdUloge();
+            result.put("name", user.getImeKorisnik() + " " + user.getPrezimeKorisnik());
+            result.put("id", userId);
+            result.put("email", email);
+            result.put("oib", user.getOib());
+
+            String role = "USER";
+            if (idUloge != null) {
+                switch (idUloge) {
+                    case 1 -> role = "ADMIN";
+                    case 2 -> role = "RACUNOVODA";
+                    case 3 -> role = "KLIJENT";
+                    case 4 -> role = "RADNIK";
                 }
             }
+            result.put("role", role);
+
+            if (idUloge != null && idUloge == 4) {
+
+                firmaRepository.findByRadnikId(userId).ifPresent(f -> {
+                    result.put("id_firme", f.getIdFirma());
+                    result.put("id_klijenta", f.getIdKlijent());
+                });
+            } else if (idUloge != null && idUloge == 3) {
+
+                firmaRepository.findByIdKlijent(userId).ifPresent(f -> {
+                    result.put("id_firme", f.getIdFirma());
+                    result.put("id_klijenta", f.getIdKlijent());
+                });
+            }
         }
-
-        Map<String, Object> result = new HashMap<>();
-        result.put("name", principal.getAttribute("name") != null ? principal.getAttribute("name") : "");
-        result.put("email", email != null ? email : "");
-        result.put("picture", principal.getAttribute("picture") != null ? principal.getAttribute("picture") : "");
-        result.put("role", role);
-        result.put("id", id);
-        result.put("oib", oib);
-
         return ResponseEntity.ok(result);
     }
 

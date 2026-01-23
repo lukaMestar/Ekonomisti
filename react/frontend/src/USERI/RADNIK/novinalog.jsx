@@ -4,10 +4,28 @@ import { useNavigate } from "react-router-dom";
 import { API_URL } from "../../config.js";
 import { apiCall } from "../../api.js";
 import { useKlijent } from "../KLIJENT/KlijentContext.jsx";
+import { useRadnik } from "./RadnikContext.jsx";
+import { useUser } from "../../UserContext.jsx";
 
 function NoviNalog() {
-   const { userId, firmaId } = useKlijent();   
-   const Navigate = useNavigate();  
+   const { user } = useUser();
+   const navigate = useNavigate(); 
+   
+   const klijentCtx = useKlijent();
+   const radnikCtx = useRadnik();
+
+   let fId, uId, kId;
+
+   if (user?.role === "KLIJENT") {
+      fId = klijentCtx?.firmaId;
+      uId = klijentCtx?.userId;
+      kId = klijentCtx?.userId; 
+   } else {
+      fId = radnikCtx?.idFirme;
+      uId = radnikCtx?.idKorisnika;
+      kId = radnikCtx?.idKlijenta;
+   }
+
    const [putniNalog, setPutniNalog] = useState({
       polaziste: "",
       odrediste: "",
@@ -19,45 +37,43 @@ function NoviNalog() {
       ostaliTroskovi: ""
    });
 
-  const handleSubmit = async (e) => {
-   e.preventDefault();
-   
-   const nalogfin = {
+   const handleSubmit = async (e) => {
+      e.preventDefault();
+      
+      const nalogfin = {
          polaziste: putniNalog.polaziste,
          odrediste: putniNalog.odrediste,
          datumPolaska: putniNalog.datumPolaska,
          datumPovratka: putniNalog.datumPovratka,
-         trosak: Number(putniNalog.troskoviSmjestaja) + Number(putniNalog.ostaliTroskovi),
+         trosak: Number(putniNalog.troskoviSmjestaja || 0) + Number(putniNalog.ostaliTroskovi || 0),
          svrhaPutovanja: putniNalog.svrhaPutovanja,
          prijevoznoSredstvo: putniNalog.prijevoznoSredstvo,
+         
          firma: {
-            idFirma: firmaId,
-            idKlijent: userId
+            idFirma: fId,
+            idKlijent: kId
          },
          zaposlenik: {
-            idKorisnika: userId
-         },
-    };
+            idKorisnika: uId
+         }
+      };
 
-   try {
+      try {
          const response = await apiCall(`${API_URL}/api/addnalog`, {
-         method: "POST",
-         headers: {
-            "Content-Type": "application/json",
-         },
-         body: JSON.stringify(nalogfin),
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(nalogfin),
          });
 
-         const responseText = await response.text();
-
          if (response.ok) {
-            alert("Nalog added successfully");
-            Navigate(-1); 
+            alert("Putni nalog uspješno spremljen!");
+            navigate(-1); 
          } else {
-            alert("Error adding nalog: " + responseText);
+            const txt = await response.text();
+            alert("Greška: " + txt);
          }
       } catch (error) {
-         alert("Error adding nalog: " + error.message);
+         alert("Greška na mreži: " + error.message);
       }
    };
 

@@ -3,11 +3,20 @@ import { API_URL } from "../../config.js";
 
 const RadnikContext = createContext();
 
-export function RadnikProvider({ children }) {
+export function RadnikProvider({ children, user }) {
   const [tvrtke, setTvrtke] = useState([]);
   const [trenutnaTvrtka, setTrenutnaTvrtka] = useState(null);
 
+
+  const idKorisnika = user?.id;
+  const idFirme = user?.id_firme;
+  const idKlijenta = user?.id_klijenta;
+  const imeKorisnik = user?.name;
+  const prezimeKorisnik = user?.prezime;
+
   useEffect(() => {
+    if (!idKorisnika) return;
+
     fetch(`${API_URL}/api/tvrtke`, {
       credentials: "include",
     })
@@ -25,16 +34,10 @@ export function RadnikProvider({ children }) {
         }
       })
       .catch((err) => {
-        if (err.message.includes("404")) {
-          console.log(
-            "API endpoint /api/tvrtke ne postoji, koriste se mock podaci"
-          );
-        } else {
-          console.warn("Greška kod dohvaćanja tvrtki:", err.message);
-        }
+        console.warn("Greška kod dohvaćanja tvrtki:", err.message);
         setTvrtke(["Tvrtka A", "Tvrtka B", "Tvrtka C"]);
       });
-  }, []);
+  }, [idKorisnika]);
 
   useEffect(() => {
     if (tvrtke.length === 1 && !trenutnaTvrtka) {
@@ -44,7 +47,17 @@ export function RadnikProvider({ children }) {
 
   return (
     <RadnikContext.Provider
-      value={{ tvrtke, setTvrtke, trenutnaTvrtka, setTrenutnaTvrtka }}
+      value={{ 
+        imeKorisnik,
+        prezimeKorisnik,
+        tvrtke, 
+        setTvrtke, 
+        trenutnaTvrtka, 
+        setTrenutnaTvrtka,
+        idFirme,
+        idKorisnika,
+        idKlijenta
+      }}
     >
       {children}
     </RadnikContext.Provider>

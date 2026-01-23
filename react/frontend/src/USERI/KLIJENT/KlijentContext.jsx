@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { API_URL } from "../../config.js";
 import { apiCall } from "../../api.js";
+import { useUser } from "../../UserContext.jsx";
 
 const KlijentContext = createContext();
 
