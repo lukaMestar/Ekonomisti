@@ -18,63 +18,60 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class OdabirFirmeTest {
 
-    @Mock
-    private JeZaposlenRepository jeZaposlenRepository;
+	@Mock
+	private JeZaposlenRepository jeZaposlenRepository;
 
-    @InjectMocks
-    private RadnikService radnikService; // Tvoj stvarni servis
+	@InjectMocks
+	private RadnikService radnikService;
 
-    @Test
-    @DisplayName("Redovni slučaj: Dohvat i mapiranje firmi u DTO za radnika")
-    public void testGetFirmeZaRadnika() {
-        // --- 1. PRIPREMA (ARRANGE) ---
-        Long idRadnika = 10L;
+	@Test
+	@DisplayName("Redovni slučaj: Dohvat i mapiranje firmi u DTO za radnika")
+	public void testGetFirmeZaRadnika() {
+		// 1. PRIPREMA
+		Long idRadnika = 10L;
 
-        // Simuliramo podatke iz baze (Entiteti)
-        Firma f1 = new Firma();
-        f1.setIdFirma(100L);
-        f1.setIdKlijent(1L);
-        f1.setNazivFirme("Eco Tech d.o.o.");
+		// Simuliramo podatke iz baze
+		Firma f1 = new Firma();
+		f1.setIdFirma(100L);
+		f1.setIdKlijent(1L);
+		f1.setNazivFirme("Eco Tech d.o.o.");
 
-        Firma f2 = new Firma();
-        f2.setIdFirma(101L);
-        f2.setIdKlijent(2L);
-        f2.setNazivFirme("Solaris j.d.o.o.");
+		Firma f2 = new Firma();
+		f2.setIdFirma(101L);
+		f2.setIdKlijent(2L);
+		f2.setNazivFirme("Solaris j.d.o.o.");
 
-        List<Firma> firmeIzBaze = Arrays.asList(f1, f2);
+		List<Firma> firmeIzBaze = Arrays.asList(f1, f2);
 
-        // Kad servis pita repozitorij, vrati listu entiteta
-        when(jeZaposlenRepository.findFirmeZaZaposlenika(idRadnika))
-                .thenReturn(firmeIzBaze);
+		// Kad servis pita repozitorij, vrati listu entiteta
+		when(jeZaposlenRepository.findFirmeZaZaposlenika(idRadnika)).thenReturn(firmeIzBaze);
 
-        // --- 2. IZVRŠAVANJE (ACT) ---
-        List<FirmaDTO> rezultat = radnikService.getFirmeZaRadnika(idRadnika);
+		// 2. IZVRŠAVANJE
+		List<FirmaDTO> rezultat = radnikService.getFirmeZaRadnika(idRadnika);
 
-        // --- 3. PROVJERA (ASSERT) ---
-        assertNotNull(rezultat);
-        assertEquals(2, rezultat.size(), "Treba vratiti 2 DTO objekta");
+		// 3. PROVJERA
+		assertNotNull(rezultat);
+		assertEquals(2, rezultat.size(), "Treba vratiti 2 DTO objekta");
 
-        // Provjera mapiranja prvog elementa
-        FirmaDTO dto1 = rezultat.get(0);
-        assertEquals(100L, dto1.idFirma()); 
-        assertEquals("Eco Tech d.o.o.", dto1.naziv());
-        
-        // Verifikacija da je repozitorij pozvan
-        verify(jeZaposlenRepository, times(1)).findFirmeZaZaposlenika(idRadnika);
-    }
+		FirmaDTO dto1 = rezultat.get(0);
+		assertEquals(100L, dto1.idFirma());
+		assertEquals("Eco Tech d.o.o.", dto1.naziv());
 
-    @Test
-    @DisplayName("Rubni slučaj: Radnik nije zaposlen nigdje (prazna lista)")
-    public void testGetFirmeZaRadnikaPrazno() {
-        // --- 1. PRIPREMA ---
-        Long idNezaposlenog = 99L;
-        when(jeZaposlenRepository.findFirmeZaZaposlenika(idNezaposlenog))
-                .thenReturn(Collections.emptyList());
+		// je li repozitorij pozvan
+		verify(jeZaposlenRepository, times(1)).findFirmeZaZaposlenika(idRadnika);
+	}
 
-        // --- 2. IZVRŠAVANJE ---
-        List<FirmaDTO> rezultat = radnikService.getFirmeZaRadnika(idNezaposlenog);
+	@Test
+	@DisplayName("Rubni slučaj: Radnik nije zaposlen nigdje")
+	public void testGetFirmeZaRadnikaPrazno() {
+		// 1. PRIPREMA
+		Long idNezaposlenog = 99L;
+		when(jeZaposlenRepository.findFirmeZaZaposlenika(idNezaposlenog)).thenReturn(Collections.emptyList());
 
-        // --- 3. PROVJERA ---
-        assertTrue(rezultat.isEmpty(), "Lista DTO-a mora biti prazna");
-    }
+		// 2. IZVRŠAVANJE
+		List<FirmaDTO> rezultat = radnikService.getFirmeZaRadnika(idNezaposlenog);
+
+		// 3. PROVJERA
+		assertTrue(rezultat.isEmpty(), "Lista DTO-a mora biti prazna");
+	}
 }

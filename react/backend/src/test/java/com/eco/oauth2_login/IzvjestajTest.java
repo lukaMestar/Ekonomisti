@@ -53,17 +53,17 @@ public class IzvjestajTest {
         when(fakturaReportService.getFaktureZaMjesec(klijentId, firmaId, mjesec))
                 .thenReturn(Collections.singletonList(f1));
 
-        // Simuliramo putne naloge
+        // putne naloge
         PutniNalog pn = new PutniNalog();
         pn.setTrosak(new BigDecimal("100.00"));
         when(putniNalogReportService.getPutniNaloziZaTekuciMjesec(firmaId, mjesec))
                 .thenReturn(Collections.singletonList(pn));
 
-        // Simuliramo trošak usluge računovođe (Rashodi: 50.00)
+        // trošak usluge računovođe (Rashodi: 50.00)
         when(racunovodaKlijentReportService.getMjesecniTrosakUsluge(klijentId))
                 .thenReturn(new BigDecimal("50.00"));
 
-        // Simuliramo plaće zaposlenika
+        // plaće zaposlenika
         Placa p = new Placa();
         p.setIznosPlace(new BigDecimal("350.00"));
         when(placaRepository.findByIdFirma(firmaId)).thenReturn(Collections.singletonList(p));
@@ -72,13 +72,13 @@ public class IzvjestajTest {
 
         assertEquals(1000.00, rezultat.getPrihodi());
 
-        // Rashodi = 100 (putni) + 50 (usluga) + 350 (placa) = 500.00
+        // Rashodi = 100 (putni) + 50 (usluga) + 350 (placa) = 500
         assertEquals(500.00, rezultat.getRashodi());
 
         // PDV = 1000 * 0.25 = 250.00
         assertEquals(250.00, rezultat.getPdv());
 
-        // Dobitak = 1000 (prihodi) - 500 (rashodi) - 250 (pdv) = 250.00
+        // Dobitak = 1000 (prihodi) - 500 (rashodi) - 250 (pdv) = 250
         assertEquals(250.00, rezultat.getDobitak());
     }
 }
