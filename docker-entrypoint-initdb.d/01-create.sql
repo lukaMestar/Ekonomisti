@@ -126,7 +126,6 @@ CREATE TABLE MjesecniRacun (
     datumGeneriranja DATE NOT NULL DEFAULT CURRENT_DATE,
     datumRoka DATE NOT NULL,
     statusPlacanja VARCHAR(20) DEFAULT 'neplaceno' CHECK (statusPlacanja IN ('neplaceno', 'placeno', 'otkazano', 'refundirano')),
-    mockPaymentId VARCHAR(255),
     stripePaymentIntentId VARCHAR(255),
     stripeCustomerId VARCHAR(255),
     datumPlacanja DATE,

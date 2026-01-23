@@ -40,9 +40,6 @@ public class MjesecniRacun {
     @Column(name = "statusplacanja", length = 20)
     private String statusPlacanja = "neplaceno";
     
-    @Column(name = "mockpaymentid", length = 255)
-    private String mockPaymentId;
-    
     @Column(name = "stripepaymentintentid", length = 255)
     private String stripePaymentIntentId;
     
@@ -133,14 +130,6 @@ public class MjesecniRacun {
     
     public void setStatusPlacanja(String statusPlacanja) {
         this.statusPlacanja = statusPlacanja;
-    }
-    
-    public String getMockPaymentId() {
-        return mockPaymentId;
-    }
-    
-    public void setMockPaymentId(String mockPaymentId) {
-        this.mockPaymentId = mockPaymentId;
     }
     
     public LocalDate getDatumPlacanja() {

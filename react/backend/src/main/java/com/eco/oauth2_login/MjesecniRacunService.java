@@ -4,7 +4,6 @@ import com.eco.oauth2_login.databaza.*;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.eco.oauth2_login.dto.MockPaymentResponse;
 import com.eco.oauth2_login.dto.PaymentIntentResponse;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
@@ -13,7 +12,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class MjesecniRacunService {
@@ -181,7 +179,7 @@ public class MjesecniRacunService {
     }
     
     /**
-     * Kreira Payment Intent za račun (Stripe ili Mock)
+     * Kreira Payment Intent za račun (Stripe)
      */
     @Transactional
     public PaymentIntentResponse kreirajPaymentIntent(Long racunId) throws StripeException {
@@ -192,12 +190,9 @@ public class MjesecniRacunService {
             throw new RuntimeException("Račun je već obrađen");
         }
         
-        // Ako Stripe nije aktiviran, koristi mock mode
+        // Provjeri da li je Stripe aktiviran
         if (!stripeService.isStripeEnabled()) {
-            String mockPaymentId = "mock_pi_" + UUID.randomUUID().toString();
-            racun.setMockPaymentId(mockPaymentId);
-            racunRepository.save(racun);
-            return new PaymentIntentResponse(mockPaymentId, "mock", "Mock payment - Stripe nije konfiguriran", true);
+            throw new RuntimeException("Stripe nije konfiguriran. Plaćanje nije moguće.");
         }
         
         // Koristi Stripe
@@ -224,11 +219,7 @@ public class MjesecniRacunService {
         );
         
         if (paymentIntent == null) {
-            // Fallback na mock ako Stripe ne radi
-            String mockPaymentId = "mock_pi_" + UUID.randomUUID().toString();
-            racun.setMockPaymentId(mockPaymentId);
-            racunRepository.save(racun);
-            return new PaymentIntentResponse(mockPaymentId, "mock", "Mock payment - Stripe error", true);
+            throw new RuntimeException("Greška pri kreiranju Payment Intent-a");
         }
         
         racun.setStripePaymentIntentId(paymentIntent.getId());
@@ -239,50 +230,6 @@ public class MjesecniRacunService {
             stripeService.getPublishableKey(),
             paymentIntent.getId()
         );
-    }
-    
-    /**
-     * Simulira plaćanje računa (MOCK - bez stvarnog Stripe-a)
-     */
-    @Transactional
-    public MockPaymentResponse simulirajPlacanje(Long racunId) {
-        MjesecniRacun racun = racunRepository.findById(racunId)
-            .orElseThrow(() -> new RuntimeException("Račun nije pronađen"));
-        
-        if (!"neplaceno".equals(racun.getStatusPlacanja())) {
-            throw new RuntimeException("Račun je već obrađen");
-        }
-        
-        // Generiraj mock payment ID
-        String mockPaymentId = "mock_pi_" + UUID.randomUUID().toString();
-        racun.setMockPaymentId(mockPaymentId);
-        
-        // Simuliraj kratku pauzu (kao da se čeka Stripe odgovor)
-        try {
-            Thread.sleep(500); // 500ms simulacija
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        
-        // Označi kao plaćeno
-        racun.setStatusPlacanja("placeno");
-        racun.setDatumPlacanja(LocalDate.now());
-        
-        // Ažuriraj financijsko stanje firme
-        Optional<Firma> firmaOpt = firmaRepository.findByIdFirmaAndIdKlijent(
-            racun.getIdFirma(), racun.getIdKlijent()
-        );
-        
-        if (firmaOpt.isPresent()) {
-            Firma firma = firmaOpt.get();
-            BigDecimal novoStanje = firma.getStanjeRacuna().subtract(racun.getIznos());
-            firma.setStanjeRacuna(novoStanje);
-            firmaRepository.save(firma);
-        }
-        
-        racunRepository.save(racun);
-        
-        return new MockPaymentResponse(mockPaymentId, "succeeded", "Plaćanje uspješno simulirano");
     }
     
     /**
@@ -317,10 +264,6 @@ public class MjesecniRacunService {
     @Transactional
     public void oznaciKaoPlacenoPoPaymentIntentId(String paymentIntentId) {
         Optional<MjesecniRacun> racunOpt = racunRepository.findByStripePaymentIntentId(paymentIntentId);
-        if (racunOpt.isEmpty()) {
-            // Pokušaj pronaći po mock payment ID
-            racunOpt = racunRepository.findByMockPaymentId(paymentIntentId);
-        }
         
         if (racunOpt.isEmpty()) {
             throw new RuntimeException("Račun nije pronađen za payment intent: " + paymentIntentId);

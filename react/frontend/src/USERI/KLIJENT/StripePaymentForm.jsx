@@ -34,7 +34,7 @@ function StripePaymentFormInner({ racunId, iznos, onSuccess, onCancel }) {
         return res.json();
       })
       .then((data) => {
-        if (data.clientSecret && data.clientSecret !== "mock") {
+        if (data.clientSecret) {
           setClientSecret(data.clientSecret);
         } else {
           setError("Greška: Payment Intent nije kreiran");
@@ -179,122 +179,35 @@ function StripePaymentFormInner({ racunId, iznos, onSuccess, onCancel }) {
   );
 }
 
-function MockPaymentForm({ racunId, iznos, onSuccess, onCancel }) {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  
-  // Osiguraj da je iznos number
-  const iznosNum = typeof iznos === 'number' ? iznos : parseFloat(iznos) || 0;
-
-  const handleMockPayment = async () => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const res = await fetch(`${API_URL}/api/placanje/plati/${racunId}`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      
-      if (res.ok) {
-        const result = await res.json();
-        alert(`Plaćanje uspješno (Mock mode) ✅\n${result.message || "Račun je označen kao plaćen"}`);
-        onSuccess();
-      } else {
-        const errorText = await res.text();
-        setError("Greška: " + errorText);
-      }
-    } catch (err) {
-      console.error("Greška:", err);
-      setError("Greška pri plaćanju");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div style={{ maxWidth: "500px", margin: "20px 0" }}>
-      <h3>Plaćanje računa (Mock Mode)</h3>
-      <p>Iznos: <strong>{iznosNum.toFixed(2)} EUR</strong></p>
-      <p style={{ fontSize: "14px", color: "#666" }}>
-        Stripe nije konfiguriran. Plaćanje će biti simulirano.
-      </p>
-      
-      {error && (
-        <div style={{ color: "red", marginBottom: "15px" }}>
-          {error}
-        </div>
-      )}
-
-      <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
-        <button
-          onClick={handleMockPayment}
-          disabled={loading}
-          style={{
-            padding: "12px 24px",
-            backgroundColor: loading ? "#ccc" : "#4CAF50",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: loading ? "not-allowed" : "pointer",
-            fontSize: "16px",
-            flex: 1,
-          }}
-        >
-          {loading ? "Obrađuje se..." : `Potvrdi plaćanje ${iznosNum.toFixed(2)} EUR`}
-        </button>
-        <button
-          onClick={onCancel}
-          disabled={loading}
-          style={{
-            padding: "12px 24px",
-            backgroundColor: "#6c757d",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: loading ? "not-allowed" : "pointer",
-            fontSize: "16px",
-          }}
-        >
-          Odustani
-        </button>
-      </div>
-    </div>
-  );
-}
-
 export default function StripePaymentForm({ racunId, iznos, onSuccess, onCancel }) {
   const [stripePromise, setStripePromise] = useState(null);
-  const [isMockMode, setIsMockMode] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Dohvati publishable key i provjeri mode
+    // Dohvati publishable key
     fetch(`${API_URL}/api/placanje/create-payment-intent/${racunId}`, {
       method: "POST",
       credentials: "include",
     })
       .then((res) => {
         if (!res.ok) {
-          throw new Error("Greška");
+          throw new Error("Greška pri dohvaćanju payment intent");
         }
         return res.json();
       })
       .then((data) => {
-        if (data.mockMode || !data.publishableKey || data.publishableKey === "mock" || data.publishableKey === "") {
-          setIsMockMode(true);
-        } else if (data.publishableKey) {
+        if (data.publishableKey) {
           // Učitaj Stripe
           const stripe = loadStripe(data.publishableKey);
           setStripePromise(stripe);
+        } else {
+          setError("Stripe nije konfiguriran. Plaćanje nije moguće.");
         }
       })
-      .catch(() => {
-        // Ako ne može dohvatiti, koristit će se mock mode
-        setIsMockMode(true);
+      .catch((err) => {
+        console.error("Greška:", err);
+        setError("Greška pri inicijalizaciji plaćanja. Stripe mora biti konfiguriran.");
       })
       .finally(() => {
         setLoading(false);
@@ -309,15 +222,25 @@ export default function StripePaymentForm({ racunId, iznos, onSuccess, onCancel 
     );
   }
 
-  // Ako je mock mode, koristi MockPaymentForm
-  if (isMockMode || !stripePromise) {
+  if (error || !stripePromise) {
     return (
-      <MockPaymentForm
-        racunId={racunId}
-        iznos={iznos}
-        onSuccess={onSuccess}
-        onCancel={onCancel}
-      />
+      <div style={{ padding: "20px", color: "red" }}>
+        <p>{error || "Stripe nije konfiguriran. Plaćanje nije moguće."}</p>
+        <button
+          onClick={onCancel}
+          style={{
+            padding: "10px 20px",
+            backgroundColor: "#6c757d",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+            marginTop: "10px",
+          }}
+        >
+          Odustani
+        </button>
+      </div>
     );
   }
 

@@ -18,8 +18,6 @@ public interface MjesecniRacunRepository extends JpaRepository<MjesecniRacun, Lo
     @Query("SELECT mr FROM MjesecniRacun mr WHERE mr.idRacunovodja = :racunovodjaId ORDER BY mr.godina DESC, mr.mjesec DESC")
     List<MjesecniRacun> findByRacunovodjaId(@Param("racunovodjaId") Long racunovodjaId);
     
-    Optional<MjesecniRacun> findByMockPaymentId(String mockPaymentId);
-    
     Optional<MjesecniRacun> findByStripePaymentIntentId(String stripePaymentIntentId);
     
     @Query("SELECT mr FROM MjesecniRacun mr WHERE mr.statusPlacanja = 'neplaceno' AND mr.datumRoka < :today")

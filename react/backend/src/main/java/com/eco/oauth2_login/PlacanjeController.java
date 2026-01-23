@@ -8,7 +8,6 @@ import com.eco.oauth2_login.databaza.Korisnik;
 import com.eco.oauth2_login.databaza.MjesecniRacun;
 import com.eco.oauth2_login.databaza.UserRepository;
 import com.eco.oauth2_login.dto.MjesecniRacunDTO;
-import com.eco.oauth2_login.dto.MockPaymentResponse;
 import com.eco.oauth2_login.dto.PaymentIntentResponse;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
@@ -70,7 +69,7 @@ public class PlacanjeController {
     }
     
     /**
-     * Kreiraj Payment Intent za račun (Stripe ili Mock)
+     * Kreiraj Payment Intent za račun (Stripe)
      */
     @PostMapping("/create-payment-intent/{racunId}")
     public ResponseEntity<PaymentIntentResponse> createPaymentIntent(
@@ -116,33 +115,7 @@ public class PlacanjeController {
             }
             
             racunService.oznaciKaoPlaceno(racunId);
-            return ResponseEntity.ok(new PaymentIntentResponse("success", "success", "Plaćanje potvrđeno", true));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-    
-    /**
-     * Simuliraj plaćanje računa (MOCK - za backward compatibility)
-     */
-    @PostMapping("/plati/{racunId}")
-    public ResponseEntity<MockPaymentResponse> platiRacun(
-        @PathVariable Long racunId,
-        @AuthenticationPrincipal OAuth2User oauthUser
-    ) {
-        try {
-            String email = oauthUser.getAttribute("email");
-            Korisnik korisnik = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Korisnik nije pronađen"));
-            
-            // Provjeri autorizaciju - samo vlasnik računa može platiti
-            MjesecniRacun racun = racunService.getRacunById(racunId);
-            if (racun == null || !racun.getIdKlijent().equals(korisnik.getIdKorisnika())) {
-                return ResponseEntity.status(403).build();
-            }
-            
-            MockPaymentResponse response = racunService.simulirajPlacanje(racunId);
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(new PaymentIntentResponse("success", "success", "success"));
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }

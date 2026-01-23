@@ -38,8 +38,7 @@ public class StripeService {
      */
     public String createOrGetCustomer(String email, String name) throws StripeException {
         if (stripeSecretKey == null || stripeSecretKey.isEmpty()) {
-            // Ako nema Stripe ključa, koristi mock
-            return "mock_customer_" + email.hashCode();
+            throw new RuntimeException("Stripe nije konfiguriran");
         }
         
         // U test mode-u, možemo kreirati novog customer-a svaki put
@@ -63,8 +62,7 @@ public class StripeService {
         String description
     ) throws StripeException {
         if (stripeSecretKey == null || stripeSecretKey.isEmpty()) {
-            // Mock mode - vraća null, service će koristiti mock plaćanje
-            return null;
+            throw new RuntimeException("Stripe nije konfiguriran");
         }
         
         // Konvertuj BigDecimal u long (Stripe koristi cente)
@@ -100,7 +98,7 @@ public class StripeService {
      */
     public String getPublishableKey() {
         if (stripePublishableKey == null || stripePublishableKey.isEmpty()) {
-            return ""; // Frontend će koristiti mock mode
+            throw new RuntimeException("Stripe publishable key nije konfiguriran");
         }
         return stripePublishableKey;
     }
