@@ -24,7 +24,7 @@ CREATE TABLE Korisnici (
     providerUserId VARCHAR(255) NOT NULL,
     datumRegistracije DATE NOT NULL DEFAULT CURRENT_DATE,
     idUloge INT REFERENCES Uloge(idUloge) ON DELETE SET NULL,
-    oib VARCHAR(11) UNIQUE CHECK (LENGTH(oib) = 11
+    oib VARCHAR(11) UNIQUE CHECK (LENGTH(oib) = 11)
 );
 
 
