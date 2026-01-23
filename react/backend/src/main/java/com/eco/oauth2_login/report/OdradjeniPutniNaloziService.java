@@ -32,6 +32,11 @@ public class OdradjeniPutniNaloziService {
     }
 
     public List<PutniNalog> odrPN(Long idFirma, Long klijentid) {
-        return odradjeniRepo.odradjeniPutniNalozi(klijentid);
+        return odradjeniRepo.odradjeniPutniNalozi(idFirma);
     }
+
+     public List<PutniNalog> odrPNRadnik(Long idFirma, Long klijentid) {
+        return odradjeniRepo.radnikOdradjeno(idFirma, klijentid);
+    }
+
 }

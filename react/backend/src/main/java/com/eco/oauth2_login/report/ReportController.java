@@ -164,6 +164,24 @@ public class ReportController {
                         .filter(pn -> !odradjeniIds.contains(pn.getIdPutniNalog()))
                         .toList();
                 }
+
+            if (idUloge == 4) { 
+                    Firma firma = firmaReportService.vratiFrimuRadnik(userId);
+                    if (firma == null) {
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                    }
+
+                    Long firmaid = firma.getIdFirma();
+                    listaOdradjenihPN = odradjeniPutniNaloziService.odrPNRadnik(firmaid, userId);
+                    System.out.println(firmaid + "hooooooooooooooooooooooooooooooooooooooooooooooooooo");
+                    listaNeodredjenihPN = putniNalogReportService.getRadnikPN(firmaid,userId);
+
+                    Set<Long> odradjeniIds = listaOdradjenihPN.stream().map(PutniNalog::getIdPutniNalog)
+                        .collect(Collectors.toSet());
+                    listaNeodredjenihPN = listaNeodredjenihPN.stream()
+                        .filter(pn -> !odradjeniIds.contains(pn.getIdPutniNalog()))
+                        .toList();
+                }
             }
         }
         Map<String, List<PutniNalog>> rezultat = new HashMap<>();

@@ -59,7 +59,10 @@ public class ReportPDFService {
 
         BigDecimal iznos = ukupanIznosFaktura.subtract(ukupanIznosMjesecnogTroska);
         //iznos = iznos.abs();
-        BigDecimal pdv = iznos.multiply(new BigDecimal("0.25"));
+        BigDecimal pdv = BigDecimal.ZERO;
+        if (iznos.doubleValue() > 0) 
+            pdv = iznos.multiply(new BigDecimal("0.25"));
+
         try {
             Document document = new Document(PageSize.A4);
             ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -119,6 +122,9 @@ public class ReportPDFService {
             document.add(new Paragraph(" "));
 
             document.add(new Paragraph("Ukupan mjesecni prihod firme: EUR " + ukupanIznosFaktura , tekst));
+            document.add(new Paragraph(" "));
+
+            document.add(new Paragraph("Ukupan mjesecni dobitak/gubitak firme: EUR " + iznos , tekst));
             document.add(new Paragraph(" "));
 
             document.add(new Paragraph("Ukupan PDV: EUR " + pdv , tekst));

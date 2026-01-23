@@ -114,8 +114,9 @@ public class ReportService {
                                                     .map(Placa::getIznosPlace)
                                                     .reduce(BigDecimal.ZERO, BigDecimal::add);
         rashodi = rashodi + mjesecniTrosak + ukupanIznosPlaca.doubleValue();
-        double pdv = prihodi * 0.25;
-
+        double pdv = 0;
+        if (prihodi - rashodi > 0)
+            pdv = prihodi * 0.25;
         return new IzvjestajDTO(prihodi, rashodi, pdv);
     }
     

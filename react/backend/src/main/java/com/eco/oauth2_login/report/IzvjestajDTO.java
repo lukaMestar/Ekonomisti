@@ -11,7 +11,7 @@ public class IzvjestajDTO {
         this.prihodi = prihodi;
         this.rashodi = rashodi;
         this.pdv = pdv;
-        this.dobitak = prihodi - rashodi - pdv;
+        this.dobitak = prihodi - rashodi;
     }
 
     public double getPrihodi() { return prihodi; }

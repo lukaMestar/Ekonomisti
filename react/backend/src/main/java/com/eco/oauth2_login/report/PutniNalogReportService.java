@@ -47,5 +47,8 @@ public class PutniNalogReportService {
         return listaNeodredjenihPN;
     }
 
+    public List<PutniNalog> getRadnikPN(long idfirma, Long idklijent){
+        return putniNalogRepository.radnikPN(idfirma, idklijent);
+    }
 
 }

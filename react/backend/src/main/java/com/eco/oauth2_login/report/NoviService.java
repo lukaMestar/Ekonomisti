@@ -9,6 +9,8 @@ import com.eco.oauth2_login.MjesecniRacunService;
 import com.eco.oauth2_login.databaza.Korisnik;
 import com.eco.oauth2_login.databaza.KorisnikRepository;
 import com.eco.oauth2_login.databaza.MjesecniRacun;
+import com.eco.oauth2_login.databaza.Placa;
+import com.eco.oauth2_login.databaza.PlacaRepository;
 import com.eco.oauth2_login.databaza.Zaposlenik;
 import com.eco.oauth2_login.databaza.ZaposlenikDTO;
 
@@ -17,13 +19,15 @@ public class NoviService {
     private final KorisnikRepository korisnikRepository;
     private final MjesecniRacunService mjesecniRacunService;
     private final JeZaposlenService jeZaposlenService;
+    private final PlacaRepository placaRepository;
 
     @Autowired
     public NoviService(KorisnikRepository korisnikRepository, MjesecniRacunService mjesecniRacunService,
-            JeZaposlenService jeZaposlenService) {
+            JeZaposlenService jeZaposlenService, PlacaRepository placaRepository) {
         this.korisnikRepository = korisnikRepository;
         this.mjesecniRacunService = mjesecniRacunService;
         this.jeZaposlenService = jeZaposlenService;
+        this.placaRepository = placaRepository;
     }
 
     public List<ZaposlenikDTO> popisZaposlenika(Long klijentID, Long firmaId) {
@@ -35,9 +39,11 @@ public class NoviService {
             Korisnik kor = korisnikRepository.findById(idZap)
                     .orElseThrow(() -> new RuntimeException("Korisnik ne postoji"));
 
+            Placa zapPlaca = placaRepository.findPlace(idZap, firmaId);
+
             zap.setImeZaposlenik(kor.getImeKorisnik() + " " + kor.getPrezimeKorisnik());
             zap.setIdKorisnika(idZap);
-            zap.setPlaca(z.getPlaca());
+            zap.setPlaca(zapPlaca.getIznosPlace());
             listaDTO.add(zap);
         }
         return listaDTO;

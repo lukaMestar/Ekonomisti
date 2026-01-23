@@ -18,6 +18,7 @@ function Nalog() {
         const fRes = await apiCall(`${API_URL}/api/izvjestaj/listaPN`);
         if (fRes.ok) {
           const fakturData = await fRes.json();
+          console.log(fakturData)
           setPutniNalozi(fakturData.odradjeni ?? []);
           setPutniNaloziNeodradjeni(fakturData.neodradjeni ?? []);
         }
@@ -59,7 +60,7 @@ function Nalog() {
           <p> Odradjeni putni nalozi</p>
            {(PN ??[]).map(nalozi => (
             <li key={nalozi.idPutniNalog}>
-              {nalozi.odrediste || "Putni nalog"} : {nalozi.trosak || "Nepoznato"}
+             Datum izadavanja- {nalozi.datumIzdavanja} || Prijevozno sredstvo-{nalozi.prijevoznoSredstvo} || Svrha putovanja-{nalozi.svrhaPutovanja || "Svrha putovanja"}|| Trosak: {nalozi.trosak || "Nepoznato"}
             </li>
           ))}
         </ul>
@@ -73,7 +74,7 @@ function Nalog() {
           <p> Neodradjeni putni nalozi </p>
            {(PNN ?? []).map(nalozi => (
             <li key={nalozi.idPutniNalog}>
-              {nalozi.odrediste || "Putni nalog"} : {nalozi.trosak || "Nepoznato"}
+              Datum izadavanja- {nalozi.datumIzdavanja} || Prijevozno sredstvo-{nalozi.prijevoznoSredstvo} || Svrha putovanja-{nalozi.svrhaPutovanja || "Svrha putovanja"}|| Trosak: {nalozi.trosak || "Nepoznato"}
             </li>
           ))}
         </ul>

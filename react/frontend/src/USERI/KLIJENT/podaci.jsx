@@ -24,6 +24,7 @@ function Podaci() {
               <tr style={{ backgroundColor: "#f2f2f2" }}>
                 <th>Ime zaposlenika</th>
                 <th>Plaća (€)</th>
+                <th>Status zaposlenosti</th>
               </tr>
             </thead>
             <tbody>
@@ -31,6 +32,7 @@ function Podaci() {
                 <tr key={z.idKorisnika}>
                   <td>{z.imeZaposlenik || "Ime nije dostupno"}</td>
                   <td>{z.placa ? `${z.placa} €` : "N/A"}</td>
+                  <td>zaposlen</td>
                 </tr>
               ))}
             </tbody>

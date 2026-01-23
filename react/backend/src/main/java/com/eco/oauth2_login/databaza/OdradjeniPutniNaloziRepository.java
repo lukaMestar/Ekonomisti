@@ -21,4 +21,17 @@ public interface OdradjeniPutniNaloziRepository
         WHERE opn.idFirma = :idFirma
     """)
     List<PutniNalog> odradjeniPutniNalozi(@Param("idFirma") Long idFirma);
+
+
+    @Query("""
+        SELECT pn
+        FROM OdradjeniPutniNalozi opn
+        JOIN opn.putniNalog pn
+        WHERE opn.idFirma = :idFirma
+        AND  opn.idKlijent = :idKlijent
+    """)
+    List<PutniNalog> radnikOdradjeno(@Param("idFirma") Long idFirma, @Param("idKlijent") Long idKlijent );
+
+
+
 }

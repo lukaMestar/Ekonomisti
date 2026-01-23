@@ -21,4 +21,7 @@ public class FirmaReportService {
         return firmaRepository.findByIdKlijent(klijentID).orElseThrow(() -> new RuntimeException("Firma ne postoji"));
     }
     
+    public Firma vratiFrimuRadnik(Long klijentID){
+        return firmaRepository.findByRadnikId(klijentID).orElseThrow(() -> new RuntimeException("Firma ne postoji"));
+    }
 }

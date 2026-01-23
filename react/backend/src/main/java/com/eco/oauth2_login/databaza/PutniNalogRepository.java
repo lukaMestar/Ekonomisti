@@ -31,5 +31,11 @@ public interface PutniNalogRepository extends JpaRepository<PutniNalog, Long> {
     """) 
         List<PutniNalog> findSvePutneNaloge( @Param("idFirma") Long idFirma );
 
-        
+    @Query(""" 
+        SELECT pn
+        FROM PutniNalog pn
+        WHERE pn.firma.idFirma = :idFirma 
+        AND pn.zaposlenik.idKorisnika  = :idZaposlenik 
+    """) 
+        List<PutniNalog> radnikPN( @Param("idFirma") Long idFirma, @Param("idZaposlenik") Long idZaposlenik );
 }
