@@ -7,10 +7,9 @@ export function RadnikProvider({ children, user }) {
   const [tvrtke, setTvrtke] = useState([]);
   const [trenutnaTvrtka, setTrenutnaTvrtka] = useState(null);
 
-
   const idKorisnika = user?.id;
-  const idFirme = user?.id_firme;
-  const idKlijenta = user?.id_klijenta;
+  const idFirme = trenutnaTvrtka ? trenutnaTvrtka.idFirma : user?.id_firme;
+  const idKlijenta = trenutnaTvrtka ? trenutnaTvrtka.idKlijent : user?.id_klijenta;
   const imeKorisnik = user?.name;
   const prezimeKorisnik = user?.prezime;
 
@@ -39,11 +38,7 @@ export function RadnikProvider({ children, user }) {
       });
   }, [idKorisnika]);
 
-  useEffect(() => {
-    if (tvrtke.length === 1 && !trenutnaTvrtka) {
-      setTrenutnaTvrtka(tvrtke[0]);
-    }
-  }, [tvrtke, trenutnaTvrtka]);
+  
 
   return (
     <RadnikContext.Provider

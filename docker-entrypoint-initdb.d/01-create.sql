@@ -210,14 +210,10 @@ EXECUTE FUNCTION sync_racunovodja_role();
 CREATE OR REPLACE FUNCTION sync_to_zaposlenik()
 RETURNS TRIGGER AS $$
 BEGIN
-    -- Ako je korisnik Klijent (3) ILI Radnik (4), mora biti u tablici Zaposlenik
     IF NEW.idUloge IN (3, 4) THEN
         INSERT INTO Zaposlenik(idKorisnika, placa)
         VALUES (NEW.idKorisnika, 0.00)
         ON CONFLICT (idKorisnika) DO NOTHING;
-    ELSE
-        -- Ako mu se uloga promijeni u nešto drugo, brišemo ga iz zaposlenika
-        DELETE FROM Zaposlenik WHERE idKorisnika = NEW.idKorisnika;
     END IF;
     RETURN NEW;
 END;

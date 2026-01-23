@@ -41,9 +41,17 @@ public class AddNalogService {
                 .findByIdFirmaAndIdKlijent(idFirma, idKlijent)
                 .orElseThrow(() -> new RuntimeException("Firma not found"));
 
-        Zaposlenik zaposlenik = zaposlenikRepository
-                .findByIdKorisnika(idZaposlenika)
-                .orElseThrow(() -> new RuntimeException("Zaposlenik not found"));
+        Zaposlenik zaposlenik = zaposlenikRepository.findByIdKorisnika(idZaposlenika).orElse(null);
+
+        if (zaposlenik == null) {
+            if (idZaposlenika.equals(idKlijent)) {
+                req.setZaposlenik(null);
+            } else {
+                throw new RuntimeException("Zaposlenik not found and ID does not match Klijent");
+            }
+        } else {
+            req.setZaposlenik(zaposlenik);
+        }
 
         req.setFirma(firma);
         req.setZaposlenik(zaposlenik);

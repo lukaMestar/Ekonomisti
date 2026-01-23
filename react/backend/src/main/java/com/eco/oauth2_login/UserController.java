@@ -64,6 +64,8 @@ public class UserController {
             Long userId = user.getIdKorisnika();
             Integer idUloge = user.getIdUloge();
             result.put("name", user.getImeKorisnik() + " " + user.getPrezimeKorisnik());
+            result.put("ime", user.getImeKorisnik());
+            result.put("prezime", user.getPrezimeKorisnik());
             result.put("id", userId);
             result.put("email", email);
             result.put("oib", user.getOib());
@@ -80,13 +82,11 @@ public class UserController {
             result.put("role", role);
 
             if (idUloge != null && idUloge == 4) {
-
                 firmaRepository.findByRadnikId(userId).ifPresent(f -> {
                     result.put("id_firme", f.getIdFirma());
                     result.put("id_klijenta", f.getIdKlijent());
                 });
             } else if (idUloge != null && idUloge == 3) {
-
                 firmaRepository.findByIdKlijent(userId).ifPresent(f -> {
                     result.put("id_firme", f.getIdFirma());
                     result.put("id_klijenta", f.getIdKlijent());
@@ -120,7 +120,6 @@ public class UserController {
                 Integer idUloge = user.getIdUloge();
                 userId = user.getIdKorisnika();
 
-                // Determine role
                 if (idUloge != null) {
                     switch (idUloge) {
                         case 1 -> role = "ADMIN";
@@ -133,7 +132,6 @@ public class UserController {
 
                 if (idUloge != null && idUloge == 3) {
                     Optional<Firma> firmaOptional = firmaRepository.findByIdKlijent(userId);
-                    System.out.println("WTF DAJ MI NESTO ZAS NE RADISSSS...................................");
                     firmaId = firmaOptional.map(Firma::getIdFirma).orElse(null);
                     nazivFirme = firmaOptional.map(Firma::getNazivFirme).orElse(null);
                     stanjeRacuna = firmaOptional.map(Firma::getStanjeRacuna).orElse(null);
@@ -143,7 +141,6 @@ public class UserController {
             }
         }
 
-        // Build response
         Map<String, Object> result = new HashMap<>();
         result.put("name", principal.getAttribute("name") != null ? principal.getAttribute("name") : "");
         result.put("email", email != null ? email : "");
