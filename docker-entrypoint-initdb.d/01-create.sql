@@ -23,7 +23,8 @@ CREATE TABLE Korisnici (
     provider VARCHAR(255),
     providerUserId VARCHAR(255) NOT NULL,
     datumRegistracije DATE NOT NULL DEFAULT CURRENT_DATE,
-    idUloge INT REFERENCES Uloge(idUloge) ON DELETE SET NULL
+    idUloge INT REFERENCES Uloge(idUloge) ON DELETE SET NULL,
+    oib VARCHAR(11) UNIQUE CHECK (LENGTH(oib) = 11)
 );
 
 
@@ -80,6 +81,7 @@ CREATE TABLE Faktura (
     tipFakture VARCHAR(50) CHECK (tipFakture IN ('prihod', 'rashod')) NOT NULL,
     idFirma INT,
     idKlijent INT,
+    odradena BOOLEAN NOT NULL DEFAULT FALSE,
     FOREIGN KEY (idFirma, idKlijent)
         REFERENCES Firma(idFirma, idKlijent)
         ON DELETE CASCADE

@@ -41,6 +41,7 @@ public class AddFakturaService {
         f.setOpis(req.getOpis());
         f.setTipFakture(req.getTipFakture());
         f.setFirma(firma);
+        f.setOdradena(false);
 
         fakturaRepository.save(f);
     }

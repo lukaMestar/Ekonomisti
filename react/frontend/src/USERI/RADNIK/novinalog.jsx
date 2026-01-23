@@ -3,10 +3,10 @@ import "./radnik.css";
 import { useNavigate } from "react-router-dom";
 import { API_URL } from "../../config.js";
 import { apiCall } from "../../api.js";
+import { useKlijent } from "../KLIJENT/KlijentContext.jsx";
 
 function NoviNalog() {
-
-
+   const { userId, firmaId } = useKlijent();   
    const Navigate = useNavigate();  
    const [putniNalog, setPutniNalog] = useState({
       polaziste: "",
@@ -21,22 +21,24 @@ function NoviNalog() {
 
   const handleSubmit = async (e) => {
    e.preventDefault();
+   
    const nalogfin = {
          polaziste: putniNalog.polaziste,
          odrediste: putniNalog.odrediste,
          datumPolaska: putniNalog.datumPolaska,
          datumPovratka: putniNalog.datumPovratka,
-         trosak: putniNalog.troskoviSmjestaja + putniNalog.ostaliTroskovi,
+         trosak: Number(putniNalog.troskoviSmjestaja) + Number(putniNalog.ostaliTroskovi),
          svrhaPutovanja: putniNalog.svrhaPutovanja,
          prijevoznoSredstvo: putniNalog.prijevoznoSredstvo,
          firma: {
-            idFirma: 1,
-            idKlijent: 1
+            idFirma: firmaId,
+            idKlijent: userId
          },
          zaposlenik: {
-            idKorisnika: 1
+            idKorisnika: userId
          },
     };
+
    try {
          const response = await apiCall(`${API_URL}/api/addnalog`, {
          method: "POST",
@@ -49,10 +51,10 @@ function NoviNalog() {
          const responseText = await response.text();
 
          if (response.ok) {
-         alert("Nalog added successfully");
-         
+            alert("Nalog added successfully");
+            Navigate(-1); 
          } else {
-         alert("Error adding nalog: " + responseText);
+            alert("Error adding nalog: " + responseText);
          }
       } catch (error) {
          alert("Error adding nalog: " + error.message);

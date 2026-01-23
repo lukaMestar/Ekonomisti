@@ -35,10 +35,10 @@ public class Korisnik {
     private LocalDate datumRegistracije;
 
     @Column(name = "idUloge")
-    private Integer idUloge; // Možeš ovo zamijeniti s @ManyToOne ako imaš entitet Uloga
+    private Integer idUloge;
 
     public Korisnik() {
-        this.datumRegistracije = LocalDate.now(); // default vrijednost
+        this.datumRegistracije = LocalDate.now();
     }
 
     public Korisnik(String imeKorisnik, String prezimeKorisnik, String email, String provider,
@@ -50,6 +50,17 @@ public class Korisnik {
         this.providerUserId = providerUserId;
         this.datumRegistracije = LocalDate.now();
         this.idUloge = idUloge;
+    }
+
+    @Column(name = "oib", unique = true, length = 11)
+    private String oib;
+
+    public String getOib() {
+        return oib;
+    }
+
+    public void setOib(String oib) {
+        this.oib = oib;
     }
 
     // Getteri i setteri

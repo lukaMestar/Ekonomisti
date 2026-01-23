@@ -32,7 +32,7 @@ import com.eco.oauth2_login.databaza.UserRepository;
 import com.eco.oauth2_login.dto.KlijentDTO;
 
 @RestController
-@CrossOrigin(origins = {"${FRONTEND_URL:http://localhost:5173}", "http://localhost:5173"}, allowCredentials = "true")
+@CrossOrigin(origins = { "${FRONTEND_URL:http://localhost:5173}", "http://localhost:5173" }, allowCredentials = "true")
 public class UserController {
 
     private final UserRepository userRepository;
@@ -41,9 +41,9 @@ public class UserController {
     private final RacunovodaKlijentRepository racunovodaKlijentRepository;
 
     @Autowired
-    public UserController(UserRepository userRepository, FirmaRepository firmaRepository, StatusOdradjenosti statusOdradjenosti,
-        RacunovodaKlijentRepository racunovodaKlijentRepository
-    ) {
+    public UserController(UserRepository userRepository, FirmaRepository firmaRepository,
+            StatusOdradjenosti statusOdradjenosti,
+            RacunovodaKlijentRepository racunovodaKlijentRepository) {
         this.userRepository = userRepository;
         this.firmaRepository = firmaRepository;
         this.statusOdradjenosti = statusOdradjenosti;
@@ -51,23 +51,25 @@ public class UserController {
     }
 
     @GetMapping("/api/user")
-    public ResponseEntity<Map<String, Object>> user(@AuthenticationPrincipal OAuth2User principal, HttpServletRequest request) {
+    public ResponseEntity<Map<String, Object>> user(@AuthenticationPrincipal OAuth2User principal,
+            HttpServletRequest request) {
         if (principal == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(Map.of("error", "User not authenticated"));
+                    .body(Map.of("error", "User not authenticated"));
         }
-        
+
         String email = principal.getAttribute("email");
         String role = "USER";
         Long id = 0L;
-        
+        String oib = null;
         if (email != null) {
             Optional<Korisnik> userOptional = userRepository.findByEmail(email);
-            
+
             if (userOptional.isPresent()) {
                 Korisnik user = userOptional.get();
                 Integer idUloge = user.getIdUloge();
                 id = user.getIdKorisnika();
+                oib = user.getOib() != null ? (user.getOib()) : null;
                 if (idUloge != null) {
                     switch (idUloge) {
                         case 1 -> role = "ADMIN";
@@ -79,29 +81,30 @@ public class UserController {
                 }
             }
         }
-        
+
         Map<String, Object> result = new HashMap<>();
         result.put("name", principal.getAttribute("name") != null ? principal.getAttribute("name") : "");
         result.put("email", email != null ? email : "");
         result.put("picture", principal.getAttribute("picture") != null ? principal.getAttribute("picture") : "");
         result.put("role", role);
-        if(id!=0){
-            result.put("id", id);
-        }
-        
+        result.put("id", id);
+        result.put("oib", oib);
+
         return ResponseEntity.ok(result);
     }
+
     @GetMapping("/api/klijent")
-    public ResponseEntity<Map<String, Object>> klijent(@AuthenticationPrincipal OAuth2User principal, HttpServletRequest request) {
+    public ResponseEntity<Map<String, Object>> klijent(@AuthenticationPrincipal OAuth2User principal,
+            HttpServletRequest request) {
         if (principal == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(Map.of("error", "User not authenticated"));
+                    .body(Map.of("error", "User not authenticated"));
         }
 
         String email = principal.getAttribute("email");
         String role = "USER";
         Long userId = 0L;
-        Long firmaId = null; 
+        Long firmaId = null;
         String nazivFirme = null;
         BigDecimal stanjeRacuna = null;
         String emailIzvjestaj = null;
@@ -125,8 +128,7 @@ public class UserController {
                     }
                 }
 
-                
-                if (idUloge != null && idUloge == 3) { 
+                if (idUloge != null && idUloge == 3) {
                     Optional<Firma> firmaOptional = firmaRepository.findByIdKlijent(userId);
                     System.out.println("WTF DAJ MI NESTO ZAS NE RADISSSS...................................");
                     firmaId = firmaOptional.map(Firma::getIdFirma).orElse(null);
@@ -144,15 +146,19 @@ public class UserController {
         result.put("email", email != null ? email : "");
         result.put("picture", principal.getAttribute("picture") != null ? principal.getAttribute("picture") : "");
         result.put("role", role);
-        if (userId != 0) result.put("id", userId);
-        if (firmaId != null) result.put("firmaId", firmaId);
-        if (nazivFirme != null) result.put("nazivFirme", nazivFirme);
-        if (stanjeRacuna != null) result.put("stanjeRacuna", stanjeRacuna);
-        if (emailIzvjestaj != null) result.put("emailIzvjestaj", emailIzvjestaj);
+        if (userId != 0)
+            result.put("id", userId);
+        if (firmaId != null)
+            result.put("firmaId", firmaId);
+        if (nazivFirme != null)
+            result.put("nazivFirme", nazivFirme);
+        if (stanjeRacuna != null)
+            result.put("stanjeRacuna", stanjeRacuna);
+        if (emailIzvjestaj != null)
+            result.put("emailIzvjestaj", emailIzvjestaj);
 
         return ResponseEntity.ok(result);
     }
-
 
     @PostMapping("/api/gumbOdradjeno/{id}")
     public ResponseEntity<Void> promijeniStatus(@PathVariable Long id) {
@@ -170,10 +176,9 @@ public class UserController {
         String email = principal.getAttribute("email");
 
         Long userId = 0L;
-        
+
         if (email != null) {
             Optional<Korisnik> userOptional = userRepository.findByEmail(email);
-            
 
             if (userOptional.isPresent()) {
                 Korisnik user = userOptional.get();
@@ -181,7 +186,7 @@ public class UserController {
                 userId = user.getIdKorisnika();
 
                 List<KlijentDTO> listaKljenata = racunovodaKlijentRepository.findKlijentiByRacunovodjaId(userId);
-                for (KlijentDTO k : listaKljenata){
+                for (KlijentDTO k : listaKljenata) {
                     Long id = k.getId();
                     boolean ima = statusOdradjenosti.trebaAzurirat(id);
                     rezultat.put(id, ima);

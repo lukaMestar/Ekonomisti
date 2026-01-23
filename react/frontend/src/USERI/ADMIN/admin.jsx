@@ -93,6 +93,7 @@ function Admin() {
             <p>
               <strong>Email:</strong> {user.email}
             </p>
+            <p><strong>OIB:</strong> {user.oib || "Nije unesen"}</p>
           </div>
           {user.picture && (
             <div className="info-card">

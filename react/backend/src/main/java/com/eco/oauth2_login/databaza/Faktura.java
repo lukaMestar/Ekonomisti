@@ -28,18 +28,26 @@ public class Faktura {
     @Column(name = "tipfakture", nullable = false, length = 50)
     private String tipFakture; // 'prihod' ili 'rashod'
 
+    @Column(name = "odradena", nullable = false)
+    private Boolean odradena = false;
+
+    public Boolean getOdradena() {
+        return odradena;
+    }
+
+    public void setOdradena(Boolean odradena) {
+        this.odradena = odradena;
+    }
 
     @ManyToOne(optional = false)
     @JoinColumns({
-        @JoinColumn(name = "idfirma", referencedColumnName = "idfirma"),
-        @JoinColumn(name = "idklijent", referencedColumnName = "idklijent")
+            @JoinColumn(name = "idfirma", referencedColumnName = "idfirma"),
+            @JoinColumn(name = "idklijent", referencedColumnName = "idklijent")
     })
     private Firma firma;
 
-   
     public Faktura() {
     }
-
 
     public Long getIdFaktura() {
         return idFaktura;

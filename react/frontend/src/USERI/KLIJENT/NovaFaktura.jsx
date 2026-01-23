@@ -52,7 +52,7 @@ function NovaFaktura() {
       } else {
         const errText = await firmaResponse.text();
         alert("Nije moguće dohvatiti firmu: " + errText);
-        return; // prekini, jer idFirma je potreban
+        return;
       }
     } catch (error) {
       alert("Greška pri dohvaćanju firme: " + error.message);
@@ -66,7 +66,8 @@ function NovaFaktura() {
       opis: faktura.napomene,
       tipFakture: "prihod",
       idFirma: firmaId,
-      idKlijent: klijentId
+      idKlijent: klijentId,
+      odradena: false,
     };
     try {
       const response = await apiCall(`${API_URL}/api/addfaktura`, {
