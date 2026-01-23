@@ -78,7 +78,7 @@ public class IzvjestajTest {
         // PDV = 1000 * 0.25 = 250.00
         assertEquals(250.00, rezultat.getPdv());
 
-        // Dobitak = 1000 (prihodi) - 500 (rashodi) - 250 (pdv) = 250
-        assertEquals(250.00, rezultat.getDobitak());
+        // Dobitak = 1000 (prihodi) - 500 (rashodi) = 500
+        assertEquals(500.00, rezultat.getDobitak());
     }
 }
